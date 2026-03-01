@@ -1,0 +1,36 @@
+{
+  "id": 1,
+  "nome": "Ana Beatriz Silva",
+  "email": "ana.silva@example.com",
+  "senha": "Senha@123",
+  "cpf": "123.456.789-00",
+  "dataNascimento": "1995-06-15",
+  "genero": "FEMININO",
+  "telefone": "(11) 98765-4321",
+  "ativo": true,
+  "roles": ["ROLE_CLIENTE"],
+  "enderecos": [
+    {
+      "id": 1,
+      "logradouro": "Rua das Flores",
+      "numero": "123",
+      "complemento": "Apto 4B",
+      "bairro": "Centro",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "01310-100",
+      "principal": true
+    }
+  ],
+  "cartoes": [
+    {
+      "id": 1,
+      "nomeTitular": "ANA B SILVA",
+      "numeroMascarado": "**** **** **** 1234",
+      "bandeira": "VISA",
+      "mesExpiracao": 12,
+      "anoExpiracao": 2028,
+      "principal": true
+    }
+  ]
+}
