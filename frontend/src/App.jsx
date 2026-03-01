@@ -7,6 +7,7 @@ import Header from './components/common/Header';
 import Footer from './components/common/Footer';
 import ErrorBoundary from './components/common/ErrorBoundary';
 import LoadingSpinner from './components/common/LoadingSpinner';
+import ChatbotWidget from './components/common/ChatbotWidget';
 import ProtectedRoute from './components/auth/ProtectedRoute';
 import { ROUTES } from './utils/constants';
 
@@ -143,6 +144,7 @@ function App() {
                 </main>
                 <Footer />
               </div>
+              <ChatbotWidget />
             </ErrorBoundary>
           </NotificationProvider>
         </CartProvider>
