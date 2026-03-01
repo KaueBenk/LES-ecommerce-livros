@@ -5,29 +5,30 @@ import api from './api';
  */
 const cartService = {
   getCart: async () => {
-    const response = await api.get('/cart');
+    const response = await api.get('/carrinho');
     return response.data.data;
   },
 
-  addItem: async (bookId, quantity) => {
-    const response = await api.post('/cart/items', { livrId: bookId, quantidade: quantity });
+  addItem: async (livroId, quantity) => {
+    const response = await api.post('/carrinho/itens', { livroId, quantidade: quantity });
     return response.data.data;
   },
 
-  updateItem: async (bookId, quantity) => {
-    const response = await api.put(`/cart/items/${bookId}`, { quantidade: quantity });
+  updateItem: async (itemId, quantity) => {
+    const response = await api.put(`/carrinho/itens/${itemId}`, { quantidade: quantity });
     return response.data.data;
   },
 
-  removeItem: async (bookId) => {
-    const response = await api.delete(`/cart/items/${bookId}`);
+  removeItem: async (itemId) => {
+    const response = await api.delete(`/carrinho/itens/${itemId}`);
     return response.data;
   },
 
   clearCart: async () => {
-    const response = await api.delete('/cart');
+    const response = await api.delete('/carrinho');
     return response.data;
   },
 };
 
 export default cartService;
+

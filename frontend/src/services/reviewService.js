@@ -5,27 +5,27 @@ import api from './api';
  */
 const reviewService = {
   getReviews: async (bookId, params = {}) => {
-    const response = await api.get(`/books/${bookId}/reviews`, { params });
+    const response = await api.get(`/livros/${bookId}/avaliacoes`, { params });
     return response.data.data;
   },
 
   submitReview: async (bookId, reviewData) => {
-    const response = await api.post(`/books/${bookId}/reviews`, reviewData);
-    return response.data.data;
+    const response = await api.post(`/livros/${bookId}/avaliacoes`, reviewData);
+    return response.data;
   },
 
   getPendingReviews: async (params = {}) => {
-    const response = await api.get('/admin/reviews/pending', { params });
+    const response = await api.get('/admin/avaliacoes/pendentes', { params });
     return response.data.data;
   },
 
   approveReview: async (reviewId) => {
-    const response = await api.put(`/admin/reviews/${reviewId}/approve`);
+    const response = await api.put(`/admin/avaliacoes/${reviewId}/aprovar`);
     return response.data;
   },
 
   rejectReview: async (reviewId, reason) => {
-    const response = await api.put(`/admin/reviews/${reviewId}/reject`, { reason });
+    const response = await api.put(`/admin/avaliacoes/${reviewId}/rejeitar`, { reason });
     return response.data;
   },
 };
