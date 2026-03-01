@@ -103,6 +103,22 @@ const adminService = {
     return response.data;
   },
 
+  // ── Exchanges ────────────────────────────────────────────────────────────
+  getExchanges: async (params = {}) => {
+    const response = await api.get('/admin/trocas', { params });
+    return response.data.data;
+  },
+
+  authorizeExchange: async (exchangeId) => {
+    const response = await api.patch(`/admin/trocas/${exchangeId}/autorizar`);
+    return response.data;
+  },
+
+  confirmExchangeReceipt: async (exchangeId, payload) => {
+    const response = await api.patch(`/admin/trocas/${exchangeId}/confirmar-recebimento`, payload);
+    return response.data;
+  },
+
   /**
    * Suppliers — no dedicated listing endpoint in the API contract.
    * Falls back to an empty array if the endpoint doesn't exist.

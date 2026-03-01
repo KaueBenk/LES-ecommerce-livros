@@ -10,6 +10,7 @@ import BookFormPage from './BookFormPage';
 import StockEntryPage from './StockEntryPage';
 import LogisticsPage from './LogisticsPage';
 import ClientSearchAdmin from '../components/admin/ClientSearchAdmin';
+import ExchangeWorkflow from '../components/admin/ExchangeWorkflow';
 
 // ─── Justification Modal (Ativar / Inativar) ──────────────────────────────────
 
@@ -572,6 +573,23 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="col-md-4">
+          <div className="card h-100 border-danger">
+            <div className="card-body d-flex flex-column">
+              <h5 className="card-title">🔄 Trocas</h5>
+              <p className="card-text text-muted small flex-grow-1">
+                Autorizar e confirmar recebimento de trocas.
+              </p>
+              <Link
+                to="/admin/trocas"
+                className="btn btn-danger btn-sm mt-2"
+                data-testid="admin-nav-exchanges"
+              >
+                Gerenciar Trocas
+              </Link>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
           <div className="card h-100 border-success">
             <div className="card-body d-flex flex-column">
               <h5 className="card-title">📥 Estoque</h5>
@@ -610,6 +628,7 @@ const AdminPage = () => (
       <Route path="estoque/entrada" element={<StockEntryPage />} />
       <Route path="logistica" element={<LogisticsPage />} />
       <Route path="clientes" element={<ClientSearchAdmin />} />
+      <Route path="trocas" element={<ExchangeWorkflow />} />
     </Routes>
   </div>
 );
