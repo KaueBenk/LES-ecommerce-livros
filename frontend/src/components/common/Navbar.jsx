@@ -4,6 +4,7 @@ import { useAuth } from '../../store/authContext';
 import { useCart } from '../../store/cartContext';
 import { ROUTES } from '../../utils/constants';
 import { getInitials } from '../../utils/helpers';
+import NotificationBell from './NotificationBell';
 
 /**
  * Navbar
@@ -97,6 +98,9 @@ const Navbar = () => {
                 </span>
               )}
             </Link>
+
+            {/* Notification bell — authenticated users only */}
+            {isAuthenticated && <NotificationBell />}
 
             {/* Auth buttons */}
             {isAuthenticated ? (
