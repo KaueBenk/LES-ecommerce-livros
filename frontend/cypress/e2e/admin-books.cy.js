@@ -39,18 +39,18 @@ const mockBooks = [
     ...livroFixture,
     id: 1,
     titulo: 'Dom Casmurro',
-    autor: 'Machado de Assis',
+    autor: { id: 1, nome: 'Machado de Assis' },
     ativo: true,
-    precoVenda: 35.91,
+    valorVenda: 35.91,
     estoque: 50,
   },
   {
     ...livroFixture,
     id: 2,
     titulo: 'O Cortiço',
-    autor: 'Aluísio Azevedo',
+    autor: { id: 2, nome: 'Aluísio Azevedo' },
     ativo: false,
-    precoVenda: 29.90,
+    valorVenda: 29.90,
     estoque: 0,
   },
 ];
@@ -86,7 +86,7 @@ const mockFormDependencies = () => {
     statusCode: 200,
     body: {
       data: [
-        { id: 1, nome: 'Padrão', margemMinima: 10, margemMaxima: 50 },
+        { id: 1, nome: 'Padrão', margemLucro: 30 },
       ],
     },
   }).as('getGrupos');
@@ -341,7 +341,7 @@ describe('Create Book', () => {
         cy.get('[data-testid="field-grupoPrecificacaoId"]').then(($el) => {
           if ($el.find('option').length > 1) cy.wrap($el).select('1');
         });
-        cy.get('[data-testid="field-precoVenda"]').clear().type('30');
+        cy.get('[data-testid="field-valorVenda"]').clear().type('30');
         cy.get('[data-testid="book-form-submit-btn"]').click();
         cy.wait('@createBook');
         cy.url().should('include', '/admin/livros');

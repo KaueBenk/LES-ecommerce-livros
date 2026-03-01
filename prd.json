@@ -728,7 +728,8 @@
         "Polling every 30sec syncs with backend",
         "UI updates reflect backend state changes",
         "Multiple items with different expiration times",
-        "All tests pass when run with npm run test:e2e against mock API responses"
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"
       ],
       "priority": 8
     },
@@ -746,7 +747,8 @@
         "Submit review: stars, text → POST → success message",
         "Admin moderation: pending reviews → approve/reject → status updates",
         "Approved reviews appear in book detail page",
-        "All tests pass when run with npm run test:e2e against mock API responses"
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"
       ],
       "priority": 8
     },
@@ -766,7 +768,8 @@
         "Tab switching between views works",
         "Mock API responses with realistic data",
         "Export/download options (if implemented)",
-        "All tests pass when run with npm run test:e2e against mock API responses"
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"        
       ],
       "priority": 8
     },
@@ -780,7 +783,8 @@
         "All tests pass against mock API responses",
         "Commit message follows conventional format",
         "Test coverage spans all 37 features",
-        "All tests pass when run with npm run test:e2e against mock API responses"
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"
       ],
       "priority": 8
     },
@@ -799,7 +803,8 @@
         "Code review checklist",
         "Clear and accessible language",
         "All tests pass when run with npm run test:e2e against mock API responses",
-        "Frontend is running using docker"
+        "Frontend is running using docker",
+        "Run all tests before complete"
       ],
       "priority": 9
     },

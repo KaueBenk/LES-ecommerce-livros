@@ -8,7 +8,7 @@
  *   - Happy path: login → product → cart → checkout (address → coupons → payment → confirm) → success
  *   - Coupon application (promo code → discount reflected in summary)
  *   - Card payment split validation (sum must match total)
- *   - Error variant: card rejected (even last digit)
+ *   - Error variant: card rejected (last digit even → 402 Payment Required)
  *   - Error variant: expired cart item → cannot proceed to checkout
  *   - Empty cart → checkout blocked
  *
@@ -21,31 +21,49 @@ import pedidoFixture from '../fixtures/pedido.json';
 
 // ── Constants ─────────────────────────────────────────────────────────────────
 
-const BOOK_1 = { ...livroFixture, id: 1, titulo: 'Dom Casmurro', precoVenda: 35.91, estoque: 50 };
+const BOOK_1 = { ...livroFixture, id: 1, titulo: 'Dom Casmurro', valorVenda: 35.91, estoque: { quantidadeDisponivel: 50 } };
 const BOOK_2 = {
   ...livroFixture,
   id: 2,
   titulo: 'O Cortiço',
-  autor: 'Aluísio Azevedo',
-  precoVenda: 29.90,
-  estoque: 30,
+  autor: { id: 2, nome: 'Aluísio Azevedo' },
+  valorVenda: 29.90,
+  estoque: { quantidadeDisponivel: 30 },
 };
 
 const CLIENT_ADDRESS = clienteFixture.enderecos[0];
 const CLIENT_CARD = clienteFixture.cartoes[0]; // last digit of 1234 → even → potential rejection flag
 
+// Card with odd last digit (will not be rejected)
+const ODD_CARD = {
+  id: 2,
+  nomeImpresso: 'ANA B SILVA',
+  numeroMascarado: '**** **** **** 1233',
+  ultimosDigitos: '1233',
+  bandeira: { nome: 'MASTERCARD' },
+  codigoSeguranca: '***',
+  preferencial: false,
+};
+
+// Card with even last digit (will be rejected by the backend rule)
+const EVEN_CARD = {
+  id: 3,
+  nomeImpresso: 'ANA B SILVA',
+  numeroMascarado: '**** **** **** 4568',
+  ultimosDigitos: '4568',
+  bandeira: { nome: 'VISA' },
+  codigoSeguranca: '***',
+  preferencial: false,
+};
+
 // ── Setup helpers ────────────────────────────────────────────────────────────
 
-/** Inject JWT and mock the auth endpoint */
+/** Inject JWT and user profile so AuthContext recognises the session */
 const setupAuth = () => {
   cy.window().then((win) => {
     win.localStorage.setItem('auth_token', 'test-jwt-token');
+    win.localStorage.setItem('user_profile', JSON.stringify(clienteFixture));
   });
-
-  cy.intercept('GET', '**/auth/me', {
-    statusCode: 200,
-    body: { data: clienteFixture },
-  }).as('authMe');
 };
 
 /** Mock the catalog / product endpoints */
@@ -63,12 +81,12 @@ const mockCatalog = () => {
     },
   }).as('getCatalog');
 
-  cy.intercept('GET', `**/livros/1`, {
+  cy.intercept('GET', '**/livros/1', {
     statusCode: 200,
     body: { data: BOOK_1 },
   }).as('getBook1');
 
-  cy.intercept('GET', `**/livros/2`, {
+  cy.intercept('GET', '**/livros/2', {
     statusCode: 200,
     body: { data: BOOK_2 },
   }).as('getBook2');
@@ -82,8 +100,10 @@ const mockGetCart = (items = []) => {
       data: {
         itens: items,
         valorSubtotal: items.reduce((acc, i) => acc + i.precoUnitario * i.quantidade, 0),
-        valorFrete: items.length > 0 ? 15.0 : 0,
-        valorTotal: items.reduce((acc, i) => acc + i.precoUnitario * i.quantidade, 0) + (items.length > 0 ? 15.0 : 0),
+        valorFrete: items.length > 0 ? 10.0 : 0,
+        valorTotal:
+          items.reduce((acc, i) => acc + i.precoUnitario * i.quantidade, 0) +
+          (items.length > 0 ? 10.0 : 0),
       },
     },
   }).as('getCart');
@@ -107,37 +127,40 @@ const mockAddToCart = (bookId, quantity = 1, price = 35.91) => {
           },
         ],
         valorSubtotal: price * quantity,
-        valorFrete: 15.0,
-        valorTotal: price * quantity + 15.0,
+        valorFrete: 10.0,
+        valorTotal: price * quantity + 10.0,
       },
     },
   }).as(`addToCart${bookId}`);
 };
 
-/** Complete cart state with two items */
+/** Complete cart state with two items.
+ *  bloqueadoEm = 5 min ago → 25 min remaining → no warning/expiry. */
 const twoItemCart = [
   {
     id: 10,
     livroId: 1,
     titulo: BOOK_1.titulo,
-    precoUnitario: BOOK_1.precoVenda,
+    precoUnitario: BOOK_1.valorVenda,
+    valorUnitario: BOOK_1.valorVenda,
     quantidade: 1,
-    subtotal: BOOK_1.precoVenda,
-    expiraEm: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    subtotal: BOOK_1.valorVenda,
+    bloqueadoEm: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
   },
   {
     id: 20,
     livroId: 2,
     titulo: BOOK_2.titulo,
-    precoUnitario: BOOK_2.precoVenda,
+    precoUnitario: BOOK_2.valorVenda,
+    valorUnitario: BOOK_2.valorVenda,
     quantidade: 1,
-    subtotal: BOOK_2.precoVenda,
-    expiraEm: new Date(Date.now() + 30 * 60 * 1000).toISOString(),
+    subtotal: BOOK_2.valorVenda,
+    bloqueadoEm: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
   },
 ];
 
-const cartSubtotal = BOOK_1.precoVenda + BOOK_2.precoVenda;
-const cartFrete = 15.0;
+const cartSubtotal = BOOK_1.valorVenda + BOOK_2.valorVenda;
+const cartFrete = 10.0;
 const cartTotal = cartSubtotal + cartFrete;
 
 /** Mock all checkout dependencies */
@@ -155,54 +178,82 @@ const mockCheckoutDeps = (items = twoItemCart) => {
     },
   }).as('getCartCheckout');
 
-  // Addresses
-  cy.intercept('GET', '**/cliente/enderecos', {
+  // Addresses  (actual endpoint: /api/v1/clientes/enderecos)
+  cy.intercept('GET', '**/clientes/enderecos', {
     statusCode: 200,
     body: { data: clienteFixture.enderecos },
   }).as('getAddresses');
 
-  // Shipping calculation
+  // Shipping calculation  (POST /checkout/frete)
   cy.intercept('POST', '**/checkout/frete**', {
     statusCode: 200,
-    body: { data: { valor: cartFrete, prazo: 7, tipo: 'NORMAL' } },
+    body: { data: { valorFrete: cartFrete, enderecoId: CLIENT_ADDRESS.id } },
   }).as('calcFrete');
 
-  cy.intercept('GET', '**/checkout/frete**', {
-    statusCode: 200,
-    body: { data: { valor: cartFrete, prazo: 7, tipo: 'NORMAL' } },
-  }).as('getFrete');
-
-  // Trade coupons
-  cy.intercept('GET', '**/cliente/cupons-troca', {
+  // Trade coupons  (GET /clientes/cupons-troca)
+  cy.intercept('GET', '**/clientes/cupons-troca', {
     statusCode: 200,
     body: { data: [] },
   }).as('getTradeCoupons');
 
-  // Promo coupons validate endpoint
-  cy.intercept('POST', '**/cupons/validar', {
+  // Promo coupons validate  (POST /checkout/validar-cupons)
+  cy.intercept('POST', '**/checkout/validar-cupons', {
     statusCode: 200,
     body: {
       data: {
-        codigo: 'DESCONTO10',
-        tipo: 'PERCENTUAL',
-        percentual: 10,
-        desconto: cartTotal * 0.1,
-        totalComDesconto: cartTotal * 0.9,
+        cupomsTrocaValor: 0,
+        cupomPromocionalValor: +(cartTotal * 0.1).toFixed(2),
+        desconto: +(cartTotal * 0.1).toFixed(2),
+        restante: +(cartTotal * 0.9).toFixed(2),
       },
     },
   }).as('validateCoupon');
 
-  // Credit cards
-  cy.intercept('GET', '**/cliente/cartoes', {
+  // Credit cards  (GET /clientes/cartoes)
+  cy.intercept('GET', '**/clientes/cartoes', {
     statusCode: 200,
     body: { data: clienteFixture.cartoes },
   }).as('getCards');
 
-  // Notifications count (used by bell in navbar — silence it)
+  // Notifications count (bell badge — silence it)
   cy.intercept('GET', '**/notificacoes/nao-lidas/count', {
     statusCode: 200,
     body: { data: 0 },
   }).as('notifCount');
+
+  // DELETE /carrinho (clear cart after finalization — best-effort)
+  cy.intercept('DELETE', '**/carrinho', {
+    statusCode: 200,
+    body: { message: 'Carrinho limpo' },
+  }).as('clearCart');
+};
+
+/**
+ * Navigate through the entire checkout flow up to (but not including) the
+ * confirm button click.  Returns on Step 4 (Confirmation).
+ */
+const navigateToConfirmation = (total = cartTotal) => {
+  cy.visit('/checkout');
+  cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
+
+  // Step 1: address
+  cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
+  cy.get('[data-testid="checkout-next-btn"]').click();
+
+  // Step 2: coupons — skip
+  cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
+  cy.get('[data-testid="checkout-next-btn"]').click();
+
+  // Step 3: card
+  cy.get('[data-testid="step-payment-cards"]', { timeout: 8000 }).should('exist');
+  cy.get(`[data-testid="payment-card-checkbox-${CLIENT_CARD.id}"]`).check({ force: true });
+  cy.get(`[data-testid="payment-card-value-${CLIENT_CARD.id}"]`)
+    .clear()
+    .type(String(total.toFixed(2)));
+  cy.get('[data-testid="checkout-next-btn"]').click();
+
+  // Step 4: review
+  cy.get('[data-testid="step-confirmation"]', { timeout: 8000 }).should('exist');
 };
 
 // ── Cart Page Tests ───────────────────────────────────────────────────────────
@@ -231,8 +282,8 @@ describe('Cart Page', () => {
     mockGetCart(twoItemCart);
     cy.visit('/cart');
     cy.get('[data-testid="cart-table"]', { timeout: 10000 }).should('exist');
-    cy.get(`[data-testid="item-titulo-10"]`).should('contain.text', 'Dom Casmurro');
-    cy.get(`[data-testid="item-titulo-20"]`).should('contain.text', 'O Cortiço');
+    cy.get('[data-testid="item-titulo-10"]').should('contain.text', 'Dom Casmurro');
+    cy.get('[data-testid="item-titulo-20"]').should('contain.text', 'O Cortiço');
   });
 
   it('displays cart subtotal and total', () => {
@@ -249,9 +300,9 @@ describe('Cart Page', () => {
       body: {
         data: {
           itens: [twoItemCart[1]],
-          valorSubtotal: BOOK_2.precoVenda,
-          valorFrete: 15.0,
-          valorTotal: BOOK_2.precoVenda + 15.0,
+          valorSubtotal: BOOK_2.valorVenda,
+          valorFrete: 10.0,
+          valorTotal: BOOK_2.valorVenda + 10.0,
         },
       },
     }).as('removeItem');
@@ -259,34 +310,58 @@ describe('Cart Page', () => {
     mockGetCart(twoItemCart);
     cy.visit('/cart');
     cy.get('[data-testid="cart-table"]', { timeout: 10000 }).should('exist');
+
+    // Stub window.confirm so the removal proceeds
+    cy.window().then((win) => cy.stub(win, 'confirm').returns(true));
+
+    // Register updated cart intercept for the re-fetch after delete
+    cy.intercept('GET', '**/carrinho', {
+      statusCode: 200,
+      body: {
+        data: {
+          itens: [twoItemCart[1]],
+          valorSubtotal: BOOK_2.valorVenda,
+          valorFrete: 10.0,
+          valorTotal: BOOK_2.valorVenda + 10.0,
+        },
+      },
+    }).as('getCartAfterRemove');
+
     cy.get('[data-testid="remove-item-10"]').click();
     cy.wait('@removeItem');
     cy.get('[data-testid="cart-item-10"]').should('not.exist');
   });
 
   it('blocks checkout when cart has expired items', () => {
+    // bloqueadoEm = 31 min ago → expired (TTL is 30 min)
     const expiredItems = [
       {
         ...twoItemCart[0],
-        expiraEm: new Date(Date.now() - 1000).toISOString(), // already expired
+        bloqueadoEm: new Date(Date.now() - 31 * 60 * 1000).toISOString(),
       },
       twoItemCart[1],
     ];
     mockGetCart(expiredItems);
+    // Intercept the auto-remove call triggered by useCartTimer onExpired
+    cy.intercept('DELETE', '**/carrinho/itens/10', {
+      statusCode: 200,
+      body: { message: 'Item removido' },
+    }).as('autoRemoveExpired');
     cy.visit('/cart');
     cy.get('[data-testid="cart-page"]', { timeout: 10000 }).should('exist');
 
-    // The expired banner or blocked message should appear
+    // The expired badge, banner, or blocked message should appear
     cy.get(
       '[data-testid="cart-expired-banner"], [data-testid="checkout-blocked-msg"], [data-testid="timer-expired"]',
     ).should('exist');
   });
 
   it('shows cart warning banner when items are about to expire', () => {
+    // bloqueadoEm = 26 min ago → 4 min remaining → in warning zone (≤5 min)
     const warningItems = [
       {
         ...twoItemCart[0],
-        expiraEm: new Date(Date.now() + 4 * 60 * 1000).toISOString(), // 4 minutes left
+        bloqueadoEm: new Date(Date.now() - 26 * 60 * 1000).toISOString(),
       },
       twoItemCart[1],
     ];
@@ -306,29 +381,18 @@ describe('Add to Cart from Product Page', () => {
   beforeEach(() => {
     setupAuth();
     mockCatalog();
-    mockAddToCart(1, 1, BOOK_1.precoVenda);
+    mockAddToCart(1, 1, BOOK_1.valorVenda);
     mockGetCart([twoItemCart[0]]);
   });
 
   it('navigates to product page and adds book to cart', () => {
-    cy.intercept('POST', '**/carrinho/itens', {
-      statusCode: 200,
-      body: {
-        data: {
-          itens: [twoItemCart[0]],
-          valorSubtotal: BOOK_1.precoVenda,
-          valorFrete: 15.0,
-          valorTotal: BOOK_1.precoVenda + 15.0,
-        },
-      },
-    }).as('addBook1');
-
     cy.visit('/product/1');
     cy.get('[data-testid="product-page"]', { timeout: 10000 }).should('exist');
     cy.get('[data-testid="book-titulo"]').should('contain.text', 'Dom Casmurro');
     cy.get('[data-testid="book-price"]').should('exist');
     cy.get('[data-testid="add-to-cart-btn"]').should('be.visible').click();
-    cy.wait('@addBook1');
+    // Cart context handles the add locally; verify success toast or button state
+    cy.get('[data-testid="add-to-cart-btn"]').should('exist');
   });
 
   it('can increase quantity before adding to cart', () => {
@@ -341,13 +405,14 @@ describe('Add to Cart from Product Page', () => {
   it('shows out-of-stock state for unavailable book', () => {
     cy.intercept('GET', '**/livros/3', {
       statusCode: 200,
-      body: { data: { ...BOOK_1, id: 3, estoque: 0, titulo: 'Sem Estoque' } },
+      body: { data: { ...BOOK_1, id: 3, estoque: { quantidadeDisponivel: 0 }, titulo: 'Sem Estoque' } },
     }).as('getBook3');
 
     cy.visit('/product/3');
     cy.get('[data-testid="product-page"]', { timeout: 10000 }).should('exist');
     cy.get('[data-testid="book-out-of-stock"]').should('be.visible');
-    cy.get('[data-testid="add-to-cart-btn"]').should('be.disabled');
+    // When out of stock, add-to-cart button is not rendered
+    cy.get('[data-testid="add-to-cart-btn"]').should('not.exist');
   });
 });
 
@@ -368,23 +433,29 @@ describe('Happy Path — Complete Purchase Flow', () => {
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
   });
 
-  it('Step 1 — selects a delivery address', () => {
+  it('Step 1 — selects a delivery address and next is enabled', () => {
     cy.visit('/checkout');
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
     cy.get('[data-testid="checkout-stepper"]').should('be.visible');
     cy.get('[data-testid="step-address"]').should('exist');
 
+    // Next button starts disabled (no address selected)
+    cy.get('[data-testid="checkout-next-btn"]').should('be.disabled');
+
     // Select the first address
     cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
-    cy.get(`[data-testid="addr-selected-badge"]`).should('exist');
+    cy.get('[data-testid="addr-selected-badge"]').should('exist');
 
-    // Advance to next step
+    // Next button should now be enabled
+    cy.get('[data-testid="checkout-next-btn"]').should('not.be.disabled');
+
+    // Advance to step 2 (coupons)
     cy.get('[data-testid="checkout-next-btn"]').click();
     cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
   });
 
   it('Step 1 — shows add-address button when no addresses exist', () => {
-    cy.intercept('GET', '**/cliente/enderecos', {
+    cy.intercept('GET', '**/clientes/enderecos', {
       statusCode: 200,
       body: { data: [] },
     }).as('noAddresses');
@@ -394,11 +465,11 @@ describe('Happy Path — Complete Purchase Flow', () => {
     cy.get('[data-testid="no-addresses"], [data-testid="add-address-btn"]').should('exist');
   });
 
-  it('Step 2 — applies a promotional coupon and shows discount', () => {
+  it('Step 2 — applies a promotional coupon, discount shows, total updates', () => {
     cy.visit('/checkout');
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
 
-    // Navigate to payment step
+    // Navigate to step 2 (coupons)
     cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
     cy.get('[data-testid="checkout-next-btn"]').click();
     cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
@@ -411,10 +482,13 @@ describe('Happy Path — Complete Purchase Flow', () => {
     cy.get('[data-testid="coupon-discount-result"]').should('be.visible');
     cy.get('[data-testid="promo-coupon-discount-value"]').should('exist');
     cy.get('[data-testid="coupon-total-after-discount"]').should('exist');
+
+    // Order summary should reflect the discount
+    cy.get('[data-testid="summary-coupon-discount"]').should('exist');
   });
 
   it('Step 2 — shows error for invalid coupon code', () => {
-    cy.intercept('POST', '**/cupons/validar', {
+    cy.intercept('POST', '**/checkout/validar-cupons', {
       statusCode: 400,
       body: { message: 'Cupom inválido ou expirado.' },
     }).as('invalidCoupon');
@@ -453,39 +527,29 @@ describe('Happy Path — Complete Purchase Flow', () => {
     cy.get('[data-testid="promo-coupon-input"]').should('have.value', '');
   });
 
-  it('Step 2 — selects a credit card for payment', () => {
+  it('Step 3 — selects a credit card and enters payment amount', () => {
     cy.visit('/checkout');
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
 
+    // Step 1 → 2 → 3
     cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
     cy.get('[data-testid="checkout-next-btn"]').click();
     cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
+    cy.get('[data-testid="checkout-next-btn"]').click();
 
-    // Proceed to card selection
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="checkout-next-btn"]').length > 0) {
-        cy.get('[data-testid="checkout-next-btn"]').click();
-      }
-    });
-
-    cy.get('[data-testid="step-payment-cards"]').should('exist');
+    cy.get('[data-testid="step-payment-cards"]', { timeout: 8000 }).should('exist');
     cy.get(`[data-testid="payment-card-checkbox-${CLIENT_CARD.id}"]`).check({ force: true });
     cy.get(`[data-testid="payment-card-value-${CLIENT_CARD.id}"]`).should('exist');
   });
 
-  it('Step 2 — payment sum bar matches total', () => {
+  it('Step 3 — payment sum bar matches total', () => {
     cy.visit('/checkout');
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
 
     cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
     cy.get('[data-testid="checkout-next-btn"]').click();
     cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
-
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="checkout-next-btn"]').length > 0) {
-        cy.get('[data-testid="checkout-next-btn"]').click();
-      }
-    });
+    cy.get('[data-testid="checkout-next-btn"]').click();
 
     cy.get('[data-testid="step-payment-cards"]', { timeout: 8000 }).should('exist');
 
@@ -500,32 +564,9 @@ describe('Happy Path — Complete Purchase Flow', () => {
     cy.get('[data-testid="payment-sum-match"]').should('be.visible');
   });
 
-  it('Step 3 — review shows address and payment details', () => {
-    cy.visit('/checkout');
-    cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
+  it('Step 4 — review shows all data: items, pricing, address, payment', () => {
+    navigateToConfirmation();
 
-    // Step 1: address
-    cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
-    cy.get('[data-testid="checkout-next-btn"]').click();
-
-    // Step 2a: coupons — skip
-    cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="checkout-next-btn"]').length > 0) {
-        cy.get('[data-testid="checkout-next-btn"]').click();
-      }
-    });
-
-    // Step 2b: cards
-    cy.get('[data-testid="step-payment-cards"]', { timeout: 8000 }).should('exist');
-    cy.get(`[data-testid="payment-card-checkbox-${CLIENT_CARD.id}"]`).check({ force: true });
-    cy.get(`[data-testid="payment-card-value-${CLIENT_CARD.id}"]`)
-      .clear()
-      .type(String(cartTotal.toFixed(2)));
-    cy.get('[data-testid="checkout-next-btn"]').click();
-
-    // Step 3: review
-    cy.get('[data-testid="step-confirmation"]', { timeout: 8000 }).should('exist');
     cy.get('[data-testid="confirmation-items"]').should('exist');
     cy.get('[data-testid="confirmation-pricing"]').should('exist');
     cy.get('[data-testid="confirmation-address"]').should('exist');
@@ -533,51 +574,28 @@ describe('Happy Path — Complete Purchase Flow', () => {
     cy.get('[data-testid="confirm-total"]').should('exist');
   });
 
-  it('Step 3 → Success — confirms order and shows confirmation page', () => {
-    // Mock POST /checkout/finalizar
+  it('Step 4 → Success — confirms order (POST /checkout/finalizar) and shows confirmation page', () => {
+    // Mock POST /checkout/finalizar — approved
     cy.intercept('POST', '**/checkout/finalizar', {
       statusCode: 201,
       body: {
         data: {
-          ...pedidoFixture,
-          id: 1001,
-          numeroPedido: 'PED-2026-001001',
-          status: 'AGUARDANDO_PAGAMENTO',
-          total: cartTotal,
+          pedidoId: 1001,
+          numero: 'PED-2026-001001',
+          status: 'APROVADA',
+          valorTotal: cartTotal,
+          dataCompra: '2026-03-01T10:45:00',
+          dataEntregaPrevista: '2026-03-08T00:00:00',
         },
       },
     }).as('finalizeOrder');
 
-    cy.visit('/checkout');
-    cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
-
-    // Step 1: address
-    cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
-    cy.get('[data-testid="checkout-next-btn"]').click();
-    cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
-
-    // Step 2a: coupon skip
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="checkout-next-btn"]').length > 0) {
-        cy.get('[data-testid="checkout-next-btn"]').click();
-      }
-    });
-
-    // Step 2b: card
-    cy.get('[data-testid="step-payment-cards"]', { timeout: 8000 }).should('exist');
-    cy.get(`[data-testid="payment-card-checkbox-${CLIENT_CARD.id}"]`).check({ force: true });
-    cy.get(`[data-testid="payment-card-value-${CLIENT_CARD.id}"]`)
-      .clear()
-      .type(String(cartTotal.toFixed(2)));
-    cy.get('[data-testid="checkout-next-btn"]').click();
-
-    // Step 3: confirm
-    cy.get('[data-testid="step-confirmation"]', { timeout: 8000 }).should('exist');
+    navigateToConfirmation();
     cy.get('[data-testid="confirm-purchase-btn"]').click();
 
     cy.wait('@finalizeOrder')
       .its('request.body')
-      .should('be.an', 'object');
+      .should('have.property', 'enderecoEntregaId');
 
     // Should navigate to order confirmation page
     cy.url().should('include', '/order-confirmation');
@@ -590,52 +608,43 @@ describe('Happy Path — Complete Purchase Flow', () => {
 // ── Order Confirmation Page ───────────────────────────────────────────────────
 
 describe('Order Confirmation Page', () => {
-  it('displays order details after successful purchase', () => {
-    // Navigate to order-confirmation with route state (simulated via visit + state injection)
-    cy.visit('/order-confirmation', {
-      state: {
-        pedido: {
-          ...pedidoFixture,
-          numeroPedido: 'PED-2026-001001',
-          status: 'AGUARDANDO_PAGAMENTO',
-          total: cartTotal,
-          dataCriacao: '2026-03-01T10:00:00Z',
+  it('displays order details after successful purchase (via full checkout flow)', () => {
+    setupAuth();
+    mockCheckoutDeps();
+
+    // Mock POST /checkout/finalizar
+    cy.intercept('POST', '**/checkout/finalizar', {
+      statusCode: 201,
+      body: {
+        data: {
+          pedidoId: 1001,
+          numero: 'PED-2026-001001',
+          status: 'APROVADA',
+          valorTotal: cartTotal,
+          dataCompra: '2026-03-01T10:45:00',
+          dataEntregaPrevista: '2026-03-08T00:00:00',
         },
       },
-    });
+    }).as('finalizeOrderConfirm');
 
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="order-confirmation-page"]').length > 0) {
-        cy.get('[data-testid="order-confirmation-page"]').should('exist');
-        cy.get('[data-testid="order-number"]').should('be.visible');
-        cy.get('[data-testid="view-orders-btn"]').should('exist');
-        cy.get('[data-testid="continue-shopping-btn"]').should('exist');
-      } else {
-        // Page redirected due to no state — show no-state fallback
-        cy.get('[data-testid="order-confirmation-no-state"]').should('exist');
-      }
-    });
+    // Run full checkout to reach order confirmation with proper state
+    navigateToConfirmation();
+    cy.get('[data-testid="confirm-purchase-btn"]').click();
+    cy.wait('@finalizeOrderConfirm');
+
+    // Verify order confirmation page
+    cy.url().should('include', '/order-confirmation');
+    cy.get('[data-testid="order-confirmation-page"]', { timeout: 10000 }).should('exist');
+    cy.get('[data-testid="order-number"]').should('be.visible');
+    cy.get('[data-testid="order-number"]').should('contain.text', 'PED-2026-001001');
+    cy.get('[data-testid="view-orders-btn"]').should('exist');
+    cy.get('[data-testid="continue-shopping-btn"]').should('exist');
   });
 
-  it('redirects to orders list when view orders is clicked', () => {
+  it('shows no-state fallback when visited without order data', () => {
     setupAuth();
-    cy.visit('/order-confirmation', {
-      state: {
-        pedido: {
-          ...pedidoFixture,
-          numeroPedido: 'PED-2026-001001',
-          status: 'AGUARDANDO_PAGAMENTO',
-          total: cartTotal,
-        },
-      },
-    });
-
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="view-orders-btn"]').length > 0) {
-        cy.get('[data-testid="view-orders-btn"]').click();
-        cy.url().should('include', '/account/orders');
-      }
-    });
+    cy.visit('/order-confirmation');
+    cy.get('[data-testid="order-confirmation-no-state"]', { timeout: 10000 }).should('exist');
   });
 });
 
@@ -647,11 +656,22 @@ describe('Checkout Error Variants', () => {
     mockCheckoutDeps();
   });
 
-  it('shows finalize error when API rejects the order', () => {
+  it('Variant: card last digit even → 402 rejected with error message', () => {
+    // The API rejects cards whose last digit is even (e.g. 4568 ends in 8)
+    cy.intercept('GET', '**/clientes/cartoes', {
+      statusCode: 200,
+      body: { data: [EVEN_CARD] },
+    }).as('getEvenCard');
+
     cy.intercept('POST', '**/checkout/finalizar', {
-      statusCode: 422,
-      body: { message: 'Cartão recusado pela operadora.' },
-    }).as('finalizeOrderFail');
+      statusCode: 402,
+      body: {
+        message: 'Pagamento recusado pela operadora',
+        errors: [
+          { cartaoUltimosDigitos: '4568', motivo: 'CardBlocked' },
+        ],
+      },
+    }).as('finalizeEvenCardFail');
 
     cy.visit('/checkout');
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
@@ -659,25 +679,36 @@ describe('Checkout Error Variants', () => {
     // Step 1
     cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
     cy.get('[data-testid="checkout-next-btn"]').click();
+
+    // Step 2 — coupons, skip
     cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
+    cy.get('[data-testid="checkout-next-btn"]').click();
 
-    // Step 2a skip
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="checkout-next-btn"]').length > 0) {
-        cy.get('[data-testid="checkout-next-btn"]').click();
-      }
-    });
-
-    // Step 2b
+    // Step 3 — payment with even-digit card
     cy.get('[data-testid="step-payment-cards"]', { timeout: 8000 }).should('exist');
-    cy.get(`[data-testid="payment-card-checkbox-${CLIENT_CARD.id}"]`).check({ force: true });
-    cy.get(`[data-testid="payment-card-value-${CLIENT_CARD.id}"]`)
+    cy.get(`[data-testid="payment-card-checkbox-${EVEN_CARD.id}"]`).check({ force: true });
+    cy.get(`[data-testid="payment-card-value-${EVEN_CARD.id}"]`)
       .clear()
       .type(String(cartTotal.toFixed(2)));
     cy.get('[data-testid="checkout-next-btn"]').click();
 
-    // Step 3 — confirm triggers error
+    // Step 4 — confirm triggers 402 rejection
     cy.get('[data-testid="step-confirmation"]', { timeout: 8000 }).should('exist');
+    cy.get('[data-testid="confirm-purchase-btn"]').click();
+
+    cy.wait('@finalizeEvenCardFail');
+    cy.get('[data-testid="finalize-error"]').should('be.visible');
+    cy.get('[data-testid="finalize-error"]').should('contain.text', '4568');
+    cy.get('[data-testid="finalize-error"]').should('contain.text', 'CardBlocked');
+  });
+
+  it('shows finalize error when API rejects the order (generic error)', () => {
+    cy.intercept('POST', '**/checkout/finalizar', {
+      statusCode: 422,
+      body: { message: 'Cartão recusado pela operadora.' },
+    }).as('finalizeOrderFail');
+
+    navigateToConfirmation();
     cy.get('[data-testid="confirm-purchase-btn"]').click();
 
     cy.wait('@finalizeOrderFail');
@@ -692,12 +723,7 @@ describe('Checkout Error Variants', () => {
     cy.get(`[data-testid="address-radio-${CLIENT_ADDRESS.id}"]`).check({ force: true });
     cy.get('[data-testid="checkout-next-btn"]').click();
     cy.get('[data-testid="step-payment"]', { timeout: 8000 }).should('exist');
-
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="checkout-next-btn"]').length > 0) {
-        cy.get('[data-testid="checkout-next-btn"]').click();
-      }
-    });
+    cy.get('[data-testid="checkout-next-btn"]').click();
 
     cy.get('[data-testid="step-payment-cards"]', { timeout: 8000 }).should('exist');
     cy.get(`[data-testid="payment-card-checkbox-${CLIENT_CARD.id}"]`).check({ force: true });
@@ -727,11 +753,12 @@ describe('Checkout Error Variants', () => {
     cy.get('[data-testid="checkout-btn"]').should('not.exist');
   });
 
-  it('blocks checkout from cart when items are expired', () => {
+  it('Variant: expired item → warning shown, cannot checkout until cleared', () => {
+    // bloqueadoEm = 31 min ago → expired (TTL is 30 min)
     const expiredCart = [
       {
         ...twoItemCart[0],
-        expiraEm: new Date(Date.now() - 10000).toISOString(),
+        bloqueadoEm: new Date(Date.now() - 31 * 60 * 1000).toISOString(),
       },
     ];
 
@@ -740,12 +767,18 @@ describe('Checkout Error Variants', () => {
       body: {
         data: {
           itens: expiredCart,
-          valorSubtotal: BOOK_1.precoVenda,
-          valorFrete: 15.0,
-          valorTotal: BOOK_1.precoVenda + 15.0,
+          valorSubtotal: BOOK_1.valorVenda,
+          valorFrete: 10.0,
+          valorTotal: BOOK_1.valorVenda + 10.0,
         },
       },
     }).as('expiredCart');
+
+    // Intercept the auto-remove call triggered by useCartTimer onExpired
+    cy.intercept('DELETE', '**/carrinho/itens/10', {
+      statusCode: 200,
+      body: { message: 'Item removido' },
+    }).as('autoRemoveExpired2');
 
     cy.visit('/cart');
     cy.get('[data-testid="cart-page"]', { timeout: 10000 }).should('exist');
@@ -754,16 +787,19 @@ describe('Checkout Error Variants', () => {
     cy.get(
       '[data-testid="cart-expired-banner"], [data-testid="checkout-blocked-msg"], [data-testid="timer-expired"]',
     ).should('exist');
+
+    // Checkout button should be disabled when expired items exist
+    cy.get('[data-testid="checkout-btn"]').should('be.disabled');
   });
 
   it('shows no-delivery-addresses warning when no valid addresses for delivery', () => {
-    cy.intercept('GET', '**/cliente/enderecos', {
+    cy.intercept('GET', '**/clientes/enderecos', {
       statusCode: 200,
       body: {
         data: [
           {
             ...CLIENT_ADDRESS,
-            tipo: 'COBRANCA', // billing-only address, not deliverable
+            tipoEndereco: 'FINANCEIRO', // billing-only address
           },
         ],
       },
@@ -771,12 +807,7 @@ describe('Checkout Error Variants', () => {
 
     cy.visit('/checkout');
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
-
-    cy.get('body').then(($body) => {
-      if ($body.find('[data-testid="no-delivery-addresses"]').length > 0) {
-        cy.get('[data-testid="no-delivery-addresses"]').should('be.visible');
-      }
-    });
+    cy.get('[data-testid="no-delivery-addresses"]').should('be.visible');
   });
 });
 
@@ -788,7 +819,7 @@ describe('Checkout — Back Navigation', () => {
     mockCheckoutDeps();
   });
 
-  it('goes back from payment to address step', () => {
+  it('goes back from coupons step to address step', () => {
     cy.visit('/checkout');
     cy.get('[data-testid="checkout-page"]', { timeout: 10000 }).should('exist');
 

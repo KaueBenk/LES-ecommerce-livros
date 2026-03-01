@@ -108,9 +108,8 @@ describe('Addresses', () => {
   const mockAddress = {
     id: addressId,
     apelido: 'Casa',
-    tipo: 'RESIDENCIAL',
     tipoResidencia: 'CASA',
-    tipoLogradouro: 'Rua',
+    tipoLogradouro: 'RUA',
     logradouro: 'Rua dos Testes',
     numero: '42',
     complemento: 'Ap 1',
@@ -119,6 +118,8 @@ describe('Addresses', () => {
     cidade: 'São Paulo',
     estado: 'SP',
     pais: 'Brasil',
+    tipoEndereco: 'ENTREGA',
+    observacoes: '',
     principal: false,
   };
 
@@ -163,13 +164,17 @@ describe('Addresses', () => {
     cy.get('[data-testid="add-address-button"]').click();
     cy.get('[data-testid="address-form-modal"]').should('be.visible');
 
-    // Fill required fields
+    // Fill required fields (RN0023)
+    cy.get('[data-testid="address-apelido-input"]').type(mockAddress.apelido);
+    cy.get('[data-testid="address-tipoResidencia-select"]').select(mockAddress.tipoResidencia);
+    cy.get('[data-testid="address-tipoLogradouro-select"]').select(mockAddress.tipoLogradouro);
     cy.get('[data-testid="address-logradouro-input"]').type(mockAddress.logradouro);
     cy.get('[data-testid="address-numero-input"]').type(mockAddress.numero);
     cy.get('[data-testid="address-bairro-input"]').type(mockAddress.bairro);
     cy.get('[data-testid="address-cep-input"]').type(mockAddress.cep);
     cy.get('[data-testid="address-cidade-input"]').type(mockAddress.cidade);
     cy.get('[data-testid="address-estado-select"]').select(mockAddress.estado);
+    cy.get('[data-testid="address-tipoEndereco-select"]').select(mockAddress.tipoEndereco);
 
     cy.get('[data-testid="address-form-save-button"]').click();
     cy.wait('@addAddress');
@@ -225,12 +230,11 @@ describe('Credit Cards', () => {
   const cardId = 77;
   const newCard = {
     id: cardId,
-    nomeTitular: 'ANA B SILVA',
+    nomeImpresso: 'ANA B SILVA',
     numeroMascarado: '**** **** **** 5678',
     bandeira: 'MASTERCARD',
-    mesExpiracao: 8,
-    anoExpiracao: 2030,
-    principal: false,
+    codigoSeguranca: '***',
+    preferencial: false,
   };
 
   beforeEach(() => {
@@ -272,7 +276,7 @@ describe('Credit Cards', () => {
 
     // Fill form fields
     cy.get('[data-testid="credit-card-numero"]').type('5234 5678 9012 3456');
-    cy.get('[data-testid="credit-card-nome"]').type(newCard.nomeTitular);
+    cy.get('[data-testid="credit-card-nome"]').type(newCard.nomeImpresso);
     cy.get('[data-testid="credit-card-bandeira"]').select(newCard.bandeira);
     cy.get('[data-testid="credit-card-cvv"]').type('321');
 
@@ -286,19 +290,19 @@ describe('Credit Cards', () => {
   it('sets a card as preferred', () => {
     const existingCardId = clienteFixture.cartoes[0].id;
 
-    cy.intercept('PATCH', `**/cliente/cartoes/${existingCardId}/principal`, {
+    cy.intercept('PATCH', `**/cliente/cartoes/${existingCardId}/preferencial`, {
       statusCode: 200,
-      body: { data: { ...clienteFixture.cartoes[0], principal: true } },
+      body: { data: { ...clienteFixture.cartoes[0], preferencial: true } },
     }).as('setPreferred');
 
-    // Only show set-preferred button if card is not already principal
+    // Only show set-preferred button if card is not already preferencial
     cy.get('body').then(($body) => {
       if ($body.find(`[data-testid="card-set-preferred-btn-${existingCardId}"]`).length > 0) {
         cy.get(`[data-testid="card-set-preferred-btn-${existingCardId}"]`).click();
         cy.wait('@setPreferred');
         cy.get(`[data-testid="card-preferred-badge-${existingCardId}"]`).should('exist');
       } else {
-        // Card is already principal — badge should already be shown
+        // Card is already preferencial — badge should already be shown
         cy.get(`[data-testid="card-preferred-badge-${existingCardId}"]`).should('exist');
       }
     });
@@ -330,7 +334,7 @@ describe('Credit Cards', () => {
     cy.get(`[data-testid="card-delete-btn-${existingCardId}"]`).click();
     cy.get('[data-testid="card-delete-confirm-modal"]').should('be.visible');
     cy.get('[data-testid="card-delete-cancel"]').click();
-    cy.get('[data-testid="credit-card-item-${existingCardId}"]').should('exist');
+    cy.get(`[data-testid="credit-card-item-${existingCardId}"]`).should('exist');
   });
 
   it('shows server error when card add fails', () => {

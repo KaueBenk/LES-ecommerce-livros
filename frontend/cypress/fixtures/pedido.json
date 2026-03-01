@@ -1,7 +1,7 @@
 {
   "id": 1001,
   "numeroPedido": "PED-2026-001001",
-  "status": "AGUARDANDO_PAGAMENTO",
+  "status": "EM_PROCESSAMENTO",
   "dataCriacao": "2026-03-01T10:00:00Z",
   "clienteId": 1,
   "itens": [
@@ -31,12 +31,12 @@
   },
   "frete": {
     "tipo": "NORMAL",
-    "valor": 15.00,
+    "valor": 10.00,
     "prazoEstimadoDias": 7
   },
   "subtotal": 71.82,
-  "totalFrete": 15.00,
+  "totalFrete": 10.00,
   "totalDescontos": 0.00,
-  "total": 86.82,
+  "total": 81.82,
   "codigoRastreio": null
 }

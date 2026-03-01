@@ -9,14 +9,6 @@ import './commands';
 // ── Global hooks ────────────────────────────────────────────────────────────
 
 /**
- * Preserve auth_token across tests within the same spec to avoid repeated logins.
- * Remove this if tests should start fully logged out.
- */
-Cypress.Cookies.defaults({
-  preserve: ['auth_token'],
-});
-
-/**
  * Silence uncaught exceptions caused by third-party scripts or hot-reload
  * so they don't fail unrelated tests.
  */

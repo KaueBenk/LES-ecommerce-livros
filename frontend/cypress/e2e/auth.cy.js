@@ -12,8 +12,35 @@ const validUser = {
   email: `joao.teste.${Date.now()}@example.com`,
   senha: 'Senha@123',
   genero: 'MASCULINO',
-  cpf: '123.456.789-00',
+  cpf: '741.534.414-65',
   dataNascimento: '1990-05-20',
+};
+
+/**
+ * Fill all required registration fields (RN0026, RN0023).
+ * Includes personal data, phone, and address.
+ */
+const fillRegistrationForm = (overrides = {}) => {
+  const email = overrides.email || validUser.email;
+  cy.get('[data-testid="name-input"]').type(validUser.nome);
+  cy.get('[data-testid="email-input"]').type(email);
+  cy.get('[data-testid="password-input"]').type(validUser.senha);
+  cy.get('[data-testid="password-confirm-input"]').type(validUser.senha);
+  cy.get('[data-testid="gender-select"]').select(validUser.genero);
+  cy.get('[data-testid="cpf-input"]').type(validUser.cpf);
+  cy.get('[data-testid="birth-date-input"]').type(validUser.dataNascimento);
+
+  // Phone (required — at least 1 telefone with DDD + número)
+  cy.get('[data-testid="phone-ddd-0"]').type('11');
+  cy.get('[data-testid="phone-number-0"]').type('987654321');
+
+  // Address (required — at least 1 with logradouro, número, bairro, cep, cidade, estado)
+  cy.get('[data-testid="address-street-0"]').type('Rua dos Testes');
+  cy.get('[data-testid="address-number-0"]').type('42');
+  cy.get('[data-testid="address-neighborhood-0"]').type('Centro');
+  cy.get('[data-testid="address-cep-0"]').type('01310-100');
+  cy.get('[data-testid="address-city-0"]').type('São Paulo');
+  cy.get('[data-testid="address-state-0"]').select('SP');
 };
 
 // ── Registration ─────────────────────────────────────────────────────────────
@@ -62,28 +89,12 @@ describe('Registration', () => {
   });
 
   it('shows API error on duplicate email (mocked)', () => {
-    cy.mockAPI(
-      'POST',
-      '**/auth/register',
-      {
-        status: 409,
-        message: 'Email já cadastrado.',
-      },
-      'registerDuplicate',
-    );
-
     cy.intercept('POST', '**/auth/register', {
       statusCode: 409,
       body: { message: 'Email já cadastrado.' },
     }).as('registerDuplicate');
 
-    cy.get('[data-testid="name-input"]').type(validUser.nome);
-    cy.get('[data-testid="email-input"]').type(validUser.email);
-    cy.get('[data-testid="password-input"]').type(validUser.senha);
-    cy.get('[data-testid="password-confirm-input"]').type(validUser.senha);
-    cy.get('[data-testid="gender-select"]').select(validUser.genero);
-    cy.get('[data-testid="cpf-input"]').type(validUser.cpf);
-    cy.get('[data-testid="birth-date-input"]').type(validUser.dataNascimento);
+    fillRegistrationForm();
     cy.get('[data-testid="register-submit"]').click();
 
     cy.wait('@registerDuplicate');
@@ -96,13 +107,7 @@ describe('Registration', () => {
       body: { data: { token: 'fake-jwt-token', usuario: { nome: validUser.nome } } },
     }).as('registerSuccess');
 
-    cy.get('[data-testid="name-input"]').type(validUser.nome);
-    cy.get('[data-testid="email-input"]').type(`success${Date.now()}@test.com`);
-    cy.get('[data-testid="password-input"]').type(validUser.senha);
-    cy.get('[data-testid="password-confirm-input"]').type(validUser.senha);
-    cy.get('[data-testid="gender-select"]').select(validUser.genero);
-    cy.get('[data-testid="cpf-input"]').type(validUser.cpf);
-    cy.get('[data-testid="birth-date-input"]').type(validUser.dataNascimento);
+    fillRegistrationForm({ email: `success${Date.now()}@test.com` });
     cy.get('[data-testid="register-submit"]').click();
 
     cy.wait('@registerSuccess');
