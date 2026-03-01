@@ -63,6 +63,16 @@ const customerService = {
     const response = await api.get('/vendas/minhas', { params: { page, size } });
     return response.data.data;
   },
+
+  getTransactions: async (page = 0, size = 20, sort = 'dataPedido,desc') => {
+    const response = await api.get('/clientes/transacoes', { params: { page, size, sort } });
+    return response.data.data;
+  },
+
+  requestExchange: async (orderId, itens) => {
+    const response = await api.post(`/pedidos/${orderId}/trocas`, { itens });
+    return response.data;
+  },
 };
 
 export default customerService;
