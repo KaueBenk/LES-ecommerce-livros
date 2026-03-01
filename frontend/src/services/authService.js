@@ -1,0 +1,52 @@
+import api from './api';
+
+/**
+ * authService — Authentication API calls
+ */
+const authService = {
+  /**
+   * Login with CPF and password.
+   * @param {string} cpf
+   * @param {string} senha
+   * @returns {Promise<{token: string, user: Object}>}
+   */
+  login: async (cpf, senha) => {
+    const response = await api.post('/auth/login', { cpf, senha });
+    return response.data.data;
+  },
+
+  /**
+   * Register a new customer.
+   * @param {Object} customerData
+   * @returns {Promise<Object>}
+   */
+  register: async (customerData) => {
+    const response = await api.post('/auth/register', customerData);
+    return response.data.data;
+  },
+
+  /**
+   * Change password (authenticated).
+   * @param {string} senhaAtual
+   * @param {string} novaSenha
+   * @returns {Promise<Object>}
+   */
+  changePassword: async (senhaAtual, novaSenha) => {
+    const response = await api.put('/auth/change-password', { senhaAtual, novaSenha });
+    return response.data;
+  },
+
+  /**
+   * Logout (server-side invalidation if needed).
+   * @returns {Promise<void>}
+   */
+  logout: async () => {
+    try {
+      await api.post('/auth/logout');
+    } catch (_error) {
+      // Ignore server errors on logout
+    }
+  },
+};
+
+export default authService;

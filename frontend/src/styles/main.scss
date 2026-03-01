@@ -1,0 +1,30 @@
+// Custom variables — must be imported BEFORE Bootstrap to allow overrides
+// stylelint-disable-next-line scss/at-import-no-partial-leading-underscore
+@import './variables';
+
+// Bootstrap core
+// sass-lint:disable no-duplicate-at-import-rules
+@import 'bootstrap/scss/bootstrap';
+
+// Custom component styles
+@import './forms';
+@import './buttons';
+@import './responsive';
+
+// Global styles
+body {
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+a {
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
+  }
+}
+
+.page-container {
+  min-height: calc(100vh - 120px);
+  padding: 2rem 0;
+}
