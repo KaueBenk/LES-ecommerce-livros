@@ -9,6 +9,7 @@ import LoadingSpinner from '../components/common/LoadingSpinner';
 import BookFormPage from './BookFormPage';
 import StockEntryPage from './StockEntryPage';
 import LogisticsPage from './LogisticsPage';
+import ClientSearchAdmin from '../components/admin/ClientSearchAdmin';
 
 // ─── Justification Modal (Ativar / Inativar) ──────────────────────────────────
 
@@ -560,7 +561,13 @@ const AdminDashboard = () => {
               <p className="card-text text-muted small flex-grow-1">
                 Consultar e gerenciar cadastros de clientes.
               </p>
-              <span className="badge bg-info text-dark mt-2">Em breve</span>
+              <Link
+                to="/admin/clientes"
+                className="btn btn-info btn-sm mt-2"
+                data-testid="admin-nav-clients"
+              >
+                Gerenciar Clientes
+              </Link>
             </div>
           </div>
         </div>
@@ -602,6 +609,7 @@ const AdminPage = () => (
       <Route path="livros/:bookId/editar" element={<BookFormPage />} />
       <Route path="estoque/entrada" element={<StockEntryPage />} />
       <Route path="logistica" element={<LogisticsPage />} />
+      <Route path="clientes" element={<ClientSearchAdmin />} />
     </Routes>
   </div>
 );
