@@ -30,3 +30,5 @@ US-027 | done | 2026-03-01 20:59:24 | Completed successfully
 US-028 | done | 2026-03-01 21:35:11 | Completed successfully
 US-030 | done | 2026-03-01 21:39:50 | Completed successfully
 US-029 | done | 2026-03-01 21:40:20 | Completed successfully
+US-031 | failed | 2026-03-01 21:41:28 | Cancelled by user
+US-032 | failed | 2026-03-01 21:41:31 | Cancelled by user
