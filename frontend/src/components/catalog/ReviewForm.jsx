@@ -38,18 +38,28 @@ StarSelector.propTypes = {
 
 // ─── ReviewForm ───────────────────────────────────────────────────────────────
 
-const ReviewForm = ({ bookId, onSubmitted }) => {
-  const { user, isAuthenticated } = useAuth();
+const ReviewForm = ({ bookId, hasPurchased, onSubmitted }) => {
+  const { isAuthenticated } = useAuth();
   const [estrelas, setEstrelas] = useState(0);
   const [texto, setTexto] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [serverError, setServerError] = useState(null);
   const [successMessage, setSuccessMessage] = useState(null);
+  const [pendingModeration, setPendingModeration] = useState(false);
 
   if (!isAuthenticated) {
     return (
       <div className="alert alert-info" data-testid="review-login-prompt">
         <Link to={ROUTES.LOGIN}>Faça login</Link> para avaliar este livro.
+      </div>
+    );
+  }
+
+  // If hasPurchased prop is explicitly false, show a purchase-required notice
+  if (hasPurchased === false) {
+    return (
+      <div className="alert alert-warning" data-testid="review-not-purchased">
+        Você precisa ter comprado este livro para poder avaliá-lo.
       </div>
     );
   }
@@ -75,11 +85,18 @@ const ReviewForm = ({ bookId, onSubmitted }) => {
     try {
       await reviewService.submitReview(bookId, { estrelas, texto: texto.trim() });
       setSuccessMessage('Avaliação enviada para moderação');
+      setPendingModeration(true);
       setEstrelas(0);
       setTexto('');
       if (onSubmitted) onSubmitted();
     } catch (err) {
-      setServerError(getErrorMessage(err) || 'Erro ao enviar avaliação.');
+      if (err?.response?.status === 403) {
+        setServerError(
+          'Você precisa ter comprado este livro para avaliá-lo. Apenas clientes que efetuaram a compra podem enviar avaliações.'
+        );
+      } else {
+        setServerError(getErrorMessage(err) || 'Erro ao enviar avaliação.');
+      }
     } finally {
       setSubmitting(false);
     }
@@ -89,7 +106,20 @@ const ReviewForm = ({ bookId, onSubmitted }) => {
     <div data-testid="review-form-container">
       <h3 className="h6 fw-bold mb-3">Escrever uma Avaliação</h3>
 
-      {successMessage && (
+      <p className="text-muted small mb-3" data-testid="review-purchase-note">
+        * Disponível apenas para clientes que compraram este livro.
+      </p>
+
+      {pendingModeration && successMessage && (
+        <div className="alert alert-success" data-testid="review-success">
+          <strong>✓</strong> {successMessage}{' '}
+          <span className="badge bg-warning text-dark ms-1" data-testid="review-moderation-badge">
+            Aguardando moderação
+          </span>
+        </div>
+      )}
+
+      {!pendingModeration && successMessage && (
         <div className="alert alert-success" data-testid="review-success">
           {successMessage}
         </div>
@@ -158,10 +188,12 @@ const ReviewForm = ({ bookId, onSubmitted }) => {
 
 ReviewForm.propTypes = {
   bookId: PropTypes.oneOfType([PropTypes.string, PropTypes.number]).isRequired,
+  hasPurchased: PropTypes.bool,
   onSubmitted: PropTypes.func,
 };
 
 ReviewForm.defaultProps = {
+  hasPurchased: undefined,
   onSubmitted: null,
 };
 
