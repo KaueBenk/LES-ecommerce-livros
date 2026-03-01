@@ -13,6 +13,8 @@ export const ROUTES = {
   CHECKOUT: '/checkout',
   ORDER_HISTORY: '/account/orders',
   ACCOUNT: '/account',
+  ADDRESSES: '/account/addresses',
+  CREDIT_CARDS: '/account/credit-cards',
   CHANGE_PASSWORD: '/account/change-password',
   ADMIN: '/admin',
   NOT_FOUND: '*',
@@ -90,3 +92,14 @@ export const LS_KEYS = {
 
 // Cart TTL in milliseconds
 export const CART_TTL_MS = 30 * 60 * 1000; // 30 minutes
+
+// Credit card brands
+export const CREDIT_CARD_BRANDS = [
+  { value: 'VISA', label: 'Visa', icon: '💳' },
+  { value: 'MASTERCARD', label: 'Mastercard', icon: '💳' },
+  { value: 'ELO', label: 'Elo', icon: '💳' },
+  { value: 'AMEX', label: 'American Express', icon: '💳' },
+  { value: 'HIPERCARD', label: 'Hipercard', icon: '💳' },
+  { value: 'DINERS', label: 'Diners Club', icon: '💳' },
+  { value: 'OUTRO', label: 'Outro', icon: '💳' },
+];

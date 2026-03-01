@@ -20,6 +20,10 @@ const CartPage = lazy(() => import('./pages/CartPage'));
 const CheckoutPage = lazy(() => import('./pages/CheckoutPage'));
 const OrderHistoryPage = lazy(() => import('./pages/OrderHistoryPage'));
 const AccountPage = lazy(() => import('./pages/AccountPage'));
+const ProfilePage = lazy(() => import('./pages/ProfilePage'));
+const AddressesPage = lazy(() => import('./pages/AddressesPage'));
+const CreditCardsPage = lazy(() => import('./pages/CreditCardsPage'));
+const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
 
@@ -61,6 +65,38 @@ function App() {
                         element={
                           <ProtectedRoute>
                             <OrderHistoryPage />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/account/profile"
+                        element={
+                          <ProtectedRoute>
+                            <ProfilePage />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path="/account/addresses"
+                        element={
+                          <ProtectedRoute>
+                            <AddressesPage />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path={ROUTES.CREDIT_CARDS}
+                        element={
+                          <ProtectedRoute>
+                            <CreditCardsPage />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path={ROUTES.CHANGE_PASSWORD}
+                        element={
+                          <ProtectedRoute>
+                            <ChangePasswordPage />
                           </ProtectedRoute>
                         }
                       />

@@ -31,8 +31,8 @@ const authService = {
    * @param {string} novaSenha
    * @returns {Promise<Object>}
    */
-  changePassword: async (senhaAtual, novaSenha) => {
-    const response = await api.put('/auth/change-password', { senhaAtual, novaSenha });
+  changePassword: async (senhaAtual, novaSenha, confirmacaoSenha) => {
+    const response = await api.put('/auth/senha', { senhaAtual, novaSenha, confirmacaoSenha });
     return response.data;
   },
 

@@ -42,6 +42,20 @@ const AccountPage = () => {
 
         <div className="col-md-4">
           <Link
+            to={ROUTES.ADDRESSES}
+            className="card text-decoration-none text-dark h-100"
+            data-testid="account-addresses-link"
+          >
+            <div className="card-body text-center py-4">
+              <div className="fs-1 mb-2">📍</div>
+              <h5>Endereços</h5>
+              <p className="text-muted small mb-0">Gerenciar endereços</p>
+            </div>
+          </Link>
+        </div>
+
+        <div className="col-md-4">
+          <Link
             to={ROUTES.ORDER_HISTORY}
             className="card text-decoration-none text-dark h-100"
             data-testid="account-orders-link"
@@ -50,6 +64,20 @@ const AccountPage = () => {
               <div className="fs-1 mb-2">📦</div>
               <h5>Meus Pedidos</h5>
               <p className="text-muted small mb-0">Histórico e acompanhamento</p>
+            </div>
+          </Link>
+        </div>
+
+        <div className="col-md-4">
+          <Link
+            to={ROUTES.CREDIT_CARDS}
+            className="card text-decoration-none text-dark h-100"
+            data-testid="account-credit-cards-link"
+          >
+            <div className="card-body text-center py-4">
+              <div className="fs-1 mb-2">💳</div>
+              <h5>Cartões de Crédito</h5>
+              <p className="text-muted small mb-0">Gerenciar cartões</p>
             </div>
           </Link>
         </div>
