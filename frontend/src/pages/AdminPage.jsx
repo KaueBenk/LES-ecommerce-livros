@@ -12,6 +12,7 @@ import LogisticsPage from './LogisticsPage';
 import ClientSearchAdmin from '../components/admin/ClientSearchAdmin';
 import ExchangeWorkflow from '../components/admin/ExchangeWorkflow';
 import ReviewModeration from '../components/admin/ReviewModeration';
+import AnalyticsDashboard from '../components/admin/AnalyticsDashboard';
 
 // ─── Justification Modal (Ativar / Inativar) ──────────────────────────────────
 
@@ -591,6 +592,23 @@ const AdminDashboard = () => {
           </div>
         </div>
         <div className="col-md-4">
+          <div className="card h-100 border-dark">
+            <div className="card-body d-flex flex-column">
+              <h5 className="card-title">📈 Analytics</h5>
+              <p className="card-text text-muted small flex-grow-1">
+                Relatórios de vendas por período e categoria.
+              </p>
+              <Link
+                to="/admin/analytics"
+                className="btn btn-dark btn-sm mt-2"
+                data-testid="admin-nav-analytics"
+              >
+                Ver Analytics
+              </Link>
+            </div>
+          </div>
+        </div>
+        <div className="col-md-4">
           <div className="card h-100 border-danger">
             <div className="card-body d-flex flex-column">
               <h5 className="card-title">🔄 Trocas</h5>
@@ -648,6 +666,7 @@ const AdminPage = () => (
       <Route path="clientes" element={<ClientSearchAdmin />} />
       <Route path="trocas" element={<ExchangeWorkflow />} />
       <Route path="avaliacoes" element={<ReviewModeration />} />
+      <Route path="analytics" element={<AnalyticsDashboard />} />
     </Routes>
   </div>
 );

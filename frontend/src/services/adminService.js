@@ -103,6 +103,12 @@ const adminService = {
     return response.data;
   },
 
+  // ── Analytics ────────────────────────────────────────────────────────────
+  getSalesAnalytics: async (params = {}) => {
+    const response = await api.get('/admin/analise/vendas', { params });
+    return response.data.data;
+  },
+
   // ── Reviews ────────────────────────────────────────────────────────────
   getReviews: async (params = {}) => {
     const response = await api.get('/admin/avaliacoes', { params });
