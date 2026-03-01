@@ -689,7 +689,8 @@
         "Stock entry: select book → qty, cost → POST → history appears",
         "Stock history: displays entries for selected book, pagination works",
         "All API calls intercepted and verified",
-        "Error cases: missing fields, invalid values → error messages"
+        "Error cases: missing fields, invalid values → error messages",
+        "All tests pass when run with npm run test:e2e against mock API responses"
       ],
       "priority": 8
     },
@@ -707,7 +708,8 @@
         "Success: order confirmation page, order number displayed",
         "API mocking for all responses",
         "Variant: card last digit even (rejected) → error message",
-        "Variant: expired item → warning shown → cannot checkout until cleared"
+        "Variant: expired item → warning shown → cannot checkout until cleared",
+        "All tests pass when run with npm run test:e2e against mock API responses"
       ],
       "priority": 8
     },
@@ -725,7 +727,8 @@
         "Checkout button disabled with message about expired item",
         "Polling every 30sec syncs with backend",
         "UI updates reflect backend state changes",
-        "Multiple items with different expiration times"
+        "Multiple items with different expiration times",
+        "All tests pass when run with npm run test:e2e against mock API responses"
       ],
       "priority": 8
     },
@@ -742,7 +745,8 @@
         "Review: authenticated user on delivered order → ReviewForm visible",
         "Submit review: stars, text → POST → success message",
         "Admin moderation: pending reviews → approve/reject → status updates",
-        "Approved reviews appear in book detail page"
+        "Approved reviews appear in book detail page",
+        "All tests pass when run with npm run test:e2e against mock API responses"
       ],
       "priority": 8
     },
@@ -761,7 +765,8 @@
         "Colors represent value magnitude",
         "Tab switching between views works",
         "Mock API responses with realistic data",
-        "Export/download options (if implemented)"
+        "Export/download options (if implemented)",
+        "All tests pass when run with npm run test:e2e against mock API responses"
       ],
       "priority": 8
     },
@@ -774,7 +779,8 @@
         "All tests runnable with npm run test:e2e",
         "All tests pass against mock API responses",
         "Commit message follows conventional format",
-        "Test coverage spans all 37 features"
+        "Test coverage spans all 37 features",
+        "All tests pass when run with npm run test:e2e against mock API responses"
       ],
       "priority": 8
     },
@@ -791,7 +797,9 @@
         "CONTRIBUTING.md with: coding standards, component pattern example, commit message guide",
         "Reference to API_CONTRACT.md",
         "Code review checklist",
-        "Clear and accessible language"
+        "Clear and accessible language",
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Frontend is running using docker"
       ],
       "priority": 9
     },
