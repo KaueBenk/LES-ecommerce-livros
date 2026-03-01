@@ -109,6 +109,11 @@ const adminService = {
     return response.data.data;
   },
 
+  getRegionalSalesAnalytics: async (params = {}) => {
+    const response = await api.get('/admin/analise/vendas-regiao', { params });
+    return response.data.data;
+  },
+
   // ── Reviews ────────────────────────────────────────────────────────────
   getReviews: async (params = {}) => {
     const response = await api.get('/admin/avaliacoes', { params });
