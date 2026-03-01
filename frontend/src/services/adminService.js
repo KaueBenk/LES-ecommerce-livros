@@ -103,6 +103,22 @@ const adminService = {
     return response.data;
   },
 
+  // ── Reviews ────────────────────────────────────────────────────────────
+  getReviews: async (params = {}) => {
+    const response = await api.get('/admin/avaliacoes', { params });
+    return response.data.data;
+  },
+
+  approveReview: async (reviewId) => {
+    const response = await api.patch(`/admin/avaliacoes/${reviewId}/aprovar`);
+    return response.data;
+  },
+
+  rejectReview: async (reviewId) => {
+    const response = await api.patch(`/admin/avaliacoes/${reviewId}/rejeitar`);
+    return response.data;
+  },
+
   // ── Exchanges ────────────────────────────────────────────────────────────
   getExchanges: async (params = {}) => {
     const response = await api.get('/admin/trocas', { params });
