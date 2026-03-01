@@ -11,6 +11,7 @@ export const ROUTES = {
   PRODUCT: '/product/:id',
   CART: '/cart',
   CHECKOUT: '/checkout',
+  ORDER_CONFIRMATION: '/order-confirmation',
   ORDER_HISTORY: '/account/orders',
   ACCOUNT: '/account',
   ADDRESSES: '/account/addresses',

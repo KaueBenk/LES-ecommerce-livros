@@ -4,6 +4,21 @@ import api from './api';
  * checkoutService — Checkout and order API calls
  */
 const checkoutService = {
+  calculateShipping: async (enderecoId) => {
+    const response = await api.post('/checkout/frete', { enderecoId });
+    return response.data.data;
+  },
+
+  validateCoupons: async (couponData) => {
+    const response = await api.post('/checkout/validar-cupons', couponData);
+    return response.data.data;
+  },
+
+  finalizeOrder: async (orderData) => {
+    const response = await api.post('/checkout/finalizar', orderData);
+    return response.data.data;
+  },
+
   getShippingOptions: async (addressId) => {
     const response = await api.get('/checkout/shipping', { params: { addressId } });
     return response.data.data;

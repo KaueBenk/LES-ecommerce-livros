@@ -26,6 +26,7 @@ const CreditCardsPage = lazy(() => import('./pages/CreditCardsPage'));
 const ChangePasswordPage = lazy(() => import('./pages/ChangePasswordPage'));
 const AdminPage = lazy(() => import('./pages/AdminPage'));
 const NotFoundPage = lazy(() => import('./pages/NotFoundPage'));
+const OrderConfirmationPage = lazy(() => import('./pages/OrderConfirmationPage'));
 
 /**
  * App — Root component with routing and providers.
@@ -57,6 +58,14 @@ function App() {
                         element={
                           <ProtectedRoute>
                             <CheckoutPage />
+                          </ProtectedRoute>
+                        }
+                      />
+                      <Route
+                        path={ROUTES.ORDER_CONFIRMATION}
+                        element={
+                          <ProtectedRoute>
+                            <OrderConfirmationPage />
                           </ProtectedRoute>
                         }
                       />

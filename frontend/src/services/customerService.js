@@ -73,6 +73,11 @@ const customerService = {
     const response = await api.post(`/pedidos/${orderId}/trocas`, { itens });
     return response.data;
   },
+
+  getCuponsTraoca: async () => {
+    const response = await api.get('/clientes/cupons-troca');
+    return response.data.data;
+  },
 };
 
 export default customerService;
