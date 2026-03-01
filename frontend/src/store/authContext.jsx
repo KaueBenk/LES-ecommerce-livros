@@ -26,10 +26,10 @@ export const AuthProvider = ({ children }) => {
     }
   }, [token]);
 
-  const login = async (cpf, senha) => {
+  const login = async (email, senha) => {
     setLoading(true);
     try {
-      const response = await authService.login(cpf, senha);
+      const response = await authService.login(email, senha);
       setToken(response.token);
       setUser(response.user);
       localStorage.setItem('auth_token', response.token);

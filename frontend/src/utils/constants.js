@@ -38,6 +38,31 @@ export const ADDRESS_TYPES = [
   { value: 'ENTREGA_E_FINANCEIRO', label: 'Entrega e Financeiro' },
 ];
 
+// Residential types
+export const RESIDENTIAL_TYPES = [
+  { value: 'CASA', label: 'Casa' },
+  { value: 'APARTAMENTO', label: 'Apartamento' },
+  { value: 'COMERCIAL', label: 'Comercial' },
+  { value: 'OUTRO', label: 'Outro' },
+];
+
+// Street types
+export const STREET_TYPES = [
+  { value: 'RUA', label: 'Rua' },
+  { value: 'AVENIDA', label: 'Avenida' },
+  { value: 'TRAVESSA', label: 'Travessa' },
+  { value: 'ALAMEDA', label: 'Alameda' },
+  { value: 'ESTRADA', label: 'Estrada' },
+  { value: 'OUTRO', label: 'Outro' },
+];
+
+// Brazilian states
+export const BRAZIL_STATES = [
+  'AC','AL','AP','AM','BA','CE','DF','ES','GO','MA','MT','MS',
+  'MG','PA','PB','PR','PE','PI','RJ','RN','RS','RO','RR','SC',
+  'SP','SE','TO',
+];
+
 // Ranking levels
 export const RANKING_LEVELS = {
   BRONZE: 'BRONZE',

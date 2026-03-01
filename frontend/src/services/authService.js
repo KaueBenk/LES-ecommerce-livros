@@ -5,13 +5,13 @@ import api from './api';
  */
 const authService = {
   /**
-   * Login with CPF and password.
-   * @param {string} cpf
+   * Login with email and password.
+   * @param {string} email
    * @param {string} senha
    * @returns {Promise<{token: string, user: Object}>}
    */
-  login: async (cpf, senha) => {
-    const response = await api.post('/auth/login', { cpf, senha });
+  login: async (email, senha) => {
+    const response = await api.post('/auth/login', { email, senha });
     return response.data.data;
   },
 
