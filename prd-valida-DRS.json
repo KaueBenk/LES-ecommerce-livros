@@ -1,0 +1,1026 @@
+{
+  "project": "LES E-Commerce de Livros — Validação de Regras (DRS_LES_1_2026)",
+  "branchName": "ralph/validate-drs-rules",
+  "description": "Ralph Loop para validação de TODAS as regras definidas no DRS_LES_1_2026.md, regra por regra. Cada user story corresponde a uma regra (RF, RNF ou RN) e contém os critérios de aceite necessários para confirmar que a implementação está conforme o documento de requisitos.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "VALIDAR RF0011: Cadastrar livro",
+      "description": "Validar que o sistema mantém um cadastro único para livros, conforme RF0011.",
+      "acceptanceCriteria": [
+        "É possível cadastrar um novo livro via interface de administrador",
+        "O sistema impede o cadastro de dois livros com o mesmo ISBN",
+        "O livro recém-cadastrado aparece na listagem de livros",
+        "Todos os campos obrigatórios (RF0011/RN0011) são exigidos pelo formulário"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-002",
+      "title": "VALIDAR RF0012: Inativar cadastro de livro",
+      "description": "Validar que o sistema permite que livros sejam inativados manualmente, conforme RF0012.",
+      "acceptanceCriteria": [
+        "Um livro ativo pode ser inativado pelo administrador",
+        "Após inativação, o livro não aparece mais na vitrine do cliente",
+        "O sistema exige justificativa e categoria de inativação ao inativar (conforme RN0015)",
+        "O status do livro muda para INATIVO após a operação"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-003",
+      "title": "VALIDAR RF0013: Inativar livro de forma automática",
+      "description": "Validar que o sistema inativa automaticamente livros sem estoque e com valor de venda abaixo do parâmetro predefinido, conforme RF0013.",
+      "acceptanceCriteria": [
+        "Livros sem estoque e com valor abaixo do parâmetro são inativados automaticamente",
+        "O parâmetro de valor mínimo é configurável no sistema",
+        "Livros inativados automaticamente recebem categoria FORA DE MERCADO (RN0016)",
+        "A inativação automática é registrada no log de auditoria (RNF0012)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-004",
+      "title": "VALIDAR RF0014: Alterar cadastro de livro",
+      "description": "Validar que o sistema permite a alteração de dados cadastrais de livros, conforme RF0014.",
+      "acceptanceCriteria": [
+        "Um administrador pode alterar qualquer campo cadastral de um livro ativo",
+        "As alterações são persistidas corretamente no banco de dados",
+        "O log de auditoria registra data, hora, usuário e dados anteriores (RNF0012)",
+        "Não é possível alterar livros inexistentes ou deletados"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-005",
+      "title": "VALIDAR RF0015: Consulta de livros",
+      "description": "Validar que o sistema permite consulta de livros com base em filtros definidos pelo usuário, conforme RF0015.",
+      "acceptanceCriteria": [
+        "É possível buscar livros por título, autor, ISBN, categoria, editora e outros campos de identificação",
+        "Os filtros podem ser usados de forma combinada ou isolada",
+        "A consulta retorna resultados em até 1 segundo (RNF0011)",
+        "Resultados inválidos ou sem match retornam lista vazia com mensagem amigável"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-006",
+      "title": "VALIDAR RF0016: Ativar cadastro de livros",
+      "description": "Validar que é possível ativar o cadastro de um livro inativo, conforme RF0016.",
+      "acceptanceCriteria": [
+        "Um livro inativo pode ser reativado pelo administrador",
+        "O sistema exige justificativa e categoria de ativação (RN0017)",
+        "Após ativação, o livro volta a aparecer na vitrine (se em estoque)",
+        "O log de auditoria registra a operação de ativação (RNF0012)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-007",
+      "title": "VALIDAR RF0021: Cadastrar cliente",
+      "description": "Validar que o sistema permite o cadastro de clientes com todos os dados obrigatórios, conforme RF0021.",
+      "acceptanceCriteria": [
+        "É possível cadastrar um novo cliente informando todos os campos obrigatórios (RN0026)",
+        "O cliente recebe um código único no sistema (RNF0035)",
+        "O cadastro exige ao menos um endereço de cobrança (RN0021) e um de entrega (RN0022)",
+        "O sistema exige ao menos um cartão de crédito ou outra forma de pagamento válida",
+        "A senha é armazenada criptografada (RNF0033)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-008",
+      "title": "VALIDAR RF0022: Alterar cliente",
+      "description": "Validar que o sistema permite a alteração de dados cadastrais de clientes, conforme RF0022.",
+      "acceptanceCriteria": [
+        "Um cliente autenticado pode alterar seus dados cadastrais",
+        "As alterações são salvas corretamente",
+        "O log de auditoria registra data, hora, usuário e dados anteriores (RNF0012)",
+        "Campos obrigatórios (RN0026) não podem ser removidos durante a edição"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-009",
+      "title": "VALIDAR RF0023: Inativar cadastro de cliente",
+      "description": "Validar que o sistema permite que clientes sejam inativados, conforme RF0023.",
+      "acceptanceCriteria": [
+        "Um administrador pode inativar o cadastro de um cliente",
+        "Após inativação, o cliente não consegue realizar login",
+        "O histórico de compras do cliente inativo é preservado",
+        "A operação é registrada no log de auditoria (RNF0012)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-010",
+      "title": "VALIDAR RF0024: Consulta de clientes",
+      "description": "Validar que o sistema permite a consulta de clientes com base em filtros, conforme RF0024.",
+      "acceptanceCriteria": [
+        "É possível buscar clientes por nome, CPF, e-mail e outros campos de identificação",
+        "Os filtros podem ser usados de forma combinada ou isolada",
+        "A consulta retorna resultados em até 1 segundo (RNF0011)",
+        "Resultados são exibidos em lista paginada"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-011",
+      "title": "VALIDAR RF0025: Consulta de transações",
+      "description": "Validar que o sistema exibe no cadastro de clientes todas as transações realizadas pelo mesmo, conforme RF0025.",
+      "acceptanceCriteria": [
+        "O perfil do cliente exibe lista completa de compras realizadas",
+        "Cada transação exibe status, data, itens e valor total",
+        "A consulta de transações responde em até 1 segundo (RNF0011)",
+        "Clientes sem transações exibem mensagem indicativa"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-012",
+      "title": "VALIDAR RF0026: Cadastro de endereços de entrega",
+      "description": "Validar que é possível associar múltiplos endereços de entrega ao cadastro de um cliente, conforme RF0026.",
+      "acceptanceCriteria": [
+        "Um cliente pode cadastrar mais de um endereço de entrega",
+        "Cada endereço é identificado por um nome/frase curta",
+        "Os campos obrigatórios do endereço (RN0023) são validados",
+        "Endereços podem ser editados sem alterar outros dados cadastrais (RF0034/RNF0035)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-013",
+      "title": "VALIDAR RF0027: Cadastro de cartões de crédito",
+      "description": "Validar que é possível associar múltiplos cartões de crédito ao cliente com um cartão preferencial, conforme RF0027.",
+      "acceptanceCriteria": [
+        "Um cliente pode cadastrar mais de um cartão de crédito",
+        "Um cartão deve estar marcado como preferencial",
+        "Os campos obrigatórios (RN0024) são exigidos: nº do cartão, nome impresso, bandeira e código de segurança",
+        "Somente bandeiras registradas no sistema são aceitas (RN0025)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-014",
+      "title": "VALIDAR RF0028: Alteração apenas de senha",
+      "description": "Validar que o sistema permite a alteração de senha sem necessidade de editar todos os dados cadastrais, conforme RF0028.",
+      "acceptanceCriteria": [
+        "Existe uma funcionalidade dedicada para alteração de senha",
+        "O sistema exige a nova senha duas vezes (RNF0032)",
+        "A nova senha deve atender às regras de senha forte (RNF0031): mínimo 8 caracteres, maiúsculas, minúsculas e caracteres especiais",
+        "A senha é armazenada criptografada após alteração (RNF0033)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-015",
+      "title": "VALIDAR RF0031: Gerenciar carrinho de compra",
+      "description": "Validar que o sistema permite adicionar, alterar, excluir e visualizar itens no carrinho de compra, conforme RF0031.",
+      "acceptanceCriteria": [
+        "Um cliente pode adicionar produtos ao carrinho",
+        "Um cliente pode remover produtos do carrinho",
+        "Um cliente pode visualizar todos os itens no carrinho",
+        "Somente produtos com estoque disponível podem ser adicionados (RN0031)",
+        "Itens adicionados ficam temporariamente bloqueados no estoque (RN0044)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-016",
+      "title": "VALIDAR RF0032: Definir quantidade de itens no carrinho",
+      "description": "Validar que é possível editar a quantidade de itens ao adicionar ou na visualização do carrinho, conforme RF0032.",
+      "acceptanceCriteria": [
+        "A quantidade pode ser editada ao adicionar um produto ao carrinho",
+        "A quantidade pode ser editada diretamente na tela do carrinho",
+        "Não é possível informar quantidade superior ao estoque disponível (RN0031)",
+        "Não é possível informar quantidade zero ou negativa"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-017",
+      "title": "VALIDAR RF0033: Realizar compra",
+      "description": "Validar que é possível realizar uma compra a partir de um carrinho de compra, conforme RF0033.",
+      "acceptanceCriteria": [
+        "Um cliente pode iniciar o processo de compra a partir do carrinho",
+        "O fluxo de compra exige seleção de endereço de entrega (RF0035) e forma de pagamento (RF0036)",
+        "A compra é finalizada com status EM PROCESSAMENTO (RF0037)",
+        "O estoque é validado novamente no momento da finalização (RN0032)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-018",
+      "title": "VALIDAR RF0034: Calcular frete",
+      "description": "Validar que o sistema calcula o frete com base nos itens selecionados e no endereço de entrega, conforme RF0034.",
+      "acceptanceCriteria": [
+        "O frete é calculado automaticamente ao selecionar o endereço de entrega",
+        "O valor do frete varia conforme o endereço informado",
+        "O valor do frete é exibido antes da finalização da compra",
+        "O frete é incluído no valor total da compra"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-019",
+      "title": "VALIDAR RF0035: Selecionar endereço de entrega",
+      "description": "Validar que o cliente pode selecionar um endereço previamente cadastrado ou informar um novo no checkout, conforme RF0035.",
+      "acceptanceCriteria": [
+        "O cliente pode escolher qualquer endereço de entrega já cadastrado em seu perfil",
+        "O cliente pode informar um novo endereço durante o checkout",
+        "Ao informar novo endereço, o sistema oferece a opção de salvá-lo no perfil",
+        "Campos obrigatórios do endereço (RN0023) são validados mesmo no checkout"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-020",
+      "title": "VALIDAR RF0036: Selecionar forma de pagamento",
+      "description": "Validar que o cliente pode selecionar cartão, cupom de troca ou cupom promocional como forma de pagamento, conforme RF0036.",
+      "acceptanceCriteria": [
+        "O cliente pode usar qualquer cartão de crédito previamente cadastrado",
+        "O cliente pode cadastrar um novo cartão durante o checkout e opcionalmente salvá-lo",
+        "O cliente pode usar cupom de troca ou cupom promocional válido",
+        "É possível combinar cupons e cartão de crédito no mesmo pagamento (RN0035)",
+        "Apenas um cupom promocional pode ser usado por compra (RN0033)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-021",
+      "title": "VALIDAR RF0037: Finalizar Compra",
+      "description": "Validar que a compra é finalizada após seleção de pagamento e endereço, com status EM PROCESSAMENTO, conforme RF0037.",
+      "acceptanceCriteria": [
+        "A compra é criada no sistema após a confirmação do cliente",
+        "O status inicial da compra é EM PROCESSAMENTO",
+        "O cliente recebe confirmação visual da finalização",
+        "A compra aparece no histórico de transações do cliente (RF0025)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-022",
+      "title": "VALIDAR RF0038: Despachar produtos para entrega",
+      "description": "Validar que o administrador pode selecionar vendas aprovadas para entrega, alterando o status para EM TRÂNSITO, conforme RF0038.",
+      "acceptanceCriteria": [
+        "O administrador visualiza lista de vendas com status APROVADA",
+        "O administrador pode selecionar uma ou mais vendas para despacho",
+        "Após despacho, o status da compra muda para EM TRÂNSITO (RN0039)",
+        "Vendas com status diferente de APROVADA não podem ser despachadas"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-023",
+      "title": "VALIDAR RF0039: Produtos entregues",
+      "description": "Validar que o administrador pode confirmar a entrega de uma compra, alterando o status para ENTREGUE, conforme RF0039.",
+      "acceptanceCriteria": [
+        "O administrador visualiza lista de compras com status EM TRÂNSITO",
+        "O administrador pode confirmar a entrega de uma compra",
+        "Após confirmação, o status muda para ENTREGUE (RN0040)",
+        "Somente compras EM TRÂNSITO podem ser confirmadas como entregues"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-024",
+      "title": "VALIDAR RF0040: Solicitar troca",
+      "description": "Validar que o cliente pode solicitar a troca de um item de uma compra com status ENTREGUE, conforme RF0040.",
+      "acceptanceCriteria": [
+        "O cliente visualiza opção de troca em compras com status ENTREGUE",
+        "O cliente pode selecionar itens específicos para troca",
+        "Somente itens de pedidos ENTREGUES podem receber solicitação de troca (RN0043)",
+        "A solicitação de troca gera um pedido de troca com status EM TROCA (RN0041)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-025",
+      "title": "VALIDAR RF0041: Autorizar trocas",
+      "description": "Validar que o administrador pode autorizar pedidos de troca, alterando o status para TROCA AUTORIZADA, conforme RF0041.",
+      "acceptanceCriteria": [
+        "O administrador visualiza lista de pedidos com status EM TROCA",
+        "O administrador pode autorizar um pedido de troca",
+        "Após autorização, o status do pedido muda para TROCA AUTORIZADA",
+        "O cliente recebe notificação da autorização (RNF0046)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-026",
+      "title": "VALIDAR RF0042: Visualização de trocas",
+      "description": "Validar que o administrador pode visualizar todos os pedidos com status EM TROCA, conforme RF0042.",
+      "acceptanceCriteria": [
+        "Existe uma tela dedicada para visualização de trocas no painel do administrador",
+        "Todos os pedidos com status EM TROCA são listados",
+        "A listagem exibe informações do pedido, cliente e itens a serem trocados",
+        "A consulta retorna resultados em até 1 segundo (RNF0011)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-027",
+      "title": "VALIDAR RF0043: Confirmar recebimento de itens para troca",
+      "description": "Validar que o administrador pode confirmar o recebimento dos itens de troca e decidir sobre reentrada em estoque, conforme RF0043.",
+      "acceptanceCriteria": [
+        "O administrador pode confirmar o recebimento dos itens de troca",
+        "O sistema pergunta se os itens devem retornar ao estoque",
+        "Se confirmado, o estoque é atualizado com os itens recebidos (RF0054)",
+        "O status do pedido muda para TROCADO (RN0042)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-028",
+      "title": "VALIDAR RF0044: Gerar cupom de troca após recebimento de itens",
+      "description": "Validar que o sistema gera automaticamente um cupom de troca quando os itens de troca chegam, conforme RF0044.",
+      "acceptanceCriteria": [
+        "Um cupom de troca é gerado automaticamente ao confirmar recebimento dos itens",
+        "O cupom é associado ao cliente que realizou a troca",
+        "O cupom fica disponível para uso em futuras compras",
+        "O valor do cupom corresponde ao valor dos itens trocados"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-029",
+      "title": "VALIDAR RF0051: Realizar entrada em estoque",
+      "description": "Validar que o sistema permite a entrada de itens em estoque com os dados obrigatórios, conforme RF0051.",
+      "acceptanceCriteria": [
+        "É possível registrar entrada de itens informando o livro previamente cadastrado e a quantidade",
+        "Os campos obrigatórios (RN0051) são exigidos: produto, quantidade, valor de custo, fornecedor e data de entrada",
+        "Não é permitida entrada com quantidade zero (RN0061)",
+        "Não é permitida entrada sem valor de custo (RN0062)",
+        "Não é permitida entrada sem data de entrada (RNF0064)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-030",
+      "title": "VALIDAR RF0052: Calcular valor de venda",
+      "description": "Validar que o sistema calcula o valor de venda com base no valor de custo e no grupo de precificação, conforme RF0052.",
+      "acceptanceCriteria": [
+        "O valor de venda é calculado automaticamente: valor de custo + percentual do grupo de precificação",
+        "Cada livro está associado a um grupo de precificação (RN0013)",
+        "Quando itens do mesmo livro têm custos diferentes, o maior custo é usado para o cálculo (RN005x)",
+        "O valor de venda calculado respeita a margem mínima definida pelo grupo (RN0014)"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-031",
+      "title": "VALIDAR RF0053: Dar baixa em estoque",
+      "description": "Validar que para cada venda realizada o sistema dá baixa no estoque dos itens vendidos, conforme RF0053.",
+      "acceptanceCriteria": [
+        "Ao aprovar uma compra, o estoque dos itens vendidos é decrementado",
+        "A baixa no estoque ocorre apenas após aprovação do pagamento (RN0028)",
+        "Itens de compras não aprovadas permanecem no estoque",
+        "O estoque não pode ficar negativo"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-032",
+      "title": "VALIDAR RF0054: Realizar reentrada em estoque",
+      "description": "Validar que o sistema realiza a reentrada de itens em estoque a partir da troca de produtos, conforme RF0054.",
+      "acceptanceCriteria": [
+        "Ao confirmar recebimento de uma troca com opção de retorno ao estoque, o sistema incrementa o estoque",
+        "A reentrada é registrada no log de auditoria (RNF0012)",
+        "O valor de estoque é atualizado imediatamente",
+        "O livro volta a aparecer disponível na vitrine se estava indisponível"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-033",
+      "title": "VALIDAR RF0055: Analisar histórico de vendas",
+      "description": "Validar que o sistema permite consultar o histórico de vendas comparando produtos ou categorias por período, conforme RF0055.",
+      "acceptanceCriteria": [
+        "Existe uma tela de análise de histórico de vendas",
+        "É possível filtrar por data de início e data de fim",
+        "É possível comparar produtos ou categorias de produtos",
+        "O resultado é exibido em gráfico de linhas (RNF0043)",
+        "A consulta retorna em até 1 segundo (RNF0011)"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-034",
+      "title": "VALIDAR RF00063: Cadastro de avaliações",
+      "description": "Validar que clientes com compras finalizadas podem publicar avaliações (estrelas e texto) para livros, conforme RF00063.",
+      "acceptanceCriteria": [
+        "Somente clientes com compras com status ENTREGUE podem avaliar os livros comprados",
+        "A avaliação contém nota em estrelas e texto descritivo",
+        "Avaliações ficam pendentes de moderação antes de serem exibidas (RF00065)",
+        "Um cliente não pode avaliar o mesmo livro duas vezes"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-035",
+      "title": "VALIDAR RF00064: Analisar histórico de vendas por região",
+      "description": "Validar que o sistema permite consultar a quantidade de vendas por estado do Brasil por período, conforme RF00064.",
+      "acceptanceCriteria": [
+        "Existe funcionalidade para consulta de vendas por estado",
+        "É possível filtrar por data de início e data de fim",
+        "Os resultados são agrupados por estado do Brasil",
+        "A consulta retorna em até 1 segundo (RNF0011)"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-036",
+      "title": "VALIDAR RF00065: Gestão de avaliações",
+      "description": "Validar que o administrador pode moderar e aprovar avaliações de clientes, conforme RF00065.",
+      "acceptanceCriteria": [
+        "O administrador visualiza lista de avaliações pendentes de moderação",
+        "O administrador pode aprovar ou rejeitar cada avaliação",
+        "Somente avaliações aprovadas são exibidas na página do livro",
+        "Avaliações rejeitadas não são exibidas ao cliente"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-037",
+      "title": "VALIDAR RNF0011: Tempo de resposta para consultas",
+      "description": "Validar que toda consulta de usuário responde em no máximo 1 segundo, conforme RNF0011.",
+      "acceptanceCriteria": [
+        "Consulta de livros responde em até 1 segundo",
+        "Consulta de clientes responde em até 1 segundo",
+        "Consulta de pedidos/transações responde em até 1 segundo",
+        "Consultas de análise/histórico de vendas respondem em até 1 segundo",
+        "Testes de performance documentam os tempos de resposta"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-038",
+      "title": "VALIDAR RNF0012: Log de transação",
+      "description": "Validar que todas as operações de escrita registram data, hora, usuário e dados alterados, conforme RNF0012.",
+      "acceptanceCriteria": [
+        "Toda inserção registra: data, hora e usuário responsável",
+        "Toda alteração registra: data, hora, usuário e dados anteriores",
+        "O log é armazenado de forma persistente e não pode ser modificado",
+        "O log de auditoria é acessível pelo administrador"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-039",
+      "title": "VALIDAR RNF0021: Código de livro",
+      "description": "Validar que todo livro cadastrado recebe um código único no sistema, conforme RNF0021.",
+      "acceptanceCriteria": [
+        "Ao cadastrar um livro, o sistema gera automaticamente um código único",
+        "Dois livros nunca compartilham o mesmo código",
+        "O código é imutável após a criação do cadastro",
+        "O código é exibido no detalhe do livro"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-040",
+      "title": "VALIDAR RNF0013: Cadastro de domínios",
+      "description": "Validar que existe um script de implantação que insere todos os registros de tabelas de domínio necessárias, conforme RNF0013.",
+      "acceptanceCriteria": [
+        "Existe um script de seed/implantação no repositório",
+        "O script insere registros de: grupo de precificação, autor, editora, fornecedor e demais domínios",
+        "O script pode ser executado em ambiente limpo sem erros",
+        "Após execução do script, todos os cadastros de domínio estão disponíveis no sistema"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-041",
+      "title": "VALIDAR RNF0031: Senha forte",
+      "description": "Validar que a senha cadastrada atende às regras de complexidade, conforme RNF0031.",
+      "acceptanceCriteria": [
+        "O sistema rejeita senhas com menos de 8 caracteres",
+        "O sistema rejeita senhas sem letras maiúsculas",
+        "O sistema rejeita senhas sem letras minúsculas",
+        "O sistema rejeita senhas sem caracteres especiais",
+        "Mensagem de erro clara é exibida quando a senha não atende os critérios"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-042",
+      "title": "VALIDAR RNF0032: Confirmação de senha",
+      "description": "Validar que o usuário deve digitar a senha duas vezes ao registrá-la, conforme RNF0032.",
+      "acceptanceCriteria": [
+        "O formulário de cadastro/alteração de senha possui dois campos de senha",
+        "O sistema impede o envio se os dois campos não são idênticos",
+        "Mensagem de erro clara é exibida quando as senhas não coincidem",
+        "O campo de confirmação é obrigatório"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-043",
+      "title": "VALIDAR RNF0033: Senha criptografada",
+      "description": "Validar que a senha é armazenada de forma criptografada no banco de dados, conforme RNF0033.",
+      "acceptanceCriteria": [
+        "A senha não é armazenada em texto plano no banco de dados",
+        "O hash da senha não é reversível (uso de bcrypt ou equivalente)",
+        "A senha não é retornada em nenhuma API response",
+        "A alteração de senha também armazena o novo valor criptografado"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-044",
+      "title": "VALIDAR RF0034 (RNF): Alteração apenas de endereços",
+      "description": "Validar que endereços de entrega ou cobrança podem ser alterados/adicionados sem edição dos demais dados cadastrais, conforme RF0034 (seção RNF).",
+      "acceptanceCriteria": [
+        "Existe uma tela/funcionalidade dedicada para gestão de endereços do cliente",
+        "É possível adicionar um novo endereço sem alterar outros dados do cliente",
+        "É possível editar um endereço existente sem alterar outros dados do cliente",
+        "As validações de campos obrigatórios (RN0023) são aplicadas"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-045",
+      "title": "VALIDAR RNF0035: Código de cliente",
+      "description": "Validar que todo cliente cadastrado recebe um código único no sistema, conforme RNF0035.",
+      "acceptanceCriteria": [
+        "Ao cadastrar um cliente, o sistema gera automaticamente um código único",
+        "Dois clientes nunca compartilham o mesmo código",
+        "O código é imutável após a criação do cadastro",
+        "O código é exibido no perfil do cliente"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-046",
+      "title": "VALIDAR RNF0042: Apresentar itens retirados do carrinho",
+      "description": "Validar que itens removidos do carrinho por expiração de prazo são exibidos na listagem com mensagem e compra desabilitada, conforme RNF0042.",
+      "acceptanceCriteria": [
+        "Itens que expiraram o prazo de bloqueio são exibidos no carrinho como removidos",
+        "A opção de finalizar compra é desabilitada quando há itens expirados",
+        "O prazo de expiração é parametrizável no sistema (RN0044)",
+        "O usuário é notificado 5 minutos antes do bloqueio expirar (RN0044)",
+        "Itens expirados precisam ser re-adicionados ao carrinho para compra"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-047",
+      "title": "VALIDAR RNF0043: Gráfico de linhas",
+      "description": "Validar que o histórico de vendas é apresentado em um gráfico de linhas, conforme RNF0043.",
+      "acceptanceCriteria": [
+        "A tela de análise exibe os dados em formato de gráfico de linhas",
+        "O gráfico é renderizado corretamente com dados reais",
+        "O gráfico é responsivo e legível em diferentes tamanhos de tela",
+        "Eixos e legenda são claramente identificáveis"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-048",
+      "title": "VALIDAR RNF0044: Recomendação com IA Generativa",
+      "description": "Validar que o sistema integra IA generativa para recomendações personalizadas e chatbot de busca, conforme RNF0044.",
+      "acceptanceCriteria": [
+        "O sistema oferece recomendações personalizadas de livros ao cliente logado",
+        "As recomendações são baseadas no histórico de compras e preferências do cliente",
+        "Existe um chatbot para auxiliar na busca de livros e responder dúvidas",
+        "As recomendações são atualizadas com base em novos dados de vendas e feedback"
+      ],
+      "priority": 4
+    },
+    {
+      "id": "US-049",
+      "title": "VALIDAR RN0011: Dados obrigatórios para cadastro de livro",
+      "description": "Validar que todos os campos obrigatórios são exigidos no cadastro de livro, conforme RN0011.",
+      "acceptanceCriteria": [
+        "O sistema exige: autor, categoria, ano, título, editora, edição, ISBN, número de páginas, sinopse",
+        "O sistema exige: dimensões (altura, largura, peso e profundidade)",
+        "O sistema exige: grupo de precificação e código de barras",
+        "O cadastro não pode ser salvo sem todos os campos obrigatórios preenchidos",
+        "Mensagens de validação claras são exibidas para cada campo ausente"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-050",
+      "title": "VALIDAR RN0012: Associação com categorias",
+      "description": "Validar que um livro pode estar associado a mais de uma categoria, conforme RN0012.",
+      "acceptanceCriteria": [
+        "O formulário de livro permite seleção de múltiplas categorias",
+        "Um livro é salvo corretamente com duas ou mais categorias",
+        "A filtragem por categoria retorna livros que possuem aquela categoria (mesmo com múltiplas)",
+        "A alteração de categorias de um livro é refletida imediatamente nas consultas"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-051",
+      "title": "VALIDAR RN0013: Definindo valor de venda",
+      "description": "Validar que todo livro cadastrado é associado a um grupo de precificação e que o valor de venda é calculado com base na margem do grupo, conforme RN0013.",
+      "acceptanceCriteria": [
+        "Todo livro cadastrado deve ser associado a um grupo de precificação",
+        "O valor de venda é calculado automaticamente: valor de custo + margem do grupo de precificação",
+        "Grupos de precificação têm margem de lucro configurável",
+        "O valor de venda calculado é exibido antes da confirmação do cadastro"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-052",
+      "title": "VALIDAR RN0014: Validar margem de lucro",
+      "description": "Validar que o valor de um livro só pode ser alterado abaixo da margem com autorização de gerente de vendas, conforme RN0014.",
+      "acceptanceCriteria": [
+        "O sistema bloqueia alteração de preço fora da margem do grupo de precificação sem autorização",
+        "A alteração abaixo da margem exige aprovação de um gerente de vendas",
+        "Após aprovação do gerente, o preço fora da margem é aceito",
+        "A tentativa de burlar a validação sem autorização resulta em erro de negócio"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-053",
+      "title": "VALIDAR RN0015: Associar motivo de inativação",
+      "description": "Validar que todo livro inativado manualmente possui justificativa e categoria de inativação, conforme RN0015.",
+      "acceptanceCriteria": [
+        "O formulário de inativação manual exige justificativa textual",
+        "O formulário de inativação manual exige seleção de categoria de inativação",
+        "Não é possível inativar um livro sem preencher ambos os campos",
+        "A justificativa e categoria ficam vinculadas ao registro de inativação do livro"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-054",
+      "title": "VALIDAR RN0016: Associar motivo de inativação automática",
+      "description": "Validar que livros inativados automaticamente recebem a categoria FORA DE MERCADO, conforme RN0016.",
+      "acceptanceCriteria": [
+        "Livros inativados de forma automática (RF0013) têm categoria FORA DE MERCADO",
+        "A categoria é atribuída automaticamente sem intervenção manual",
+        "A categoria FORA DE MERCADO existe no cadastro de domínios de inativação",
+        "É possível consultar livros com esta categoria no painel do administrador"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-055",
+      "title": "VALIDAR RN0017: Associar motivo de ativação",
+      "description": "Validar que todo livro ativado possui justificativa e categoria de ativação, conforme RN0017.",
+      "acceptanceCriteria": [
+        "O formulário de ativação exige justificativa textual",
+        "O formulário de ativação exige seleção de categoria de ativação",
+        "Não é possível ativar um livro sem preencher ambos os campos",
+        "A justificativa e categoria ficam vinculadas ao registro de ativação do livro"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-056",
+      "title": "VALIDAR RN0021: Cadastro de endereço de cobrança",
+      "description": "Validar que todo cliente cadastrado possui ao menos um endereço de cobrança obrigatório, conforme RN0021.",
+      "acceptanceCriteria": [
+        "O formulário de cadastro de cliente exige ao menos um endereço de cobrança",
+        "Não é possível finalizar o cadastro sem um endereço de cobrança",
+        "O endereço de cobrança segue os campos obrigatórios de RN0023",
+        "O cliente pode adicionar mais de um endereço de cobrança"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-057",
+      "title": "VALIDAR RN0022: Cadastro de endereço de entrega",
+      "description": "Validar que todo cliente cadastrado possui ao menos um endereço de entrega obrigatório, conforme RN0022.",
+      "acceptanceCriteria": [
+        "O formulário de cadastro de cliente exige ao menos um endereço de entrega",
+        "Não é possível finalizar o cadastro sem um endereço de entrega",
+        "O endereço de entrega segue os campos obrigatórios de RN0023",
+        "O cliente pode adicionar mais de um endereço de entrega"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-058",
+      "title": "VALIDAR RN0023: Composição do registro de endereços",
+      "description": "Validar que todos os campos obrigatórios de um endereço estão presentes, conforme RN0023.",
+      "acceptanceCriteria": [
+        "O formulário de endereço exige: Tipo de residência, Tipo Logradouro, Logradouro, Número, Bairro, CEP, Cidade, Estado e País",
+        "Todos os campos listados são de preenchimento obrigatório",
+        "O campo de observações é opcional",
+        "Mensagens de validação são exibidas para campos obrigatórios não preenchidos"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-059",
+      "title": "VALIDAR RN0024: Composição do registro de cartões de crédito",
+      "description": "Validar que o cadastro de cartão de crédito exige todos os campos obrigatórios, conforme RN0024.",
+      "acceptanceCriteria": [
+        "O formulário de cartão exige: Nº do Cartão, Nome impresso no Cartão, Bandeira do Cartão e Código de Segurança",
+        "Não é possível salvar cartão sem todos os campos preenchidos",
+        "O número do cartão é validado quanto ao formato",
+        "O código de segurança tem comprimento mínimo validado"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-060",
+      "title": "VALIDAR RN0025: Bandeiras permitidas para cartões de crédito",
+      "description": "Validar que somente cartões de bandeiras registradas no sistema são aceitos, conforme RN0025.",
+      "acceptanceCriteria": [
+        "O sistema possui lista de bandeiras válidas cadastradas",
+        "Ao cadastrar cartão, somente bandeiras da lista são aceitas",
+        "Tentativa de cadastrar cartão com bandeira inválida resulta em erro",
+        "A lista de bandeiras é gerenciada pelo administrador"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-061",
+      "title": "VALIDAR RN0026: Dados obrigatórios para cadastro de cliente",
+      "description": "Validar que todos os campos obrigatórios são exigidos no cadastro de cliente, conforme RN0026.",
+      "acceptanceCriteria": [
+        "O sistema exige: Gênero, Nome, Data de Nascimento, CPF",
+        "O sistema exige: Telefone (tipo, DDD e número), e-mail, senha",
+        "O sistema exige: endereço residencial",
+        "Não é possível concluir o cadastro com campos obrigatórios vazios",
+        "Mensagens de validação são exibidas para cada campo ausente"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-062",
+      "title": "VALIDAR RN0027: Ranking de cliente",
+      "description": "Validar que o cliente recebe um ranking numérico com base no seu perfil de compra, conforme RN0027.",
+      "acceptanceCriteria": [
+        "Todo cliente possui um ranking numérico em seu perfil",
+        "O ranking é atualizado conforme o histórico de compras do cliente",
+        "O ranking é visível no painel do cliente e/ou do administrador",
+        "As regras de cálculo do ranking estão documentadas e implementadas"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-063",
+      "title": "VALIDAR RN0028: Validar retorno da operadora de cartão de crédito",
+      "description": "Validar que a baixa no estoque só ocorre após a compra ser efetivada (aprovada pela operadora), conforme RN0028.",
+      "acceptanceCriteria": [
+        "O estoque não é decrementado enquanto a compra está EM PROCESSAMENTO",
+        "O estoque é decrementado somente após status APROVADA",
+        "Itens de compras não aprovadas (REPROVADA) são desbloqueados e mantidos em estoque",
+        "O sistema trata falhas de comunicação com a operadora de forma adequada"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-064",
+      "title": "VALIDAR RN0031: Validar estoque para adição de itens no carrinho",
+      "description": "Validar que não é possível adicionar ao carrinho itens sem estoque ou em quantidade superior ao disponível, conforme RN0031.",
+      "acceptanceCriteria": [
+        "Itens sem estoque não podem ser adicionados ao carrinho",
+        "Itens sem estoque exibem mensagem de indisponível na vitrine",
+        "A quantidade adicionada ao carrinho não pode superar o estoque disponível",
+        "Mensagem de erro clara é exibida ao tentar adicionar quantidade inválida"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-065",
+      "title": "VALIDAR RN0032: Validar estoque para compra",
+      "description": "Validar que alterações de estoque entre a adição ao carrinho e a finalização são tratadas corretamente, conforme RN0032.",
+      "acceptanceCriteria": [
+        "O sistema valida o estoque novamente na finalização da compra",
+        "Se o estoque foi reduzido, o sistema notifica o cliente sobre a mudança",
+        "A quantidade no carrinho é atualizada automaticamente para o disponível",
+        "Se o item ficou indisponível, ele é removido do carrinho com mensagem de alerta"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-066",
+      "title": "VALIDAR RN0033: Uso de cupom promocional para pagamento",
+      "description": "Validar que apenas um cupom promocional pode ser utilizado por compra, conforme RN0033.",
+      "acceptanceCriteria": [
+        "O sistema aceita no máximo um cupom promocional por compra",
+        "Ao tentar adicionar um segundo cupom promocional, o sistema exibe erro",
+        "Múltiplos cupons de troca ainda podem ser usados junto a um cupom promocional",
+        "A restrição é aplicada tanto na interface quanto na API"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-067",
+      "title": "VALIDAR RN0034: Uso de diversos cartões de crédito",
+      "description": "Validar que uma compra pode ser paga com mais de um cartão, com valor mínimo de R$ 10,00 por cartão, conforme RN0034.",
+      "acceptanceCriteria": [
+        "O sistema permite informar mais de um cartão de crédito para o pagamento",
+        "O valor mínimo por cartão é R$ 10,00",
+        "O sistema impede valor abaixo de R$ 10,00 por cartão (exceto quando combinado com cupons - RN0035)",
+        "A soma dos valores dos cartões deve cobrir o total a pagar com cartão"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-068",
+      "title": "VALIDAR RN0035: Uso de cupons junto a cartão de crédito",
+      "description": "Validar que ao usar cupons e cartão juntos, o valor máximo dos cupons é considerado e o cartão pode ter valor abaixo de R$ 10,00, conforme RN0035.",
+      "acceptanceCriteria": [
+        "O sistema calcula corretamente o saldo restante após aplicar cupons",
+        "O valor restante para o cartão pode ser menor que R$ 10,00 quando há cupons na compra",
+        "O valor total dos cupons é aplicado antes do cartão",
+        "O exemplo do documento é validado: compra R$35, cupons R$30, cartão R$5 — deve ser aceito"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-069",
+      "title": "VALIDAR RN0036: Gerar cupom de troca por pagamento com cupons excedentes",
+      "description": "Validar que um cupom de troca é gerado quando cupons utilizados superam o valor da compra, conforme RN0036.",
+      "acceptanceCriteria": [
+        "O sistema gera cupom de troca com a diferença quando cupons superam o valor da compra",
+        "O sistema não permite uso de cupons que supere desnecessariamente o valor da compra",
+        "No exemplo: venda R$50, três cupons R$20, R$40 e R$35 — o sistema aceita no máximo dois e gera cupom com a diferença",
+        "O cupom gerado fica disponível ao cliente para uso futuro"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-070",
+      "title": "VALIDAR RN0037: Validar Forma de Pagamento para finalização de compra",
+      "description": "Validar que após a finalização, a forma de pagamento é validada quanto a cupons e operadora de cartão, conforme RN0037.",
+      "acceptanceCriteria": [
+        "O sistema valida a validade dos cupons de troca utilizados",
+        "O sistema valida a validade dos cupons promocionais utilizados",
+        "O sistema submete o pagamento à operadora de cartão para aprovação",
+        "Erros de validação resultam em status REPROVADA sem afetar o estoque"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-071",
+      "title": "VALIDAR RN0038: Alterar status da compra conforme aprovação do pagamento",
+      "description": "Validar que o status da compra muda para APROVADA ou REPROVADA conforme o resultado da validação do pagamento, conforme RN0038.",
+      "acceptanceCriteria": [
+        "Compras com pagamento validado com sucesso recebem status APROVADA",
+        "Compras com pagamento inválido ou negado recebem status REPROVADA",
+        "A transição de status é automática após a validação",
+        "O cliente é notificado do resultado do processamento"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-072",
+      "title": "VALIDAR RN0039: Alterar status da compra para transporte",
+      "description": "Validar que toda compra selecionada para entrega tem o status alterado para EM TRANSPORTE, conforme RN0039.",
+      "acceptanceCriteria": [
+        "O status muda para EM TRANSPORTE ao despachar a compra (RF0038)",
+        "Somente compras APROVADAS podem ser despachadas",
+        "A mudança de status é registrada no histórico da compra",
+        "O cliente pode visualizar o novo status na consulta de pedidos"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-073",
+      "title": "VALIDAR RN0040: Alterar status da compra após entrega",
+      "description": "Validar que toda compra confirmada como entregue tem o status alterado para ENTREGUE, conforme RN0040.",
+      "acceptanceCriteria": [
+        "O status muda para ENTREGUE ao confirmar entrega (RF0039)",
+        "Somente compras EM TRANSPORTE podem ser confirmadas como entregues",
+        "A mudança de status é registrada no histórico da compra",
+        "Após o status ENTREGUE, o cliente pode solicitar troca dos itens"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-074",
+      "title": "VALIDAR RN0041: Gerar pedido de troca",
+      "description": "Validar que todo item selecionado para troca gera um pedido de troca com status EM TROCA, conforme RN0041.",
+      "acceptanceCriteria": [
+        "Ao solicitar troca de item(ns), um pedido de troca é criado com status EM TROCA",
+        "Se toda a compra for solicitada para troca, o status do pedido inteiro é EM TROCA",
+        "O pedido de troca é vinculado ao pedido original",
+        "O cliente pode visualizar o pedido de troca no histórico de transações"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-075",
+      "title": "VALIDAR RN0042: Alterar status do pedido após recebimento de troca",
+      "description": "Validar que ao confirmar recebimento dos itens de troca, o status do pedido muda para TROCADO, conforme RN0042.",
+      "acceptanceCriteria": [
+        "Ao confirmar recebimento dos itens (RF0043), o status muda para TROCADO",
+        "Somente pedidos com status EM TROCA ou TROCA AUTORIZADA podem ser confirmados",
+        "A mudança de status é registrada no histórico",
+        "O cliente pode visualizar o status TROCADO em seu histórico"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-076",
+      "title": "VALIDAR RN0043: Validação para solicitar troca",
+      "description": "Validar que somente itens de pedidos com status ENTREGUE podem receber solicitação de troca, conforme RN0043.",
+      "acceptanceCriteria": [
+        "A opção de troca não está disponível para pedidos com status diferente de ENTREGUE",
+        "Tentativa de solicitar troca via API em pedido não ENTREGUE retorna erro de negócio",
+        "Pedidos EM PROCESSAMENTO, APROVADA, EM TRANSPORTE não permitem solicitação de troca",
+        "A validação é aplicada tanto na interface quanto na API"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-077",
+      "title": "VALIDAR RN0044: Bloqueio de produtos no carrinho",
+      "description": "Validar que ao adicionar item no carrinho, o item é bloqueado temporariamente com prazo parametrizável e desbloqueado se não comprado, conforme RN0044.",
+      "acceptanceCriteria": [
+        "Itens adicionados ao carrinho são bloqueados para novas compras",
+        "O prazo de bloqueio é parametrizável no sistema",
+        "O prazo é reiniciado a cada novo item adicionado ao carrinho",
+        "O cliente é notificado 5 minutos antes do prazo de bloqueio expirar",
+        "Ao expirar, os itens são removidos do carrinho e desbloqueados para outros clientes"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-078",
+      "title": "VALIDAR RNF0045: Retirar item do carrinho ao desbloquear",
+      "description": "Validar que ao desbloquear um item, todos os itens do mesmo produto são retirados do carrinho que gerou o prazo de bloqueio, conforme RNF0045.",
+      "acceptanceCriteria": [
+        "Ao desbloquear um produto por expiração, todos os itens daquele produto são removidos do carrinho",
+        "Outros produtos no mesmo carrinho não são afetados",
+        "O desbloqueio libera os itens para outros clientes",
+        "O carrinho é atualizado imediatamente e o cliente vê a lista atualizada"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-079",
+      "title": "VALIDAR RNF0046: Gerar notificação de autorização de troca",
+      "description": "Validar que quando o administrador autoriza uma troca, o sistema gera notificação ao cliente, conforme RNF0046.",
+      "acceptanceCriteria": [
+        "Ao autorizar troca (RF0041), o sistema envia notificação ao cliente",
+        "O cliente recebe a notificação na plataforma (email ou notificação in-app)",
+        "O conteúdo da notificação informa que a troca foi autorizada",
+        "A notificação é enviada de forma assíncrona sem impactar a resposta da API"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-080",
+      "title": "VALIDAR RN0051: Validar dados de estoque",
+      "description": "Validar que para cada entrada em estoque todos os campos obrigatórios são informados, conforme RN0051.",
+      "acceptanceCriteria": [
+        "O sistema exige: produto, quantidade, valor de custo, fornecedor e data de entrada",
+        "Não é possível salvar entrada sem todos os campos obrigatórios",
+        "Cada campo obrigatório possui validação com mensagem de erro clara",
+        "Entradas válidas são persistidas e refletem no estoque imediatamente"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-081",
+      "title": "VALIDAR RN005x: Definir valor de item com diferentes custos",
+      "description": "Validar que quando itens do mesmo livro têm custos diferentes, o valor de venda é calculado com base no maior custo, conforme RN005x.",
+      "acceptanceCriteria": [
+        "Ao registrar novos itens com custo diferente do lote existente, o sistema recalcula o valor de venda",
+        "O valor de venda de todos os itens do livro é atualizado para refletir o maior custo",
+        "O cálculo usa o maior valor de custo entre todos os lotes do livro",
+        "O novo valor de venda é aplicado na vitrine imediatamente após o recálculo"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-082",
+      "title": "VALIDAR RN0061: Quantidade de itens na entrada de estoque",
+      "description": "Validar que não é permitida a entrada de itens com quantidade zero, conforme RN0061.",
+      "acceptanceCriteria": [
+        "O sistema rejeita entradas em estoque com quantidade igual a zero",
+        "O sistema rejeita entradas com quantidade negativa",
+        "Mensagem de erro clara é exibida para quantidade inválida",
+        "A validação ocorre tanto na interface quanto na API"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-083",
+      "title": "VALIDAR RN0062: Valor de custo obrigatório na entrada de estoque",
+      "description": "Validar que todo item de estoque possui um valor de custo, conforme RN0062.",
+      "acceptanceCriteria": [
+        "O sistema rejeita entradas em estoque sem valor de custo",
+        "O sistema rejeita entradas com valor de custo zero ou negativo",
+        "Mensagem de erro clara é exibida quando o campo de custo está ausente",
+        "A validação é aplicada tanto na interface quanto na API"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-084",
+      "title": "VALIDAR RNF0064: Data de entrada obrigatória no estoque",
+      "description": "Validar que não é permitido registrar itens em estoque sem data de entrada, conforme RNF0064.",
+      "acceptanceCriteria": [
+        "O sistema rejeita entradas em estoque sem data de entrada",
+        "Mensagem de erro clara é exibida quando a data está ausente",
+        "A data de entrada não pode ser futura",
+        "A validação é aplicada tanto na interface quanto na API"
+      ],
+      "priority": 1
+    }
+  ]
+}

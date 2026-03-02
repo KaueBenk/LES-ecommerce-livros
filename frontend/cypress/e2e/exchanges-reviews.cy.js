@@ -62,6 +62,37 @@ const silenceGlobalAPIs = () => {
     statusCode: 200,
     body: { data: 0 },
   }).as('notifCount');
+  // Silence cart / profile API calls made by Header / CartProvider on mount
+  cy.intercept('GET', '**/carrinhos/**', { statusCode: 200, body: { data: { itens: [], valorTotal: 0, quantidade: 0 } } });
+  cy.intercept('GET', '**/clientes/perfil', { statusCode: 200, body: { data: clienteFixture } });
+  cy.intercept('GET', '**/categorias**', { statusCode: 200, body: { data: [] } });
+};
+
+// ── Helpers that visit a page with pre-seeded auth state ─────────────────────
+
+/**
+ * Visit a URL while setting customer auth in localStorage before React mounts.
+ */
+const visitAsCustomer = (url) => {
+  cy.visit(url, {
+    onBeforeLoad(win) {
+      win.localStorage.setItem('auth_token', 'customer-jwt');
+      win.localStorage.setItem('user_profile', JSON.stringify(clienteFixture));
+    },
+  });
+};
+
+/**
+ * Visit a URL while setting admin auth in localStorage before React mounts.
+ */
+const visitAsAdmin = (url) => {
+  const adminProfile = { ...clienteFixture, role: 'ADMIN', roles: ['ADMIN'] };
+  cy.visit(url, {
+    onBeforeLoad(win) {
+      win.localStorage.setItem('auth_token', 'admin-jwt');
+      win.localStorage.setItem('user_profile', JSON.stringify(adminProfile));
+    },
+  });
 };
 
 // ── Order / Exchange fixtures ─────────────────────────────────────────────────
@@ -193,14 +224,13 @@ describe('Exchanges — User and Admin Workflow', () => {
 
   describe('User: submit exchange request from order history', () => {
     beforeEach(() => {
-      setupCustomer();
       silenceGlobalAPIs();
     });
 
     it('shows Solicitar Troca button only for ENTREGUE orders', () => {
       mockGetTransactions([deliveredOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       // Expand the order card
@@ -214,7 +244,7 @@ describe('Exchanges — User and Admin Workflow', () => {
       const processingOrder = { ...deliveredOrder, id: 200, status: 'EM_PROCESSAMENTO' };
       mockGetTransactions([processingOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${processingOrder.id}"]`).click();
@@ -225,7 +255,7 @@ describe('Exchanges — User and Admin Workflow', () => {
     it('opens exchange modal when clicking Solicitar Troca', () => {
       mockGetTransactions([deliveredOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -237,7 +267,7 @@ describe('Exchanges — User and Admin Workflow', () => {
     it('modal contains item rows for each order item', () => {
       mockGetTransactions([deliveredOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -254,7 +284,7 @@ describe('Exchanges — User and Admin Workflow', () => {
     it('shows error when submitting without selecting an item', () => {
       mockGetTransactions([deliveredOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -270,7 +300,7 @@ describe('Exchanges — User and Admin Workflow', () => {
     it('shows error when submitting without justification', () => {
       mockGetTransactions([deliveredOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -298,7 +328,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         },
       }).as('submitExchange');
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -335,7 +365,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         },
       }).as('submitExchange');
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -374,7 +404,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         },
       }).as('submitExchange');
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -395,7 +425,7 @@ describe('Exchanges — User and Admin Workflow', () => {
     it('exchange modal closes when clicking Cancel', () => {
       mockGetTransactions([deliveredOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -409,7 +439,7 @@ describe('Exchanges — User and Admin Workflow', () => {
     it('exchange modal closes when clicking the X button', () => {
       mockGetTransactions([deliveredOrder]);
 
-      cy.visit('/orders');
+      visitAsCustomer('/account/orders');
       cy.get('[data-testid="order-history-page"]', { timeout: 10000 }).should('exist');
 
       cy.get(`[data-testid="order-toggle-${deliveredOrder.id}"]`).click();
@@ -425,7 +455,6 @@ describe('Exchanges — User and Admin Workflow', () => {
 
   describe('Admin: authorize pending exchange (EM_TROCA)', () => {
     beforeEach(() => {
-      setupAdmin();
       silenceGlobalAPIs();
     });
 
@@ -443,7 +472,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         },
       }).as('getPendingExchanges');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.get('[data-testid="tab-pending"]').should('have.class', 'active');
     });
@@ -462,7 +491,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         },
       }).as('getPendingExchanges');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getPendingExchanges');
 
@@ -477,7 +506,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         },
       }).as('emptyExchanges');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@emptyExchanges');
 
@@ -503,7 +532,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         body: { message: 'Troca autorizada com sucesso' },
       }).as('authorizeExchange');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getPendingExchanges');
 
@@ -529,7 +558,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         body: { message: 'Troca autorizada com sucesso' },
       }).as('authorizeExchange');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.get(`[data-testid="pending-exchange-row-${pendingExchange.id}"]`).should('exist');
 
@@ -545,7 +574,6 @@ describe('Exchanges — User and Admin Workflow', () => {
 
   describe('Admin: confirm exchange receipt (TROCA_AUTORIZADA)', () => {
     beforeEach(() => {
-      setupAdmin();
       silenceGlobalAPIs();
     });
 
@@ -565,7 +593,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         });
       }).as('exchanges');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
 
       // Click the authorized tab
@@ -585,7 +613,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         });
       }).as('exchanges');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
 
       cy.get('[data-testid="tab-authorized"]').click();
@@ -606,7 +634,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         });
       }).as('exchanges');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.get('[data-testid="tab-authorized"]').click();
       cy.wait('@exchanges');
@@ -629,7 +657,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         });
       }).as('exchanges');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.get('[data-testid="tab-authorized"]').click();
       cy.wait('@exchanges');
@@ -659,7 +687,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         body: { message: 'Troca finalizada' },
       }).as('confirmReceipt');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.get('[data-testid="tab-authorized"]').click();
       cy.wait('@exchanges');
@@ -685,7 +713,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         body: { message: 'Troca finalizada' },
       }).as('confirmReceipt');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.get('[data-testid="tab-authorized"]').click();
       cy.wait('@exchanges');
@@ -721,7 +749,7 @@ describe('Exchanges — User and Admin Workflow', () => {
         body: { message: 'Troca finalizada' },
       }).as('confirmReceipt');
 
-      cy.visit('/admin/trocas');
+      visitAsAdmin('/admin/trocas');
       cy.get('[data-testid="admin-exchanges-section"]', { timeout: 10000 }).should('exist');
       cy.get('[data-testid="tab-authorized"]').click();
       cy.get(`[data-testid="authorized-exchange-row-${authorizedExchange.id}"]`).should('exist');
@@ -908,7 +936,6 @@ describe('Reviews — User Submission and Admin Moderation', () => {
 
   describe('Admin: review moderation workflow', () => {
     beforeEach(() => {
-      setupAdmin();
       silenceGlobalAPIs();
     });
 
@@ -926,7 +953,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         },
       }).as('getReviews');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
     });
 
@@ -944,7 +971,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         },
       }).as('getReviews');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -965,7 +992,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         },
       }).as('getReviews');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -987,7 +1014,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         },
       }).as('getReviews');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -1014,7 +1041,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         body: { message: 'Avaliação aprovada com sucesso' },
       }).as('approveReview');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -1041,7 +1068,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         body: { message: 'Avaliação aprovada' },
       }).as('approveReview');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -1072,7 +1099,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         body: { message: 'Avaliação rejeitada' },
       }).as('rejectReview');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -1099,7 +1126,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         body: { message: 'Avaliação rejeitada' },
       }).as('rejectReview');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -1118,7 +1145,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         },
       }).as('getReviews');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
 
       cy.get('[data-testid="filter-status-pending"]').should('exist');
@@ -1142,7 +1169,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         });
       }).as('getReviewsFiltered');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
 
       cy.get('[data-testid="filter-status-approved"]').click();
@@ -1166,7 +1193,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         },
       }).as('getReviews');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -1188,7 +1215,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         },
       }).as('getReviews');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 
@@ -1218,7 +1245,7 @@ describe('Reviews — User Submission and Admin Moderation', () => {
         body: { message: 'Avaliação aprovada' },
       }).as('modalApprove');
 
-      cy.visit('/admin/avaliacoes');
+      visitAsAdmin('/admin/avaliacoes');
       cy.get('[data-testid="admin-reviews-section"]', { timeout: 10000 }).should('exist');
       cy.wait('@getReviews');
 

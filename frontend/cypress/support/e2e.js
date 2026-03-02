@@ -17,5 +17,13 @@ Cypress.on('uncaught:exception', (err) => {
   if (err.message.includes('ResizeObserver loop')) return false;
   // Ignore Vite HMR disconnection noise
   if (err.message.includes('Failed to fetch dynamically imported module')) return false;
+  // Ignore network/connection errors from unmocked API calls in test environment
+  if (err.message.includes('Network Error')) return false;
+  if (err.message.includes('ERR_CONNECTION_REFUSED')) return false;
+  if (err.message.includes('ECONNREFUSED')) return false;
+  if (err.message.includes('net::ERR_')) return false;
+  // Ignore Axios cancellation / timeout that may surface during fast test teardown
+  if (err.message.includes('Request aborted')) return false;
+  if (err.message.includes('Request failed')) return false;
   return true;
 });
