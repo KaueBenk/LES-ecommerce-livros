@@ -1,6 +1,11 @@
 /**
  * Demo mode interceptor - Replaces API calls with mock data
- * Strategy: Use a custom adapter for axios that serves mock data instead of making real requests
+ * Uses a custom axios adapter so all requests are intercepted before reaching the network.
+ *
+ * IMPORTANT: response shapes must match what the service layer returns after
+ * doing `response.data.data`, and then what the UI components expect from
+ * that service return value.  For paginated endpoints the UI expects Spring
+ * Boot's Page shape: { content: [...], totalPages, totalElements, ... }
  */
 
 import {
@@ -14,555 +19,303 @@ import {
   mockCreditCards,
   mockAnalytics,
   mockNotifications,
+  mockCustomers,
+  mockExchanges,
+  mockStock,
 } from './mockData';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
 
-/**
- * Handle mock API response for all demo mode requests
- */
-const getMockResponse = (config) => {
-  const url = config.url || '';
-  const method = config.method || 'get';
+// Safe body parse — config.data may be a string or already an object
+const body = (config) => {
+  if (!config.data) return {};
+  if (typeof config.data === 'string') { try { return JSON.parse(config.data); } catch { return {}; } }
+  return config.data;
+};
 
-  console.log('[DEMO MODE] Intercepting:', method.toUpperCase(), url);
-
-  // ─── Auth Endpoints ────────────────────────────────────────────────────
-  if (url.includes('/auth/login')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: {
-        data: {
-          token: 'demo-token-' + Date.now(),
-          user: mockUser,
-        },
-      },
-    };
-  }
-
-  if (url.includes('/auth/register')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: {
-        data: {
-          token: 'demo-token-' + Date.now(),
-          user: mockUser,
-        },
-      },
-    };
-  }
-
-  if (url.includes('/auth/logout')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { success: true },
-    };
-  }
-
-  if (url.includes('/auth/senha')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { message: 'Senha alterada com sucesso' },
-    };
-  }
-
-  // ─── Admin Books Endpoints ────────────────────────────────────────────
-  if (url.includes('/admin/livros') && !url.includes('/ativar') && !url.includes('/inativar')) {
-    if (method === 'get') {
-      if (/\/admin\/livros\/\d+/.test(url)) {
-        const bookId = url.split('/').pop();
-        const book = mockBooks.find((b) => b.id === bookId);
-        return {
-          status: 200,
-          statusText: 'OK',
-          headers: {},
-          config,
-          data: { data: book || mockBooks[0] },
-        };
-      }
-
-      const page = config.params?.page || 0;
-      const size = config.params?.size || 12;
-      const startIdx = page * size;
-      const endIdx = startIdx + size;
-
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: {
-          data: mockBooks.slice(startIdx, endIdx),
-          totalElements: mockBooks.length,
-          totalPages: Math.ceil(mockBooks.length / size),
-          currentPage: page,
-          pageSize: size,
-        },
-      };
-    }
-
-    if (method === 'post') {
-      return {
-        status: 201,
-        statusText: 'Created',
-        headers: {},
-        config,
-        data: {
-          data: {
-            id: Math.random().toString(36),
-            ...config.data,
-          },
-        },
-      };
-    }
-
-    if (method === 'put') {
-      const bookId = url.split('/').pop();
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: {
-          data: {
-            id: bookId,
-            ...config.data,
-          },
-        },
-      };
-    }
-  }
-
-  // ─── Admin Book Activation/Deactivation ────────────────────────────────
-  if (url.includes('/admin/livros/') && (url.includes('/ativar') || url.includes('/inativar'))) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { message: 'Status alterado com sucesso' },
-    };
-  }
-
-  // ─── Admin Orders Endpoints ────────────────────────────────────────────
-  if (url.includes('/admin/pedidos')) {
-    if (method === 'get') {
-      if (/\/admin\/pedidos\/\d+/.test(url)) {
-        const orderId = url.split('/').pop();
-        const order = mockOrders.find((o) => o.id === orderId);
-        return {
-          status: 200,
-          statusText: 'OK',
-          headers: {},
-          config,
-          data: { data: order || mockOrders[0] },
-        };
-      }
-
-      const page = config.params?.page || 0;
-      const size = config.params?.size || 20;
-      const startIdx = page * size;
-      const endIdx = startIdx + size;
-
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: {
-          data: mockOrders.slice(startIdx, endIdx),
-          totalElements: mockOrders.length,
-          totalPages: Math.ceil(mockOrders.length / size),
-          currentPage: page,
-          pageSize: size,
-        },
-      };
-    }
-
-    if (method === 'patch') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { message: 'Pedido atualizado com sucesso' },
-      };
-    }
-  }
-
-  // ─── Admin Analytics ───────────────────────────────────────────────────
-  if (url.includes('/admin/analytics') || url.includes('/admin/dashboard')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { data: mockAnalytics },
-    };
-  }
-
-  // ─── Catalog Endpoints (Books) ────────────────────────────────────────
-  if (url.includes('/livros') && !url.includes('/admin') && !url.includes('/avaliacoes')) {
-    if (method === 'get') {
-      if (/\/livros\/\d+$/.test(url)) {
-        const bookId = url.split('/').pop();
-        const book = mockBooks.find((b) => b.id === bookId);
-        return {
-          status: 200,
-          statusText: 'OK',
-          headers: {},
-          config,
-          data: { data: book || mockBooks[0] },
-        };
-      }
-
-      const page = config.params?.page || 0;
-      const size = config.params?.size || 12;
-      const startIdx = page * size;
-      const endIdx = startIdx + size;
-
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: {
-          data: mockBooks.slice(startIdx, endIdx),
-          totalElements: mockBooks.length,
-          totalPages: Math.ceil(mockBooks.length / size),
-          currentPage: page,
-          pageSize: size,
-        },
-      };
-    }
-  }
-
-  // ─── Categories ───────────────────────────────────────────────────────
-  if (url.includes('/catalogo/categorias')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { data: mockCategories },
-    };
-  }
-
-  // ─── Authors ───────────────────────────────────────────────────────────
-  if (url.includes('/catalogo/autores')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { data: mockAuthors },
-    };
-  }
-
-  // ─── Publishers (editoras) ──────────────────────────────────────────────
-  if (url.includes('/catalogo/editoras')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { data: [{ id: '1', nome: 'Editora Demo' }] },
-    };
-  }
-
-  // ─── Reviews ───────────────────────────────────────────────────────────
-  if (url.includes('/avaliacoes')) {
-    const bookId = url.split('/')[2];
-
-    if (method === 'get') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { data: mockReviews[bookId] || [] },
-      };
-    }
-
-    if (method === 'post') {
-      return {
-        status: 201,
-        statusText: 'Created',
-        headers: {},
-        config,
-        data: {
-          data: {
-            id: Math.random().toString(36),
-            livroId: bookId,
-            usuarioId: '1',
-            nomeUsuario: mockUser.nome,
-            ...config.data,
-            data: new Date().toISOString().split('T')[0],
-          },
-        },
-      };
-    }
-  }
-
-  // ─── Orders (Customer) ────────────────────────────────────────────────
-  if (url.includes('/pedidos') && !url.includes('/admin')) {
-    if (method === 'get') {
-      if (/\/pedidos\/\d+/.test(url)) {
-        const orderId = url.split('/').pop();
-        const order = mockOrders.find((o) => o.id === orderId);
-        return {
-          status: 200,
-          statusText: 'OK',
-          headers: {},
-          config,
-          data: { data: order || mockOrders[0] },
-        };
-      }
-
-      const page = config.params?.page || 0;
-      const size = config.params?.size || 20;
-      const startIdx = page * size;
-      const endIdx = startIdx + size;
-
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: {
-          data: mockOrders.slice(startIdx, endIdx),
-          totalElements: mockOrders.length,
-          totalPages: Math.ceil(mockOrders.length / size),
-          currentPage: page,
-          pageSize: size,
-        },
-      };
-    }
-
-    if (method === 'post') {
-      return {
-        status: 201,
-        statusText: 'Created',
-        headers: {},
-        config,
-        data: {
-          data: {
-            id: Math.random().toString(36),
-            numeroPedido: 'PED-' + Date.now(),
-            data: new Date().toISOString().split('T')[0],
-            status: 'CONFIRMADO',
-            total: config.data?.total || 0,
-            itens: config.data?.itens || [],
-          },
-        },
-      };
-    }
-  }
-
-  // ─── Checkout ─────────────────────────────────────────────────────────
-  if (url.includes('/checkout')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: {
-        data: {
-          id: Math.random().toString(36),
-          numeroPedido: 'PED-' + Date.now(),
-          status: 'SUCESSO',
-          message: 'Pedido criado com sucesso em modo demo',
-          orderId: Math.random().toString(36),
-        },
-      },
-    };
-  }
-
-  // ─── Customer Profile ────────────────────────────────────────────────
-  if (url.includes('/clientes/perfil') || url.includes('/clientes/me')) {
-    if (method === 'get') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { data: mockUser },
-      };
-    }
-
-    if (method === 'put') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { data: { ...mockUser, ...config.data } },
-      };
-    }
-  }
-
-  // ─── Addresses ────────────────────────────────────────────────────────
-  if (url.includes('/enderecosEntrega') || url.includes('/enderecos')) {
-    if (method === 'get') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { data: mockAddresses },
-      };
-    }
-
-    if (method === 'post') {
-      return {
-        status: 201,
-        statusText: 'Created',
-        headers: {},
-        config,
-        data: {
-          data: {
-            id: Math.random().toString(36),
-            ...config.data,
-          },
-        },
-      };
-    }
-
-    if (method === 'put') {
-      const id = url.split('/').pop();
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: {
-          data: {
-            id,
-            ...config.data,
-          },
-        },
-      };
-    }
-
-    if (method === 'delete') {
-      return {
-        status: 204,
-        statusText: 'No Content',
-        headers: {},
-        config,
-        data: {},
-      };
-    }
-  }
-
-  // ─── Credit Cards ────────────────────────────────────────────────────
-  if (url.includes('/cartoes')) {
-    if (method === 'get') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { data: mockCreditCards },
-      };
-    }
-
-    if (method === 'post') {
-      return {
-        status: 201,
-        statusText: 'Created',
-        headers: {},
-        config,
-        data: {
-          data: {
-            id: Math.random().toString(36),
-            ...config.data,
-            numeroMascarado: '****-****-****-' + config.data?.numero?.slice(-4),
-          },
-        },
-      };
-    }
-
-    if (method === 'delete') {
-      return {
-        status: 204,
-        statusText: 'No Content',
-        headers: {},
-        config,
-        data: {},
-      };
-    }
-  }
-
-  // ─── Notifications ────────────────────────────────────────────────────
-  if (url.includes('/notificacoes')) {
-    if (method === 'get') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { data: mockNotifications },
-      };
-    }
-
-    if (method === 'put' || method === 'patch') {
-      return {
-        status: 200,
-        statusText: 'OK',
-        headers: {},
-        config,
-        data: { success: true },
-      };
-    }
-  }
-
-  // ─── Pricing Groups ───────────────────────────────────────────────────
-  if (url.includes('/grupos-precificacao')) {
-    return {
-      status: 200,
-      statusText: 'OK',
-      headers: {},
-      config,
-      data: { data: [] },
-    };
-  }
-
-  // ─── Fallback: Return empty response ────────────────────────────────
-  console.warn('[DEMO MODE] No mock handler for:', method.toUpperCase(), url);
+// Helper: wrap an array in Spring-Boot Page shape
+const paginate = (items, config) => {
+  const page = Number(config.params?.page ?? 0);
+  const size = Number(config.params?.size ?? 20);
+  const start = page * size;
+  const slice = items.slice(start, start + size);
   return {
-    status: 200,
-    statusText: 'OK',
-    headers: {},
-    config,
-    data: { data: [] },
+    content: slice,
+    totalElements: items.length,
+    totalPages: Math.ceil(items.length / size),
+    number: page,
+    size,
+    first: page === 0,
+    last: start + size >= items.length,
+    empty: slice.length === 0,
   };
 };
 
+// Helper: build a standard axios-shaped response
+const ok = (config, data, status = 200) => ({
+  status,
+  statusText: 'OK',
+  headers: {},
+  config,
+  data: { data },
+});
+
 /**
- * Create axios interceptor for demo mode
- * Intercepts ALL requests to serve mock data
+ * Route an incoming request config to mock data.
+ */
+const getMockResponse = (config) => {
+  const url = config.url || '';
+  const method = (config.method || 'get').toLowerCase();
+
+  console.log('[DEMO MODE] Intercepting:', method.toUpperCase(), url);
+
+  // ─── Auth ────────────────────────────────────────────────────────────
+  if (url.includes('/auth/login') || url.includes('/auth/register')) {
+    return ok(config, { token: 'demo-token-' + Date.now(), user: mockUser });
+  }
+  if (url.includes('/auth/logout')) {
+    return ok(config, { success: true });
+  }
+  if (url.includes('/auth/senha')) {
+    return ok(config, { message: 'Senha alterada com sucesso' });
+  }
+
+  // ─── Admin Analytics ─────────────────────────────────────────────────
+  // Must come before generic /admin/… checks
+  if (url.includes('/admin/analise/vendas-regiao')) {
+    return ok(config, mockAnalytics.regional);
+  }
+  if (url.includes('/admin/analise/vendas')) {
+    return ok(config, mockAnalytics.sales);
+  }
+  if (url.includes('/admin/dashboard') || url.includes('/admin/analytics')) {
+    return ok(config, mockAnalytics.sales);
+  }
+
+  // ─── Admin Books ─────────────────────────────────────────────────────
+  if (url.includes('/admin/livros')) {
+    if (url.includes('/ativar') || url.includes('/inativar')) {
+      return ok(config, { message: 'Status alterado com sucesso' });
+    }
+    if (method === 'get') {
+      if (/\/admin\/livros\/[^/]+$/.test(url)) {
+        const id = url.split('/').pop();
+        return ok(config, mockBooks.find(b => b.id === id) || mockBooks[0]);
+      }
+      return ok(config, paginate(mockBooks, config));
+    }
+    if (method === 'post') {
+      return ok(config, { id: String(Date.now()), ...body(config) }, 201);
+    }
+    if (method === 'put') {
+      const id = url.split('/').pop();
+      return ok(config, { id, ...body(config) });
+    }
+  }
+
+  // ─── Admin Orders ────────────────────────────────────────────────────
+  if (url.includes('/admin/pedidos')) {
+    if (url.includes('/despachar') || url.includes('/entregar')) {
+      return ok(config, { message: 'Pedido atualizado com sucesso' });
+    }
+    if (method === 'get') {
+      if (/\/admin\/pedidos\/[^/]+$/.test(url)) {
+        const id = url.split('/').pop();
+        return ok(config, mockOrders.find(o => o.id === id) || mockOrders[0]);
+      }
+      // Filter by status if requested
+      let filtered = mockOrders;
+      const statusFilter = config.params?.status;
+      if (statusFilter) {
+        filtered = mockOrders.filter(o => o.status === statusFilter);
+      }
+      return ok(config, paginate(filtered, config));
+    }
+    if (method === 'patch') {
+      return ok(config, { message: 'Pedido atualizado com sucesso' });
+    }
+  }
+
+  // ─── Admin Customers ─────────────────────────────────────────────────
+  if (url.includes('/admin/clientes')) {
+    if (method === 'get') {
+      if (/\/admin\/clientes\/[^/]+$/.test(url)) {
+        const id = url.split('/').pop();
+        return ok(config, mockCustomers.find(c => c.id === id) || mockCustomers[0]);
+      }
+      const search = (config.params?.search || config.params?.nome || '').toLowerCase();
+      let filtered = mockCustomers;
+      if (search) {
+        filtered = mockCustomers.filter(c =>
+          c.nome.toLowerCase().includes(search) ||
+          c.email.toLowerCase().includes(search) ||
+          c.cpf.includes(search)
+        );
+      }
+      return ok(config, paginate(filtered, config));
+    }
+  }
+
+  // ─── Admin Exchanges ─────────────────────────────────────────────────
+  if (url.includes('/admin/trocas')) {
+    if (url.includes('/autorizar') || url.includes('/confirmar-recebimento')) {
+      return ok(config, { message: 'Troca atualizada com sucesso' });
+    }
+    if (method === 'get') {
+      if (/\/admin\/trocas\/[^/]+$/.test(url)) {
+        const id = url.split('/').pop();
+        return ok(config, mockExchanges.find(e => e.id === id) || mockExchanges[0]);
+      }
+      const statusFilter = config.params?.status;
+      let filtered = mockExchanges;
+      if (statusFilter) {
+        filtered = mockExchanges.filter(e => e.status === statusFilter);
+      }
+      return ok(config, paginate(filtered, config));
+    }
+  }
+
+  // ─── Admin Stock Entries ─────────────────────────────────────────────
+  if (url.includes('/admin/estoque')) {
+    if (method === 'get') {
+      return ok(config, paginate(mockStock, config));
+    }
+    if (method === 'post') {
+      return ok(config, { id: String(Date.now()), message: 'Entrada registrada' }, 201);
+    }
+  }
+
+  // ─── Admin Reviews ───────────────────────────────────────────────────
+  if (url.includes('/admin/avaliacoes')) {
+    if (url.includes('/aprovar') || url.includes('/rejeitar')) {
+      return ok(config, { message: 'Avaliação atualizada com sucesso' });
+    }
+    if (method === 'get') {
+      return ok(config, paginate(mockReviews, config));
+    }
+  }
+
+  // ─── Admin Suppliers (stub) ──────────────────────────────────────────
+  if (url.includes('/admin/fornecedores')) {
+    return ok(config, []);
+  }
+
+  // ─── Catalog / Public Books ──────────────────────────────────────────
+  if (/\/livros\/[^/]+\/avaliacoes/.test(url)) {
+    const bookId = url.match(/\/livros\/([^/]+)\/avaliacoes/)?.[1];
+    const reviews = mockReviews.filter(r => r.livroId === bookId);
+    return ok(config, paginate(reviews, config));
+  }
+
+  if (url.includes('/livros') && !url.includes('/admin')) {
+    if (method === 'get') {
+      if (/\/livros\/[^/]+$/.test(url)) {
+        const id = url.split('/').pop();
+        return ok(config, mockBooks.find(b => b.id === id) || mockBooks[0]);
+      }
+      return ok(config, paginate(mockBooks, config));
+    }
+    if (method === 'post') {
+      // review submission
+      return ok(config, { id: String(Date.now()), ...body(config) }, 201);
+    }
+  }
+
+  // ─── Catalog Reference Data ──────────────────────────────────────────
+  if (url.includes('/catalogo/categorias')) return ok(config, mockCategories);
+  if (url.includes('/catalogo/autores'))    return ok(config, mockAuthors);
+  if (url.includes('/catalogo/editoras'))   return ok(config, [{ id: '1', nome: 'Editora Demo' }]);
+
+  // ─── Customer Profile ────────────────────────────────────────────────
+  if (url.includes('/clientes/perfil') || url.includes('/clientes/me')) {
+    if (method === 'put') return ok(config, { ...mockUser, ...body(config) });
+    return ok(config, mockUser);
+  }
+
+  // ─── Customer Addresses ──────────────────────────────────────────────
+  if (url.includes('/clientes/enderecos') || url.includes('/enderecosEntrega') || url.includes('/enderecos')) {
+    if (method === 'get')    return ok(config, mockAddresses);
+    if (method === 'post')   return ok(config, { id: String(Date.now()), ...body(config) }, 201);
+    if (method === 'put')    return ok(config, { id: url.split('/').pop(), ...body(config) });
+    if (method === 'delete') return ok(config, null, 204);
+  }
+
+  // ─── Customer Credit Cards ───────────────────────────────────────────
+  if (url.includes('/clientes/cartoes') || url.includes('/cartoes')) {
+    if (url.includes('/preferencial')) return ok(config, { message: 'Cartão preferencial atualizado' });
+    if (method === 'get')    return ok(config, mockCreditCards);
+    if (method === 'post')   return ok(config, { id: String(Date.now()), ...body(config) }, 201);
+    if (method === 'put')    return ok(config, { id: url.split('/').pop(), ...body(config) });
+    if (method === 'delete') return ok(config, null, 204);
+  }
+
+  // ─── Customer Orders (vendas/minhas) ─────────────────────────────────
+  if (url.includes('/vendas/minhas')) {
+    return ok(config, paginate(mockOrders, config));
+  }
+
+  // ─── Customer Transactions ───────────────────────────────────────────
+  if (url.includes('/clientes/transacoes')) {
+    return ok(config, paginate(mockOrders, config));
+  }
+
+  // ─── Customer Exchange Coupons ───────────────────────────────────────
+  if (url.includes('/clientes/cupons-troca')) {
+    return ok(config, []);
+  }
+
+  // ─── Customer Orders (non-admin) ─────────────────────────────────────
+  if (url.includes('/pedidos') && !url.includes('/admin')) {
+    if (url.includes('/trocas') && method === 'post') {
+      return ok(config, { message: 'Troca solicitada com sucesso' });
+    }
+    if (method === 'get') {
+      if (/\/pedidos\/[^/]+$/.test(url)) {
+        const id = url.split('/').pop();
+        return ok(config, mockOrders.find(o => o.id === id) || mockOrders[0]);
+      }
+      return ok(config, paginate(mockOrders, config));
+    }
+    if (method === 'post') {
+      return ok(config, {
+        id: String(Date.now()),
+        numeroPedido: 'PED-' + Date.now(),
+        status: 'CONFIRMADO',
+      }, 201);
+    }
+  }
+
+  // ─── Checkout ────────────────────────────────────────────────────────
+  if (url.includes('/checkout')) {
+    return ok(config, {
+      id: String(Date.now()),
+      numeroPedido: 'PED-' + Date.now(),
+      status: 'SUCESSO',
+      message: 'Pedido criado com sucesso em modo demo',
+    });
+  }
+
+  // ─── Notifications ──────────────────────────────────────────────────
+  if (url.includes('/notificacoes')) {
+    if (method === 'get') return ok(config, mockNotifications);
+    return ok(config, { success: true });
+  }
+
+  // ─── Pricing Groups ─────────────────────────────────────────────────
+  if (url.includes('/grupos-precificacao')) return ok(config, []);
+
+  // ─── Fallback ────────────────────────────────────────────────────────
+  console.warn('[DEMO MODE] No mock handler for:', method.toUpperCase(), url);
+  return ok(config, []);
+};
+
+/**
+ * Install the mock adapter on the given axios instance.
  */
 const createMockInterceptor = (axiosInstance) => {
   if (!DEMO_MODE) return;
 
-  // Replace the default adapter with a mock adapter
-  const originalAdapter = axiosInstance.defaults.adapter;
-
   axiosInstance.defaults.adapter = (config) => {
-    // In demo mode, serve mock data immediately without making a real request
     const response = getMockResponse(config);
     return Promise.resolve(response);
   };
@@ -570,4 +323,3 @@ const createMockInterceptor = (axiosInstance) => {
 
 export default createMockInterceptor;
 export { DEMO_MODE };
-

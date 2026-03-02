@@ -10,15 +10,14 @@
 
 1. [Visão Geral do Ralph Loop](#visão-geral-do-ralph-loop)
 2. [Stack Técnico](#stack-técnico)
-3. [Mapeamento de Fases e Requisitos](#mapeamento-de-fases-e-requisitos)
-4. [Arquitetura de Componentes](#arquitetura-de-componentes)
-5. [Fase 0: Setup do Projeto (FE-001)](#fase-0-setup-do-projeto-fe-001)
-6. [Fase 1: Autenticação (FE-002)](#fase-1-autenticação-fe-002)
-7. [Fase 2: Dados Pessoais (FE-003)](#fase-2-dados-pessoais-fe-003)
-8. [Fase 3+: Fluxos de Negócio](#fase-3-fluxos-de-negócio)
-9. [Estratégia de Testes (Cypress + Selenium)](#estratégia-de-testes-cypress--selenium)
-10. [Requisitos Não Funcionais](#requisitos-não-funcionais)
-11. [Decisões de Design](#decisões-de-design)
+3. [Arquitetura de Componentes](#arquitetura-de-componentes)
+4. [Fase 0: Setup do Projeto (FE-001)](#fase-0-setup-do-projeto-fe-001)
+5. [Fase 1: Autenticação (FE-002)](#fase-1-autenticação-fe-002)
+6. [Fase 2: Dados Pessoais (FE-003)](#fase-2-dados-pessoais-fe-003)
+7. [Fase 3+: Fluxos de Negócio](#fase-3-fluxos-de-negócio)
+8. [Estratégia de Testes (Cypress + Selenium)](#estratégia-de-testes-cypress--selenium)
+9. [Requisitos Não Funcionais](#requisitos-não-funcionais)
+10. [Decisões de Design](#decisões-de-design)
 
 ---
 
@@ -31,62 +30,18 @@ O **Ralph Loop** é um ciclo iterativo de desenvolvimento que segue as fases:
 3. **Review (Revisar):** Validar testes funcionam, código é limpo
 4. **Loop (Iterar):** Feedback → próxima fase
 
-### Fases do Frontend (Roadmap Completo)
+### Fases do Frontend
 
 | Fase | Issue | Titulo | Prioridade | Status |
 |------|-------|--------|-----------|--------|
 | 0 | #42 | [FE-001] Setup do Projeto (Vite + Bootstrap + Router) | Alta | Not Started |
 | 1 | #43 | [FE-002] Formulários de Autenticação | Alta | Not Started |
-| 2 | #44 | [FE-003] Minha Conta - Dados Pessoais | Alta | Not Started |
-| 3 | #45 | [FE-004] Minha Conta - Endereços | Alta | Not Started |
-| 3 | #46 | [FE-005] Minha Conta - Cartões | Alta | Not Started |
-| 3 | #47 | [FE-006] Minha Conta - Alteração de Senha | Alta | Not Started |
-| 4 | #48 | [FE-007] Histórico de Pedidos | Média | Not Started |
-| 4 | #49 | [FE-008] Solicitação de Troca | Média | Not Started |
-| 5 | #50 | [FE-009] Vitrine / Tela Inicial | Alta | Not Started |
-| 5 | #51 | [FE-010] Busca e Filtros Avançados | Média | Not Started |
-| 5 | #52 | [FE-011] Página do Livro | Alta | Not Started |
-| 5 | #53 | [FE-012] Seção de Avaliações do Livro | Média | Not Started |
-| 6 | #54 | [FE-013] Carrinho - Listagem e Edição | Alta | Not Started |
-| 6 | #55 | [FE-014] Carrinho - Timer de Bloqueio e Alertas | Média | Not Started |
-| 7 | #56 | [FE-015] Checkout - Endereço e Frete | Alta | Not Started |
-| 7 | #57 | [FE-016] Checkout - Seleção de Cupons | Média | Not Started |
-| 7 | #58 | [FE-017] Checkout - Pagamento com Cartões | Média | Not Started |
-| 7 | #59 | [FE-018] Checkout - Resumo e Confirmação | Alta | Not Started |
-| 8 | #60 | [FE-019] Widget de Chatbot Flutuante | Baixa | Not Started |
-| 9 | #61 | [FE-020] CRUD Admin - Cadastro de Livros | Média | Not Started |
-| 9 | #62 | [FE-021] CRUD Admin - Precificação e Margem | Média | Not Started |
-| 9 | #63 | [FE-022] CRUD Admin - Listagem de Livros | Média | Not Started |
-| 10 | #64 | [FE-023] Gestão de Estoque | Alta | Not Started |
-| 10 | #65 | [FE-024] Painel Logístico de Vendas | Alta | Not Started |
-| 10 | #66 | [FE-025] Consulta de Clientes (Admin) | Média | Not Started |
-| 10 | #67 | [FE-026] Workflow de Trocas | Média | Not Started |
-| 10 | #68 | [FE-027] Moderação de Avaliações | Média | Not Started |
-| 11 | #69 | [FE-028] Dashboard - Gráfico de Vendas por Período | Média | Not Started |
-| 11 | #70 | [FE-029] Dashboard - Vendas por Região | Média | Not Started |
-| 11 | #71 | [FE-030] Sistema de Notificações | Média | Not Started |
-| **Testes** | #72 | [FE-031] Setup do Cypress | Alta | Not Started |
-| **Testes** | #73 | [FE-032] Testes - Autenticação e Perfil | Alta | Not Started |
-| **Testes** | #74 | [FE-033] Testes - CRUD de Livros e Estoque | Alta | Not Started |
-| **Testes** | #75 | [FE-034] Testes - Fluxo de Compra Completo | Alta | Not Started |
-| **Testes** | #76 | [FE-035] Testes - Carrinho e Bloqueio Temporal | Média | Not Started |
-| **Testes** | #77 | [FE-036] Testes - Trocas e Avaliações | Média | Not Started |
-| **Testes** | #78 | [FE-037] Testes - Dashboard e Análise | Média | Not Started |
+| 2 | #44 | [FE-003] Minha Conta - Dados Pessoais | Média | Not Started |
+| 3+ | - | Catálogo, Carrinho, Checkout, Admin | Médias | Backlog |
 
 ---
 
 ## Stack Técnico
-
-### Containerização e Ambiente
-
-```yaml
-# Docker stack (Decision D11)
-Docker: Latest stable (multi-stage builds)
-Docker Compose: 2.x+
-Node.js: 24+ (na imagem Docker)
-Package Manager: npm 11+
-Base Image: node:current-alpine3.23 para produção
-```
 
 ### Versões Pinned
 
@@ -127,51 +82,7 @@ Base Image: node:current-alpine3.23 para produção
 }
 ```
 
----
-
-## Mapeamento de Fases e Requisitos
-
-| Fase | FE | Titulo | Requisitos Funcionais | Requisitos Não-Func. |
-|------|----|----|---|---|
-| 0 | FE-001 | Setup | RF0028 (auth setup) | RNF0011 |
-| 1 | FE-002 | Autenticação | RF0021, RF0028 | RNF0031, RNF0032, RNF0033 |
-| 2 | FE-003 | Dados Pessoais | RF0022 | RNF0035 |
-| 2 | FE-004 | Endereços | RF0026, RF0035 | RN0023 |
-| 2 | FE-005 | Cartões | RF0027, RF0036 | RN0024, RN0025 |
-| 2 | FE-006 | Alterar Senha | RF0028 | RNF0031, RNF0032 |
-| 4 | FE-007 | Histórico de Pedidos | RF0025 | - |
-| 4 | FE-008 | Solicitação de Troca | RF0040 | - |
-| 5 | FE-009 | Vitrine / Tela Inicial | RF0011, RF0015 | RNF0011 |
-| 5 | FE-010 | Busca e Filtros | RF0015 | RNF0011 |
-| 5 | FE-011 | Página do Livro | RF0015 | - |
-| 5 | FE-012 | Avaliações | RF00063, RF0025 | - |
-| 6 | FE-013 | Carrinho | RF0031, RF0032 | RN0031, RN0044 |
-| 6 | FE-014 | Timer Bloqueio | RF0032 | RNF0042, RN0044 |
-| 7 | FE-015 | Checkout - Endereço | RF0034, RF0035 | RNF0011 |
-| 7 | FE-016 | Checkout - Cupons | RF0036 | RN0033, RN0036 |
-| 7 | FE-017 | Checkout - Pagamento | RF0036 | RN0034, RN0035 |
-| 7 | FE-018 | Checkout - Confirmação | RF0033, RF0037 | - |
-| 8 | FE-019 | Chatbot | RNF0044 | RNF0044 |
-| 9 | FE-020 | CRUD - Cadastro Livros | RF0011, RF0014 | RN0011 |
-| 9 | FE-021 | Precificação | RF0014 | RN0014 |
-| 9 | FE-022 | CRUD - Listagem Livros | RF0015 | RNF0011 |
-| 10 | FE-023 | Gestão de Estoque | RF0051 | RN0051, RN0062 |
-| 10 | FE-024 | Painel Logístico | RF0038, RF0039 | RN0028, RN0030 |
-| 10 | FE-025 | Consulta Clientes | RF0024 | - |
-| 10 | FE-026 | Workflow Trocas | RF0041, RF0042, RF0043 | RN0044, RN0054 |
-| 10 | FE-027 | Moderação Avaliações | RF00065 | - |
-| 11 | FE-028 | Dashboard - Vendas | RF0055 | RNF0043 |
-| 11 | FE-029 | Dashboard - Regiões | RF00064 | - |
-| 11 | FE-030 | Notificações | RNF0046 (D5) | RNF0046 |
-| Testes | FE-031 | Setup Cypress | - | - |
-| Testes | FE-032 | Testes Auth | RF0021, RNF0031 | - |
-| Testes | FE-033 | Testes CRUD Livros | RF0011, RF0012, RF0051 | - |
-| Testes | FE-034 | Testes Fluxo Compra | RF0031, RF0033, RF0037 | - |
-| Testes | FE-035 | Testes Carrinho | RN0044, RNF0042 | - |
-| Testes | FE-036 | Testes Trocas | RF0040, RF00063 | - |
-| Testes | FE-037 | Testes Dashboard | RF0055, RF00064 | - |
-
----
+### Estrutura de Diretórios
 
 ```
 frontend/
@@ -506,11 +417,9 @@ export const CartProvider = ({ children }) => {
 - [ ] Criar estructura de diretórios conforme PRD
 - [ ] Criar `AuthContext` em `src/store`
 - [ ] Criar `CartContext` em `src/store`
-- [ ] Criar `services/api.js` com axios instance (baseURL: `/api/v1`, interceptador JWT)
+- [ ] Criar `services/api.js` com axios instance
 - [ ] Criar layout base (Header, Footer, Navbar)
 - [ ] Criar `App.jsx` com rotas principais
-- [ ] **Revisar [API_CONTRACT.md](../API_CONTRACT.md)** — Garantir alinhamento com endpoints esperados
-- [ ] Criar `.env.example` com `VITE_API_URL` para Dev/Prod
 - [ ] Documentar processo em `frontend/SETUP.md`
 
 ### Testes Cypress — Smoke Test
@@ -1301,10 +1210,9 @@ class TestAuthentication:
 | RNF0031 | Senha forte | ≥8 chars, maiúscula, minúscula, especial | Validator regex |
 | RNF0032 | Confirmação de senha | Digitar 2x | Form validation |
 | RNF0033 | Criptografia | Enviar via HTTPS | Production only |
-| RNF0042 | Carrinho com timeout | Notificação 5min antes de expiração, remover item após timeout (RN0044) | Cypress timer test e polling |
-| RNF0043 | Gráfico de linhas | Chart.js renderizado com histórico de vendas | Snapshot test |
-| RNF0044 | IA generativa | Chatbot integrado via OpenAI API (Spring AI) | Integration test |
-| RNF0046 | Sistema de notificações | Ícone de sino no navbar com badge contagem (§4.12) | Cypress polling test |
+| RNF0042 | Carrinho com timeout | Notificação 5min antes | Cypress timer test |
+| RNF0043 | Gráfico de linhas | Chart.js renderizado | Snapshot test |
+| RNF0044 | IA generativa | Chatbot integrado | Integration test |
 
 ### Checklist de Acessibilidade
 
@@ -1330,139 +1238,46 @@ describe('Accessibility', () => {
 
 ## Decisões de Design
 
-| # | Decisão | Justificativa | Notas Contexto Técnico |
-|---|---------|---------------|---|
-| D1 | React Hooks over Class Components | Mais simples, menor bundle, testes mais diretos | Stack base: React 18+ |
-| D2 | Context API over Redux | Projeto de médio porte, não necessita middleware | AuthContext, CartContext em use |
-| D3 | Bootstrap 5 CSS Framework | Agilidade, componentes prontos, responsivo | Bootstrap 5.3+ |
-| D4 | Axios for HTTP | API simples, interceptadores, cancelamento de requisição | BaseURL: `/api/v1`, JWT header |
-| D5 | Notificações In-App | In-app only (Decision D5 no Contexto Técnico) | Entity Notificacao (§4.12) |
-| D6 | localStorage para cart | Persistência sem backend (timeout server-side via RN0044) | 30min timeout, configurável |
-| D7 | ISO 8601 timestamps | Standard internacional, fácil parse em JS | Sincronizado com backend |
-| D8 | Error boundaries | Captura de crashes, UI não quebra | ErrorBoundary.jsx componente |
-| D9 | Data-testid attributes | Acesso determinístico em testes, desacoplado de CSS | Cypress acceptance tests |
-| D10 | Cypress + Selenium | Cypress para E2E, Selenium para cross-browser validation | FE-031 a FE-037 issues |
-| D11 | Docker para dev + prod | Containerização completa (dev, build, testes, produção) | multi-stage, docker-compose |
-
-**Referência ao Contexto Técnico:**
-- **D1 (Frete fixo):** Mock fixo de R$ 10,00 em todas as regiões (FE-015, #56)
-- **D2 (Ranking):** Exibido read-only em FE-003, calculado como soma total gasto
-- **D3 (Parâmetros):** Timeout do carrinho e dias de inativação são configuráveis via admin (RNF0046)
-- **D4 (Mock carrão):** Último dígito PAR = reprovado, ÍMPAR = aprovado (FE-017, #58)
-- **D5 (IA):** OpenAI GPT via Spring AI (FE-019, #60 — Chatbot flutuante)
-- **D6 (Imagens):** Placeholder padrão (`/assets/book-placeholder.png`) para todos os livros
-- **D7 (Notificações):** Sistema in-app com ícone de sino e polling (FE-030, #71)
-- **D11 (Docker):** Dockerfile multi-stage + docker-compose.yml para dev/build/testes/produção — Criado em FE-001
+| # | Decisão | Justificativa |
+|---|---------|---------------|
+| D1 | React Hooks over Class Components | Mais simples, menor bundle, testes mais diretos |
+| D2 | Context API over Redux | Projeto de médio porte, não necessita middleware |
+| D3 | Bootstrap 5 CSS Framework | Agilidade, componentes prontos, responsivo |
+| D4 | Axios for HTTP | API simples, interceptadores, cancelamento de requisição |
+| D5 | Cypress for E2E | Melhor DX, testes mais legíveis, não requer Selenium |
+| D6 | Selenium para cross-browser | Validação em Chrome, Firefox, Edge simultaneamente |
+| D7 | Data-testid attributes | Acesso determinístico em testes, desacoplado de CSS |
+| D8 | localStorage para cart | Persistência sem backend (timeout server-side) |
+| D9 | ISO 8601 timestamps | Standard internacional, fácil parse em JS |
+| D10 | Error boundaries | Captura de crashes, UI não quebra |
 
 ---
 
 ## Prioridades Iniciais
 
 ### Sprint 1 — Fundação (1-2 semanas)
-- [x] Fase 0: Setup (FE-001, #42)
-- [x] Fase 1: Auth (FE-002, #43)
-- [x] Fase 2: Account (FE-003 a FE-006, #44-#47)
+- [x] Fase 0: Setup (FE-001)
+- [x] Fase 1: Auth (FE-002)
+- [x] Fase 2: Account (FE-003)
 
-### Sprint 2 — Vitrine e Busca (1-2 semanas)
-- [ ] FE-009: Vitrine / Tela Inicial (#50)
-- [ ] FE-010: Busca e Filtros (#51)
-- [ ] FE-011: Página do Livro (#52)
-- [ ] FE-012: Avaliações (#53)
+### Sprint 2 — Catálogo
+- [ ] Home page com featured books
+- [ ] Catálogo com filtros
+- [ ] Detalhes de livro com avaliações
 
-### Sprint 3 — Carrinho (1 semana)
-- [ ] FE-013: Carrinho - Listagem e Edição (#54)
-- [ ] FE-014: Timer de Bloqueio e Alertas (#55)
+### Sprint 3 — Compra
+- [ ] Carrinho de compras
+- [ ] Checkout (endereço + pagamento)
+- [ ] Histórico de compras
 
-### Sprint 4 — Checkout (1-2 semanas)
-- [ ] FE-015: Checkout - Endereço e Frete (#56)
-- [ ] FE-016: Checkout - Cupons (#57)
-- [ ] FE-017: Checkout - Pagamento (#58)
-- [ ] FE-018: Checkout - Confirmação (#59)
-
-### Sprint 5 — Admin Básico (1-2 semanas)
-- [ ] FE-020: CRUD Admin - Cadastro de Livros (#61)
-- [ ] FE-021: Precificação e Margem (#62)
-- [ ] FE-022: Listagem de Livros (#63)
-- [ ] FE-023: Gestão de Estoque (#64)
-- [ ] FE-024: Painel Logístico (#65)
-
-### Sprint 6 — Admin Avançado (1-2 semanas)
-- [ ] FE-025: Consulta de Clientes (#66)
-- [ ] FE-026: Workflow de Trocas (#67)
-- [ ] FE-027: Moderação de Avaliações (#68)
-
-### Sprint 7 — Analytics e Chatbot (1-2 semanas)
-- [ ] FE-019: Widget de Chatbot (#60)
-- [ ] FE-028: Dashboard - Vendas por Período (#69)
-- [ ] FE-029: Dashboard - Vendas por Região (#70)
-- [ ] FE-030: Sistema de Notificações (#71)
-
-### Sprint 8 — Testes E2E (2 semanas)
-- [ ] FE-031: Setup do Cypress (#72)
-- [ ] FE-032: Testes - Autenticação e Perfil (#73)
-- [ ] FE-033: Testes - CRUD de Livros (#74)
-- [ ] FE-034: Testes - Fluxo de Compra (#75)
-- [ ] FE-035: Testes - Carrinho e Bloqueio (#76)
-- [ ] FE-036: Testes - Trocas e Avaliações (#77)
-- [ ] FE-037: Testes - Dashboard e Análise (#78)
-
----
-
-## Notas de Validação com Documentação Técnica
-
-Este PRD foi validado contra:
-- ✅ [Contexto_Tecnico_LES_2026.md](../docs/Contexto_Tecnico_LES_2026.md) — Specs de entidades, decisões (D1-D11), convenções de API
-- ✅ [DRS_LES_1_2026.md](../docs/DRS_LES_1_2026.md) — Requisitos funcionais (RF0011-RF00065), não-funcionais (RNF0011-RNF0044), regras de negócio (RN0014-RN0062)
-- ✅ GitHub Issues #42-#78 — FE-001 a FE-037 com descrições detalhadas e dependências
-
-**Alinhamentos:****Mapeamento completo de todas as 37 issues (FE-001 a FE-037) em 11 sprints + testes
-- Todas as RFs mencionadas correspondem aos números do DRS
-- Todas as RNs relacionadas estão vinculadas às features específicas
-- Decisões de design refletem as decisões do Contexto Técnico (D1-D11)
-- Convenções HTTP, Entidades JPA e Regras de Negócio seguem especificações
-- BaseURL `/api/v1`, formato JSON, paginação, erros — alinhados
-- LocalStorage keys, JWT auth, timestamps ISO 8601 — alinhados
-
-**Pontos ajustados nesta revisão:**
-- ❌ → ✅ Tabela de fases agora lista todas as 37 issues com prioridades reais
-- ❌ → ✅ RNF0042, RNF0043, RNF0044 descritivos com referências a RN e D* correspondentes
-- ❌ → ✅ Adicionado RNF0046 para notificações (Decision D5)
-- ❌ → ✅ Sprints revisados com agrupamento lógico e sequência de dependências
-- ❌ → ✅ Tabela de mapeamento RF/RN/FE para rastreabilidade completa
-- ❌ → ✅ **Adicionado D11 (Docker para dev + prod)** com Dockerfile multi-stage + docker-compose.yml
+### Sprint 4 — Admin + IA
+- [ ] Dashboard administrativo
+- [ ] Gestão de pedidos
+- [ ] Chatbot com IA
 
 ---
 
 ## Comandos Úteis
-
-### Com Docker (Recomendado — Decision D11)
-
-```bash
-# Desenvolvimento (hot reload no container na porta 5173)
-docker-compose up frontend-dev
-
-# Build da imagem de produção
-docker-compose build frontend
-
-# Build no container
-docker-compose run --rm frontend npm run build
-
-# Linting no container
-docker-compose run --rm frontend npm run lint
-docker-compose run --rm frontend npm run lint:fix
-
-# Testes Cypress no container
-docker-compose run --rm frontend npm run test:e2e
-docker-compose run --rm frontend npm run test:e2e:open
-
-# Format code no container
-docker-compose run --rm frontend npm run format
-
-# Entrar no bash do container para executar comandos customizados
-docker-compose run --rm frontend bash
-```
-
-### Sem Docker (Local / Fallback)
 
 ```bash
 # Desenvolvimento
@@ -1487,75 +1302,6 @@ pytest __tests__/e2e/selenium/
 npm run format
 ```
 
-### Estrutura de Dockerfile e docker-compose.yml
-
-Deverão ser criados em FE-001 (Setup do Projeto) com as seguintes características:
-
-**Dockerfile (multi-stage):**
-```dockerfile
-# Stage 1: Development
-FROM node:20-alpine AS development
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-EXPOSE 5173
-CMD ["npm", "run", "dev"]
-
-# Stage 2: Build
-FROM node:20-alpine AS builder
-WORKDIR /app
-COPY package*.json ./
-RUN npm ci
-COPY . .
-RUN npm run build
-
-# Stage 3: Production
-FROM nginx:alpine
-COPY --from=builder /app/dist /usr/share/nginx/html
-EXPOSE 80
-CMD ["nginx", "-g", "daemon off;"]
-```
-
-**docker-compose.yml:**
-```yaml
-version: '3.8'
-
-services:
-  frontend-dev:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      target: development
-    ports:
-      - "5173:5173"
-    volumes:
-      - ./frontend/src:/app/src
-      - ./frontend/__tests__:/app/__tests__
-    environment:
-      - VITE_API_URL=http://localhost:8080/api/v1
-    networks:
-      - ecommerce
-
-  frontend:
-    build:
-      context: ./frontend
-      dockerfile: Dockerfile
-      target: production
-    ports:
-      - "80:80"
-    environment:
-      - VITE_API_URL=/api/v1
-    networks:
-      - ecommerce
-    depends_on:
-      - backend
-
-networks:
-  ecommerce:
-    driver: bridge
-```
-
 ---
 
 ## Referências
@@ -1565,20 +1311,9 @@ networks:
 - [Bootstrap 5](https://getbootstrap.com)
 - [Cypress Docs](https://docs.cypress.io)
 - [React Router v6](https://reactrouter.com)
-- **[API_CONTRACT.md](../API_CONTRACT.md)** — Contrato da API Backend (FONTE ÚNICA DE VERDADE)
 
 ---
 
 **Autor:** GitHub Copilot | Kauê Benk  
 **Última atualização:** 1º de março de 2026  
 **Status:** ✅ Pronto para iniciação do Ralph Loop
-
----
-
-## 🔗 Dependência Crítica: Backend API
-
-Este PRD assume que o backend Java seguirá **exatamente** o contrato documentado em [API_CONTRACT.md](../API_CONTRACT.md). A integração frontend-backend dependerá 100% dessa especificação.
-
-**Para o desenvolvedor backend:** Implemente todos os endpoints, validações, formatos de resposta e códigos de erro conforme descrito no API_CONTRACT.md. Assim que o backend estiver rodando (em Docker), o frontend funcionará sem necessidade de ajustes.
-
-**Para o desenvolvedor frontend:** Todo endpoint consumido está documentado no API_CONTRACT.md. Se um endpoint não existir ou retornar em formato diferente, consulte o contrato antes de fazer ajustes.

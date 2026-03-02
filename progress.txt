@@ -10,3 +10,7 @@ US-013 | done | 2026-03-02 17:02:17 | Completed in 280s
 US-014 | done | 2026-03-02 18:26:11 | Completed in 214s
 US-015 | done | 2026-03-02 18:27:53 | Completed in 99s
 US-016 | done | 2026-03-02 18:22:35 | Completed in 729s
+US-017 | failed | 2026-03-02 19:41:49 | Timed out (900s)
+US-018 | failed | 2026-03-02 19:56:51 | Timed out (900s)
+US-019 | failed | 2026-03-02 20:11:53 | Timed out (900s)
+US-020 | failed | 2026-03-02 20:26:54 | Timed out (900s)
