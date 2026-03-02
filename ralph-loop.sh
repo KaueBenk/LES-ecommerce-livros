@@ -168,12 +168,12 @@ EOF
 
 # Show status
 show_status() {
-  local project total done failed pending
+  local project total_count done_count failed_count pending
   project=$(jq -r '.project' "$PRD_FILE")
-  total=$(jq '.userStories | length' "$PRD_FILE")
-  done=$(count_done)
-  failed=$(grep -c " | failed |" "$PROGRESS_FILE" 2>/dev/null || echo 0)
-  pending=$((total - done - failed))
+  total_count=$(jq '.userStories | length' "$PRD_FILE" || echo "0")
+  done_count=$(count_done)
+  failed_count=$(grep -c " | failed |" "$PROGRESS_FILE" 2>/dev/null || true)
+  pending=$(( total_count - done_count - failed_count ))
   
   log_header "RALPH Status — $project"
   echo ""
@@ -198,7 +198,7 @@ show_status() {
   done
   
   echo ""
-  echo -e "  Total: ${total}  |  ${GREEN}Done: ${done}${NC}  |  ${CYAN}Pending: ${pending}${NC}  |  ${RED}Failed: ${failed}${NC}"
+  echo -e "  Total: ${total_count}  |  ${GREEN}Done: ${done_count}${NC}  |  ${CYAN}Pending: ${pending}${NC}  |  ${RED}Failed: ${failed_count}${NC}"
   echo ""
 }
 
