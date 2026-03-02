@@ -16,11 +16,22 @@
 
 set -euo pipefail
 
+# Detect if we're running inside Copilot CLI context
+# This prevents infinite recursion when the script tries to call copilot
+if [[ -n "${INSIDE_COPILOT:-}" ]]; then
+  echo "❌ Error: ralph-loop.sh cannot be executed from inside a Copilot CLI context"
+  echo "   ralph-loop.sh is a launcher that CALLS copilot, not something copilot should run"
+  echo ""
+  echo "✓ Instead, run this from your terminal:"
+  echo "  $ ./ralph-loop.sh --build"
+  exit 1
+fi
+
 # Configuration
 MODE="build"
 MAX_LOOPS="${MAX_LOOPS:-0}"  # 0 = unlimited
 MODEL_NAME="${MODEL_NAME:-claude-opus-4.5}"
-COPILOT_ARGS="${COPILOT_ARGS:---yolo}"
+COPILOT_ARGS="${COPILOT_ARGS:-}"
 COPILOT_TIMEOUT="${COPILOT_TIMEOUT:-3600}"
 PRD_FILE="${PRD_FILE:-prd.json}"
 PROGRESS_FILE="${PROGRESS_FILE:-progress.txt}"
@@ -277,9 +288,9 @@ execute_iteration() {
   start_time=$(date +%s)
   
   # Use unbuffered output and line buffering for better responsiveness
+  # Set environment variable to prevent recursion
   timeout "$COPILOT_TIMEOUT" \
-    stdbuf -oL -eL \
-    copilot -p "$(cat "$prompt_file")" $COPILOT_ARGS --model "$MODEL_NAME" \
+    bash -c "INSIDE_COPILOT=1 stdbuf -oL -eL copilot -p \"\$(cat '$prompt_file')\" --allow-all-tools --model \"$MODEL_NAME\"" \
     || exit_code=$?
   
   elapsed=$(($(date +%s) - start_time))
