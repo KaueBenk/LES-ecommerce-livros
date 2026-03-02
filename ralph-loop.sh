@@ -245,25 +245,33 @@ execute_iteration() {
   echo "Acceptance Criteria:"
   echo "$story_criteria"
   echo ""
+  echo -e "${YELLOW}⏳ Processing…${NC}"
+  echo ""
   
   # Execute copilot with fresh context
   log_info "Starting Copilot (model: $MODEL_NAME)…"
+  log_info "Timeout: ${COPILOT_TIMEOUT}s"
+  echo ""
   
   local exit_code=0
-  local prompt
+  local prompt start_time elapsed
   prompt=$(cat PROMPT.md; echo ""; echo "## Current Task"; echo ""; echo "**Story ID:** $next_id"; echo ""; echo "**Title:** $story_title"; echo ""; echo "**Description:** $story_desc"; echo ""; echo "**Acceptance Criteria:**"; echo "$story_criteria")
+  
+  start_time=$(date +%s)
   
   timeout "$COPILOT_TIMEOUT" \
     copilot -p "$prompt" $COPILOT_ARGS --model "$MODEL_NAME" \
     || exit_code=$?
   
+  elapsed=$(($(date +%s) - start_time))
+  echo ""
+  log_info "Copilot finished after ${elapsed}s (exit code: $exit_code)"
   echo ""
   
   # Check result
   if [[ $exit_code -eq 0 ]]; then
+    log_ok "✓ Story $next_id completed successfully (${elapsed}s)"
     _record_done "$next_id" "Completed successfully"
-    log_ok "Story $next_id marked as done"
-    
     # Update plan
     generate_plan
     
@@ -274,12 +282,12 @@ execute_iteration() {
     
     return 0
   elif [[ $exit_code -eq 124 ]]; then
+    log_warn "✗ Story $next_id timed out after ${COPILOT_TIMEOUT}s"
     _record_failed "$next_id" "Timeout after ${COPILOT_TIMEOUT}s"
-    log_warn "Story $next_id timed out"
     return 1
   else
+    log_warn "✗ Story $next_id failed (exit code: $exit_code, ${elapsed}s)"
     _record_failed "$next_id" "Copilot exited with code $exit_code"
-    log_warn "Story $next_id failed (exit code: $exit_code)"
     return 1
   fi
 }
@@ -318,11 +326,13 @@ case "$MODE" in
     # Build loop
     project=$(jq -r '.project' "$PRD_FILE")
     iterations=0
+    loop_start=$(date +%s)
     
     log_header "RALPH Loop — $project (BUILD MODE)"
     echo "  Model    : $MODEL_NAME"
     echo "  PRD      : $PRD_FILE"
     echo "  Max iter : ${MAX_LOOPS:-unlimited}"
+    echo "  Started  : $(_timestamp)"
     echo ""
     
     while true; do
@@ -335,9 +345,11 @@ case "$MODE" in
       fi
       
       iterations=$((iterations + 1))
+      loop_elapsed=$(($(date +%s) - loop_start))
+      log_info "Elapsed: ${loop_elapsed}s | Iterations: $iterations"
+      echo ""
       
       # Check if all done
-      local total done
       total=$(jq '.userStories | length' "$PRD_FILE")
       done=$(count_done)
       if [[ $done -ge $total ]]; then

@@ -14,23 +14,45 @@ import livroFixture from '../fixtures/livro.json';
 
 const ADMIN_TOKEN = 'admin-fake-jwt-token';
 
-/** Seed admin auth token and mock the auth endpoints */
-const setupAdminAuth = () => {
-  cy.window().then((win) => {
-    win.localStorage.setItem('auth_token', ADMIN_TOKEN);
-  });
+const ADMIN_PROFILE = {
+  id: 9,
+  nome: 'Admin Teste',
+  email: 'admin@livros.com',
+  roles: ['ADMIN'],
+  role: 'ADMIN',
+};
 
+/** Visit an admin URL with admin auth pre-seeded in localStorage via onBeforeLoad */
+const visitAdmin = (url) => {
+  cy.visit(url, {
+    onBeforeLoad(win) {
+      win.localStorage.setItem('auth_token', ADMIN_TOKEN);
+      win.localStorage.setItem('user_profile', JSON.stringify(ADMIN_PROFILE));
+    },
+  });
+};
+
+/** Setup intercepts for admin APIs (call before visitAdmin) */
+const setupAdminAuth = () => {
   cy.intercept('GET', '**/auth/me', {
     statusCode: 200,
-    body: {
-      data: {
-        id: 9,
-        nome: 'Admin Teste',
-        email: 'admin@livros.com',
-        roles: ['ROLE_ADMIN'],
-      },
-    },
+    body: { data: ADMIN_PROFILE },
   }).as('authMe');
+
+  cy.intercept('GET', '**/clientes/perfil', {
+    statusCode: 200,
+    body: { data: ADMIN_PROFILE },
+  }).as('adminPerfil');
+
+  cy.intercept('GET', '**/notificacoes/nao-lidas/count', {
+    statusCode: 200,
+    body: { data: 0 },
+  });
+
+  cy.intercept('GET', '**/carrinhos/**', {
+    statusCode: 200,
+    body: { data: { itens: [], quantidade: 0, valorTotal: 0 } },
+  });
 };
 
 /** Sample book list for mocking GET /admin/livros */
@@ -56,7 +78,7 @@ const mockBooks = [
 ];
 
 const mockAdminLivros = (books = mockBooks, extra = {}) => {
-  cy.intercept('GET', '**/admin/livros**', {
+  cy.intercept('GET', '**/api/**admin/livros**', {
     statusCode: 200,
     body: {
       data: {
@@ -72,17 +94,17 @@ const mockAdminLivros = (books = mockBooks, extra = {}) => {
 };
 
 const mockFormDependencies = () => {
-  cy.intercept('GET', '**/admin/autores**', {
+  cy.intercept('GET', '**/api/**admin/autores**', {
     statusCode: 200,
     body: { data: [{ id: 1, nome: 'Machado de Assis' }] },
   }).as('getAutores');
 
-  cy.intercept('GET', '**/admin/editoras**', {
+  cy.intercept('GET', '**/api/**admin/editoras**', {
     statusCode: 200,
     body: { data: [{ id: 1, nome: 'Editora Abril' }] },
   }).as('getEditoras');
 
-  cy.intercept('GET', '**/admin/grupos-precificacao**', {
+  cy.intercept('GET', '**/api/**admin/grupos-precificacao**', {
     statusCode: 200,
     body: {
       data: [
@@ -91,7 +113,7 @@ const mockFormDependencies = () => {
     },
   }).as('getGrupos');
 
-  cy.intercept('GET', '**/admin/categorias**', {
+  cy.intercept('GET', '**/api/**admin/categorias**', {
     statusCode: 200,
     body: {
       data: [
@@ -101,7 +123,7 @@ const mockFormDependencies = () => {
     },
   }).as('getCategorias');
 
-  cy.intercept('GET', '**/admin/fornecedores**', {
+  cy.intercept('GET', '**/api/**admin/fornecedores**', {
     statusCode: 200,
     body: {
       data: [{ id: 1, nome: 'Distribuidora Nacional Ltda' }],
@@ -114,7 +136,7 @@ const mockFormDependencies = () => {
 describe('Admin Dashboard — Book Navigation', () => {
   beforeEach(() => {
     setupAdminAuth();
-    cy.visit('/admin');
+    visitAdmin('/admin');
     cy.get('[data-testid="admin-page"]', { timeout: 10000 }).should('exist');
   });
 
@@ -142,7 +164,7 @@ describe('Book List', () => {
   beforeEach(() => {
     setupAdminAuth();
     mockAdminLivros();
-    cy.visit('/admin/livros');
+    visitAdmin('/admin/livros');
     cy.get('[data-testid="admin-books-section"]', { timeout: 10000 }).should('exist');
     cy.wait('@getAdminBooks');
   });
@@ -245,7 +267,7 @@ describe('Create Book', () => {
   beforeEach(() => {
     setupAdminAuth();
     mockFormDependencies();
-    cy.visit('/admin/livros/novo');
+    visitAdmin('/admin/livros/novo');
     cy.get('[data-testid="book-form-page"]', { timeout: 10000 }).should('exist');
   });
 
@@ -305,7 +327,7 @@ describe('Create Book', () => {
   it('creates a book successfully (mocked) and redirects to list', () => {
     const newBookId = 99;
 
-    cy.intercept('POST', '**/admin/livros', {
+    cy.intercept('POST', '**/api/**admin/livros', {
       statusCode: 201,
       body: { data: { ...livroFixture, id: newBookId, titulo: 'Novo Livro Criado' } },
     }).as('createBook');
@@ -350,7 +372,7 @@ describe('Create Book', () => {
   });
 
   it('shows error on API failure during create', () => {
-    cy.intercept('POST', '**/admin/livros', {
+    cy.intercept('POST', '**/api/**admin/livros', {
       statusCode: 400,
       body: { message: 'ISBN já cadastrado.' },
     }).as('createBookFail');
@@ -369,12 +391,12 @@ describe('Edit Book', () => {
     setupAdminAuth();
     mockFormDependencies();
 
-    cy.intercept('GET', `**/admin/livros/${editBookId}`, {
+    cy.intercept('GET', `**/api/**admin/livros/${editBookId}`, {
       statusCode: 200,
       body: { data: { ...mockBooks[0], id: editBookId } },
     }).as('getBook');
 
-    cy.visit(`/admin/livros/${editBookId}/editar`);
+    visitAdmin(`/admin/livros/${editBookId}/editar`);
     cy.get('[data-testid="book-form-page"]', { timeout: 10000 }).should('exist');
     cy.wait('@getBook');
   });
@@ -386,7 +408,7 @@ describe('Edit Book', () => {
   it('edits the title and saves via PUT', () => {
     const updatedTitle = 'Dom Casmurro — Edição Revisada';
 
-    cy.intercept('PUT', `**/admin/livros/${editBookId}`, {
+    cy.intercept('PUT', `**/api/**admin/livros/${editBookId}`, {
       statusCode: 200,
       body: { data: { ...mockBooks[0], titulo: updatedTitle } },
     }).as('updateBook');
@@ -428,7 +450,7 @@ describe('Activate and Inactivate Book', () => {
   beforeEach(() => {
     setupAdminAuth();
     mockAdminLivros();
-    cy.visit('/admin/livros');
+    visitAdmin('/admin/livros');
     cy.get('[data-testid="admin-books-section"]', { timeout: 10000 }).should('exist');
     cy.wait('@getAdminBooks');
   });
@@ -449,7 +471,7 @@ describe('Activate and Inactivate Book', () => {
   });
 
   it('inactivates an active book after providing justification', () => {
-    cy.intercept('PATCH', '**/admin/livros/1/status', {
+    cy.intercept('PATCH', '**/api/**admin/livros/1/status', {
       statusCode: 200,
       body: { data: { ...mockBooks[0], ativo: false } },
     }).as('toggleBookStatus');
@@ -484,7 +506,7 @@ describe('Activate and Inactivate Book', () => {
   });
 
   it('activates an inactive book after providing justification', () => {
-    cy.intercept('PATCH', '**/admin/livros/2/status', {
+    cy.intercept('PATCH', '**/api/**admin/livros/2/status', {
       statusCode: 200,
       body: { data: { ...mockBooks[1], ativo: true } },
     }).as('activateBook');
@@ -529,7 +551,7 @@ describe('Stock Entry', () => {
   beforeEach(() => {
     setupAdminAuth();
     mockFormDependencies();
-    cy.visit('/admin/estoque');
+    visitAdmin('/admin/estoque');
     cy.get('[data-testid="stock-entry-page"]', { timeout: 10000 }).should('exist');
   });
 
@@ -542,7 +564,7 @@ describe('Stock Entry', () => {
   });
 
   it('searches for a book and shows results', () => {
-    cy.intercept('GET', '**/admin/livros**', {
+    cy.intercept('GET', '**/api/**admin/livros**', {
       statusCode: 200,
       body: {
         data: { content: mockBooks, totalElements: 2, totalPages: 1, number: 0, size: 20 },
@@ -559,14 +581,14 @@ describe('Stock Entry', () => {
   });
 
   it('selects a book from search results', () => {
-    cy.intercept('GET', '**/admin/livros**', {
+    cy.intercept('GET', '**/api/**admin/livros**', {
       statusCode: 200,
       body: {
         data: { content: mockBooks, totalElements: 2, totalPages: 1, number: 0, size: 20 },
       },
     }).as('searchBooks');
 
-    cy.intercept('GET', '**/admin/estoque/historico**', {
+    cy.intercept('GET', '**/api/**admin/estoque/historico**', {
       statusCode: 200,
       body: {
         data: {
@@ -597,19 +619,19 @@ describe('Stock Entry', () => {
   });
 
   it('creates a stock entry successfully', () => {
-    cy.intercept('POST', '**/admin/estoque', {
+    cy.intercept('POST', '**/api/**admin/estoque', {
       statusCode: 201,
       body: { data: mockHistoryEntry },
     }).as('createEntry');
 
-    cy.intercept('GET', '**/admin/livros**', {
+    cy.intercept('GET', '**/api/**admin/livros**', {
       statusCode: 200,
       body: {
         data: { content: mockBooks, totalElements: 2, totalPages: 1, number: 0, size: 20 },
       },
     }).as('searchBooks');
 
-    cy.intercept('GET', '**/admin/estoque/historico**', {
+    cy.intercept('GET', '**/api/**admin/estoque/historico**', {
       statusCode: 200,
       body: {
         data: {
@@ -647,7 +669,7 @@ describe('Stock Entry', () => {
   });
 
   it('shows API error when stock entry fails', () => {
-    cy.intercept('POST', '**/admin/estoque', {
+    cy.intercept('POST', '**/api/**admin/estoque', {
       statusCode: 400,
       body: { message: 'Livro não encontrado.' },
     }).as('createEntryFail');
@@ -695,7 +717,7 @@ describe('Stock History', () => {
     setupAdminAuth();
     mockFormDependencies();
 
-    cy.intercept('GET', '**/admin/estoque/historico**', {
+    cy.intercept('GET', '**/api/**admin/estoque/historico**', {
       statusCode: 200,
       body: {
         data: {
@@ -708,7 +730,7 @@ describe('Stock History', () => {
       },
     }).as('getHistory');
 
-    cy.visit('/admin/estoque');
+    visitAdmin('/admin/estoque');
     cy.get('[data-testid="stock-entry-page"]', { timeout: 10000 }).should('exist');
   });
 
@@ -738,14 +760,14 @@ describe('Stock History', () => {
   });
 
   it('shows empty state message when no history exists', () => {
-    cy.intercept('GET', '**/admin/estoque/historico**', {
+    cy.intercept('GET', '**/api/**admin/estoque/historico**', {
       statusCode: 200,
       body: {
         data: { content: [], totalElements: 0, totalPages: 0, number: 0, size: 10 },
       },
     }).as('getEmptyHistory');
 
-    cy.visit('/admin/estoque');
+    visitAdmin('/admin/estoque');
     cy.wait('@getEmptyHistory');
 
     cy.get('body').then(($body) => {
@@ -756,7 +778,7 @@ describe('Stock History', () => {
   });
 
   it('pagination buttons exist when there are multiple pages', () => {
-    cy.intercept('GET', '**/admin/estoque/historico**', {
+    cy.intercept('GET', '**/api/**admin/estoque/historico**', {
       statusCode: 200,
       body: {
         data: {
@@ -769,7 +791,7 @@ describe('Stock History', () => {
       },
     }).as('getPagedHistory');
 
-    cy.visit('/admin/estoque');
+    visitAdmin('/admin/estoque');
     cy.wait('@getPagedHistory');
 
     cy.get('body').then(($body) => {
@@ -780,7 +802,7 @@ describe('Stock History', () => {
   });
 
   it('navigates to next page of history', () => {
-    cy.intercept('GET', '**/admin/estoque/historico**', {
+    cy.intercept('GET', '**/api/**admin/estoque/historico**', {
       statusCode: 200,
       body: {
         data: {
@@ -793,10 +815,10 @@ describe('Stock History', () => {
       },
     }).as('getPage1');
 
-    cy.visit('/admin/estoque');
+    visitAdmin('/admin/estoque');
     cy.wait('@getPage1');
 
-    cy.intercept('GET', '**/admin/estoque/historico**', {
+    cy.intercept('GET', '**/api/**admin/estoque/historico**', {
       statusCode: 200,
       body: {
         data: {
@@ -828,14 +850,14 @@ describe('Admin Books — Mobile Responsiveness', () => {
 
   it('book list renders correctly on mobile', () => {
     mockAdminLivros();
-    cy.visit('/admin/livros');
+    visitAdmin('/admin/livros');
     cy.get('[data-testid="admin-books-section"]', { timeout: 10000 }).should('exist');
     cy.get('[data-testid="admin-books-table-wrapper"]').should('exist');
   });
 
   it('stock entry page renders correctly on mobile', () => {
     mockFormDependencies();
-    cy.visit('/admin/estoque');
+    visitAdmin('/admin/estoque');
     cy.get('[data-testid="stock-entry-page"]', { timeout: 10000 }).should('exist');
   });
 });

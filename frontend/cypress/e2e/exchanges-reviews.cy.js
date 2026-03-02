@@ -100,7 +100,7 @@ describe('Exchanges workflow (customer + admin)', () => {
   it('ENTREGUE -> solicitar troca -> EM_TROCA, depois admin autoriza e confirma recebimento', () => {
     let customerOrdersState = [deliveredOrder];
 
-    cy.intercept('GET', '**/clientes/transacoes', {
+    cy.intercept('GET', '**/clientes/transacoes**', {
       statusCode: 200,
       body: {
         data: {
@@ -173,7 +173,7 @@ describe('Exchanges workflow (customer + admin)', () => {
     const exchangeAuthorized = { ...exchangePending, status: 'TROCA_AUTORIZADA' };
     let adminState = { pending: [exchangePending], authorized: [] };
 
-    cy.intercept('GET', '**/admin/trocas*', (req) => {
+    cy.intercept('GET', '**/api/**admin/trocas**', (req) => {
       const wantsPending = req.url.includes('status=EM_TROCA');
       const wantsAuthorized =
         req.url.includes('status=TROCA_AUTORIZADA') || req.url.includes('status=EM_TROCA_AUTORIZADA');
@@ -193,7 +193,7 @@ describe('Exchanges workflow (customer + admin)', () => {
       });
     }).as('getAdminExchanges');
 
-    cy.intercept('PATCH', `**/admin/trocas/${exchangePending.id}/autorizar`, (req) => {
+    cy.intercept('PATCH', `**/api/**admin/trocas/${exchangePending.id}/autorizar`, (req) => {
       adminState = { pending: [], authorized: [exchangeAuthorized] };
       req.reply({
         statusCode: 200,
@@ -204,7 +204,7 @@ describe('Exchanges workflow (customer + admin)', () => {
       });
     }).as('authorizeExchange');
 
-    cy.intercept('PATCH', `**/admin/trocas/${exchangePending.id}/confirmar-recebimento`, (req) => {
+    cy.intercept('PATCH', `**/api/**admin/trocas/${exchangePending.id}/confirmar-recebimento`, (req) => {
       expect(req.body).to.deep.equal({
         itens: [{ id: 200, retornarAoEstoque: true }],
       });
@@ -245,7 +245,7 @@ describe('Reviews workflow (customer submit + admin moderation)', () => {
   });
 
   it('usuário autenticado com pedido entregue vê form, envia avaliação e admin aprova/rejeita pendentes', () => {
-    cy.intercept('GET', '**/clientes/transacoes', {
+    cy.intercept('GET', '**/clientes/transacoes**', {
       statusCode: 200,
       body: {
         data: {
@@ -314,7 +314,7 @@ describe('Reviews workflow (customer submit + admin moderation)', () => {
       },
     ];
 
-    cy.intercept('GET', '**/admin/avaliacoes*', {
+    cy.intercept('GET', '**/api/**admin/avaliacoes**', {
       statusCode: 200,
       body: {
         data: {
@@ -327,12 +327,12 @@ describe('Reviews workflow (customer submit + admin moderation)', () => {
       },
     }).as('getAdminReviews');
 
-    cy.intercept('PATCH', '**/admin/avaliacoes/501/aprovar', {
+    cy.intercept('PATCH', '**/api/**admin/avaliacoes/501/aprovar', {
       statusCode: 200,
       body: { data: { id: 501, aprovada: true }, message: 'Avaliação aprovada' },
     }).as('approve501');
 
-    cy.intercept('PATCH', '**/admin/avaliacoes/502/rejeitar', {
+    cy.intercept('PATCH', '**/api/**admin/avaliacoes/502/rejeitar', {
       statusCode: 200,
       body: { data: { id: 502, aprovada: false, rejeitada: true }, message: 'Avaliação rejeitada' },
     }).as('reject502');

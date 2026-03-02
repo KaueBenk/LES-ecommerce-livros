@@ -46,6 +46,7 @@ Read `IMPLEMENTATION_PLAN.md`, select the **single most important pending task**
 
 - `DRS_LES_1_2026.md` — Project requirements
 - `IMPLEMENTATION_PLAN.md` — Task list and current state
+- `prd.json` — Detailed implementation plan
 - `AGENTS.md` — Operational learnings (patterns, tools, commands)
 - `progress.txt` — Historical record of completed/failed tasks
 - `src/`, `frontend/`, `docs/` — Project source code

@@ -11,22 +11,29 @@ import clienteFixture from '../fixtures/cliente.json';
 
 // ── Helpers ──────────────────────────────────────────────────────────────────
 
-/**
- * Seed localStorage with a JWT and mock the /auth/me (or /cliente/perfil) endpoint
- * so the app renders content for an authenticated user.
- */
-const setupAuth = () => {
-  cy.window().then((win) => {
-    win.localStorage.setItem('auth_token', 'test-jwt-token');
-  });
+const TOKEN = 'test-jwt-token';
 
+/**
+ * Seed localStorage with a JWT via onBeforeLoad and mock auth endpoints.
+ * Returns a visit function that injects auth before the page loads.
+ */
+const visitAccount = (url) => {
+  cy.visit(url, {
+    onBeforeLoad(win) {
+      win.localStorage.setItem('auth_token', TOKEN);
+      win.localStorage.setItem('user_profile', JSON.stringify(clienteFixture));
+    },
+  });
+};
+
+const setupAuth = () => {
   // Mock the initial "who am I" call the app may make on mount
   cy.intercept('GET', '**/auth/me', {
     statusCode: 200,
     body: { data: clienteFixture },
   }).as('authMe');
 
-  cy.intercept('GET', '**/cliente/perfil', {
+  cy.intercept('GET', '**/clientes/perfil', {
     statusCode: 200,
     body: { data: clienteFixture },
   }).as('perfil');
@@ -39,12 +46,12 @@ describe('Edit Profile', () => {
     setupAuth();
 
     // Mock profile GET
-    cy.intercept('GET', '**/cliente/perfil', {
+    cy.intercept('GET', '**/clientes/perfil', {
       statusCode: 200,
       body: { data: clienteFixture },
     }).as('getProfile');
 
-    cy.visit('/account/profile');
+    visitAccount('/account/profile');
     cy.get('[data-testid="profile-form"], [data-testid="profile-loading"]', {
       timeout: 10000,
     });
@@ -73,7 +80,7 @@ describe('Edit Profile', () => {
   it('saves updated name and calls PUT API', () => {
     const updatedNome = 'Ana Beatriz Alterada';
 
-    cy.intercept('PUT', '**/cliente/perfil', {
+    cy.intercept('PUT', '**/clientes/perfil', {
       statusCode: 200,
       body: { data: { ...clienteFixture, nome: updatedNome } },
     }).as('updateProfile');
@@ -87,7 +94,7 @@ describe('Edit Profile', () => {
   });
 
   it('shows error message when profile update fails', () => {
-    cy.intercept('PUT', '**/cliente/perfil', {
+    cy.intercept('PUT', '**/clientes/perfil', {
       statusCode: 500,
       body: { message: 'Erro interno do servidor.' },
     }).as('updateProfileFail');
@@ -126,12 +133,12 @@ describe('Addresses', () => {
   beforeEach(() => {
     setupAuth();
 
-    cy.intercept('GET', '**/cliente/enderecos', {
+    cy.intercept('GET', '**/clientes/enderecos', {
       statusCode: 200,
       body: { data: [{ ...clienteFixture.enderecos[0] }] },
     }).as('getAddresses');
 
-    cy.visit('/account/addresses');
+    visitAccount('/account/addresses');
     cy.get('[data-testid="address-list"], [data-testid="address-list-loading"]', {
       timeout: 10000,
     });
@@ -148,13 +155,13 @@ describe('Addresses', () => {
   });
 
   it('adds a new address and it appears in the list', () => {
-    cy.intercept('POST', '**/cliente/enderecos', {
+    cy.intercept('POST', '**/clientes/enderecos', {
       statusCode: 201,
       body: { data: mockAddress },
     }).as('addAddress');
 
     // Refetch list after add (return both original + new)
-    cy.intercept('GET', '**/cliente/enderecos', {
+    cy.intercept('GET', '**/clientes/enderecos', {
       statusCode: 200,
       body: {
         data: [{ ...clienteFixture.enderecos[0] }, mockAddress],
@@ -166,15 +173,15 @@ describe('Addresses', () => {
 
     // Fill required fields (RN0023)
     cy.get('[data-testid="address-apelido-input"]').type(mockAddress.apelido);
-    cy.get('[data-testid="address-tipoResidencia-select"]').select(mockAddress.tipoResidencia);
-    cy.get('[data-testid="address-tipoLogradouro-select"]').select(mockAddress.tipoLogradouro);
+    cy.get('[data-testid="address-residencia-select"]').select(mockAddress.tipoResidencia);
+    cy.get('[data-testid="address-logradouro-tipo-select"]').select(mockAddress.tipoLogradouro);
     cy.get('[data-testid="address-logradouro-input"]').type(mockAddress.logradouro);
     cy.get('[data-testid="address-numero-input"]').type(mockAddress.numero);
     cy.get('[data-testid="address-bairro-input"]').type(mockAddress.bairro);
     cy.get('[data-testid="address-cep-input"]').type(mockAddress.cep);
     cy.get('[data-testid="address-cidade-input"]').type(mockAddress.cidade);
     cy.get('[data-testid="address-estado-select"]').select(mockAddress.estado);
-    cy.get('[data-testid="address-tipoEndereco-select"]').select(mockAddress.tipoEndereco);
+    cy.get('[data-testid="address-tipo-select"]').select(mockAddress.tipoEndereco);
 
     cy.get('[data-testid="address-form-save-button"]').click();
     cy.wait('@addAddress');
@@ -195,13 +202,13 @@ describe('Addresses', () => {
   it('deletes an address after confirmation', () => {
     const existingId = clienteFixture.enderecos[0].id;
 
-    cy.intercept('DELETE', `**/cliente/enderecos/${existingId}`, {
+    cy.intercept('DELETE', `**/clientes/enderecos/${existingId}`, {
       statusCode: 204,
       body: {},
     }).as('deleteAddress');
 
     // List is empty after deletion
-    cy.intercept('GET', '**/cliente/enderecos', {
+    cy.intercept('GET', '**/clientes/enderecos', {
       statusCode: 200,
       body: { data: [] },
     }).as('getAddressesAfterDelete');
@@ -240,12 +247,12 @@ describe('Credit Cards', () => {
   beforeEach(() => {
     setupAuth();
 
-    cy.intercept('GET', '**/cliente/cartoes', {
+    cy.intercept('GET', '**/clientes/cartoes', {
       statusCode: 200,
       body: { data: clienteFixture.cartoes },
     }).as('getCards');
 
-    cy.visit('/account/credit-cards');
+    visitAccount('/account/credit-cards');
     cy.get('[data-testid="credit-card-list"], [data-testid="credit-cards-loading"]', {
       timeout: 10000,
     });
@@ -261,12 +268,12 @@ describe('Credit Cards', () => {
   });
 
   it('adds a new card and it appears in the list', () => {
-    cy.intercept('POST', '**/cliente/cartoes', {
+    cy.intercept('POST', '**/clientes/cartoes', {
       statusCode: 201,
       body: { data: newCard },
     }).as('addCard');
 
-    cy.intercept('GET', '**/cliente/cartoes', {
+    cy.intercept('GET', '**/clientes/cartoes', {
       statusCode: 200,
       body: { data: [...clienteFixture.cartoes, newCard] },
     }).as('getCardsAfterAdd');
@@ -290,7 +297,7 @@ describe('Credit Cards', () => {
   it('sets a card as preferred', () => {
     const existingCardId = clienteFixture.cartoes[0].id;
 
-    cy.intercept('PATCH', `**/cliente/cartoes/${existingCardId}/preferencial`, {
+    cy.intercept('PATCH', `**/clientes/cartoes/${existingCardId}/preferencial`, {
       statusCode: 200,
       body: { data: { ...clienteFixture.cartoes[0], preferencial: true } },
     }).as('setPreferred');
@@ -311,12 +318,12 @@ describe('Credit Cards', () => {
   it('deletes a card after confirmation', () => {
     const existingCardId = clienteFixture.cartoes[0].id;
 
-    cy.intercept('DELETE', `**/cliente/cartoes/${existingCardId}`, {
+    cy.intercept('DELETE', `**/clientes/cartoes/${existingCardId}`, {
       statusCode: 204,
       body: {},
     }).as('deleteCard');
 
-    cy.intercept('GET', '**/cliente/cartoes', {
+    cy.intercept('GET', '**/clientes/cartoes', {
       statusCode: 200,
       body: { data: [] },
     }).as('getCardsAfterDelete');
@@ -338,7 +345,7 @@ describe('Credit Cards', () => {
   });
 
   it('shows server error when card add fails', () => {
-    cy.intercept('POST', '**/cliente/cartoes', {
+    cy.intercept('POST', '**/clientes/cartoes', {
       statusCode: 422,
       body: { message: 'Número de cartão inválido.' },
     }).as('addCardFail');
@@ -360,7 +367,7 @@ describe('Credit Cards', () => {
 describe('Password Change', () => {
   beforeEach(() => {
     setupAuth();
-    cy.visit('/account/change-password');
+    visitAccount('/account/change-password');
     cy.get('[data-testid="change-password-form"]', { timeout: 10000 }).should('be.visible');
   });
 
@@ -394,7 +401,7 @@ describe('Password Change', () => {
   });
 
   it('changes password successfully (mocked)', () => {
-    cy.intercept('PATCH', '**/cliente/senha', {
+    cy.intercept('PUT', '**/auth/senha', {
       statusCode: 200,
       body: { message: 'Senha alterada com sucesso.' },
     }).as('changePassword');
@@ -409,7 +416,7 @@ describe('Password Change', () => {
   });
 
   it('shows error when current password is incorrect', () => {
-    cy.intercept('PATCH', '**/cliente/senha', {
+    cy.intercept('PUT', '**/auth/senha', {
       statusCode: 401,
       body: { message: 'Senha atual incorreta.' },
     }).as('changePasswordFail');
@@ -445,16 +452,16 @@ describe('Account — Mobile Responsiveness', () => {
   });
 
   it('profile page renders correctly on mobile', () => {
-    cy.visit('/account/profile');
+    visitAccount('/account/profile');
     cy.get('[data-testid="profile-form"]', { timeout: 10000 }).should('exist');
   });
 
   it('addresses page renders correctly on mobile', () => {
-    cy.intercept('GET', '**/cliente/enderecos', {
+    cy.intercept('GET', '**/clientes/enderecos', {
       statusCode: 200,
       body: { data: clienteFixture.enderecos },
     });
-    cy.visit('/account/addresses');
+    visitAccount('/account/addresses');
     cy.get('[data-testid="address-list"]', { timeout: 10000 }).should('exist');
   });
 });
