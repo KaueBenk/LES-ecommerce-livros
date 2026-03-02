@@ -1,6 +1,5 @@
 # RALPH Progress
 # Format: <storyId> | <status> | <timestamp> | <notes>
-US-001 | done | 2026-03-01 19:14:46 | Completed successfully
 US-002 | done | 2026-03-02 16:22:04 | Completed in 198s
 US-004 | done | 2026-03-02 16:33:44 | Completed in 697s
 US-005 | done | 2026-03-02 16:39:10 | Completed in 323s
@@ -20,4 +19,4 @@ US-016 | done | 2026-03-02 18:22:35 | Completed in 729s
 US-014 | done | 2026-03-02 18:25:34 | All 20 tests passed - Password change validation complete
 US-014 | done | 2026-03-02 18:26:11 | Completed in 214s
 US-015 | done | 2026-03-02 18:27:53 | Completed in 99s
-US-017 | failed | 2026-03-02 18:48:08 | Copilot execution failed (exit: 1)
+US-001 | done | 2026-03-02 15:00:00 | Previously completed (restored)

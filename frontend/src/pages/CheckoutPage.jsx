@@ -1075,27 +1075,26 @@ const CheckoutPage = () => {
   const [showAddModal, setShowAddModal] = useState(false);
 
   // ── Fetch cart + addresses on mount ──
-  const fetchData = useCallback(async () => {
-    setCartLoading(true);
-    setAddressesLoading(true);
-    try {
-      const [cartData, addressData] = await Promise.all([
-        cartService.getCart(),
-        customerService.getAddresses(),
-      ]);
-      setCart(cartData);
-      setAddresses(addressData ?? []);
-    } catch (err) {
-      notifyError(getErrorMessage(err) || 'Erro ao carregar dados do checkout.');
-    } finally {
-      setCartLoading(false);
-      setAddressesLoading(false);
-    }
-  }, [notifyError]);
-
   useEffect(() => {
+    const fetchData = async () => {
+      setCartLoading(true);
+      setAddressesLoading(true);
+      try {
+        const [cartData, addressData] = await Promise.all([
+          cartService.getCart(),
+          customerService.getAddresses(),
+        ]);
+        setCart(cartData);
+        setAddresses(addressData ?? []);
+      } catch (err) {
+        notifyError(getErrorMessage(err) || 'Erro ao carregar dados do checkout.');
+      } finally {
+        setCartLoading(false);
+        setAddressesLoading(false);
+      }
+    };
     fetchData();
-  }, [fetchData]);
+  }, []);
 
   // ── Shipping calculation when address is selected ──
   const handleSelectAddress = useCallback(
