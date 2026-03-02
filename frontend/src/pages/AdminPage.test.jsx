@@ -12,7 +12,7 @@
 
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { render, screen, fireEvent, waitFor } from '@testing-library/react';
-import { BrowserRouter } from 'react-router-dom';
+import { MemoryRouter, Routes, Route } from 'react-router-dom';
 import AdminPage from '../pages/AdminPage';
 import adminService from '../services/adminService';
 
@@ -97,9 +97,11 @@ describe('AdminPage - US-002: VALIDAR RF0012: Inativar cadastro de livro', () =>
 
   const renderAdminPage = () => {
     return render(
-      <BrowserRouter initialEntries={['/admin/livros']}>
-        <AdminPage />
-      </BrowserRouter>
+      <MemoryRouter initialEntries={["/admin/livros"]}>
+        <Routes>
+          <Route path="/admin/*" element={<AdminPage />} />
+        </Routes>
+      </MemoryRouter>
     );
   };
 
@@ -155,12 +157,12 @@ describe('AdminPage - US-002: VALIDAR RF0012: Inativar cadastro de livro', () =>
     await waitFor(() => {
       expect(screen.getByTestId('status-modal')).toBeInTheDocument();
     });
-
     // Check modal title
     expect(screen.getByText(/Inativar livro:/)).toBeInTheDocument();
-    expect(screen.getByText(/The Pragmatic Programmer/)).toBeInTheDocument();
+    const modal = screen.getByTestId('status-modal');
+    expect(modal).toHaveTextContent('The Pragmatic Programmer');
 
-    // Check required fields exist
+
     const motivoField = screen.getByTestId('status-modal-motivo');
     const categoriaField = screen.getByTestId('status-modal-categoria');
     expect(motivoField).toBeInTheDocument();
