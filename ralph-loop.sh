@@ -16,23 +16,13 @@
 
 set -euo pipefail
 
-# Detect if we're running inside Copilot CLI context
-# This prevents infinite recursion when the script tries to call copilot
-if [[ -n "${INSIDE_COPILOT:-}" ]]; then
-  echo "❌ Error: ralph-loop.sh cannot be executed from inside a Copilot CLI context"
-  echo "   ralph-loop.sh is a launcher that CALLS copilot, not something copilot should run"
-  echo ""
-  echo "✓ Instead, run this from your terminal:"
-  echo "  $ ./ralph-loop.sh --build"
-  exit 1
-fi
 
 # Configuration
 MODE="build"
 MAX_LOOPS="${MAX_LOOPS:-0}"  # 0 = unlimited
 MODEL_NAME="${MODEL_NAME:-claude-opus-4.5}"
 COPILOT_ARGS="${COPILOT_ARGS:-}"
-COPILOT_TIMEOUT="${COPILOT_TIMEOUT:-300}"  # 5 minutes default
+COPILOT_TIMEOUT="${COPILOT_TIMEOUT:-900}"  # 15 minutes default
 PRD_FILE="${PRD_FILE:-prd.json}"
 PROGRESS_FILE="${PROGRESS_FILE:-progress.txt}"
 PLAN_FILE="${PLAN_FILE:-IMPLEMENTATION_PLAN.md}"
@@ -313,11 +303,12 @@ execute_iteration() {
   fi
   
   # Record result
+  local timestamp
   timestamp=$(_timestamp)
   if [[ $exit_code -eq 0 ]]; then
-    echo "$next_id | completed | $timestamp | Task implemented by Copilot" >> "$PROGRESS_FILE"
+    _record_done "$next_id" "Completed in ${elapsed}s"
   else
-    echo "$next_id | failed | $timestamp | Copilot execution failed (exit: $exit_code)" >> "$PROGRESS_FILE"
+    _record_failed "$next_id" "Copilot execution failed (exit: $exit_code, ${elapsed}s)"
   fi
   
   return $exit_code
