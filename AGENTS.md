@@ -106,3 +106,6 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 - React Testing Library renders components in jsdom environment
 - Form validation tests should trigger validation by clicking buttons
 - Use unique test data to avoid conflicts with mock data
+- **Edit mode testing:** Components in edit mode require waiting for both reference data AND specific record to load before form renders
+- **Async loading timing:** When testing forms with edit mode, use longer timeouts (10s+) and check for loading state disappearance
+- **Test isolation:** Use `vi.clearAllMocks()` in beforeEach to reset mock call counts between tests
