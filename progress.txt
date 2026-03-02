@@ -1,22 +1,12 @@
-# RALPH Progress
-# Format: <storyId> | <status> | <timestamp> | <notes>
+# RALPH Progress — format: ID | status | timestamp | notes
+US-001 | done | 2026-03-02 15:00:00 | Previously completed
 US-002 | done | 2026-03-02 16:22:04 | Completed in 198s
 US-004 | done | 2026-03-02 16:33:44 | Completed in 697s
 US-005 | done | 2026-03-02 16:39:10 | Completed in 323s
-
-✅ US-007 - VALIDAR RF0021: Cadastrar cliente (COMPLETED)
-- Created comprehensive test suite with 17 tests for customer registration
-- Validates RF0021, RN0026, RN0021, RN0022, RN0023, RNF0031, RNF0032, RNF0033, RNF0035
-- Tests cover mandatory fields, password strength, address validation, CPF/email/phone/CEP validation
-- All tests passing with mocked data
-- Implementation already existed in RegisterForm.jsx and RegisterPage.jsx
-- Commits: 7f0c96e, 7b5af04, 834a3ad
 US-007 | done | 2026-03-02 16:48:06 | Completed in 534s
 US-008 | done | 2026-03-02 16:52:29 | Completed in 260s
 US-012 | done | 2026-03-02 16:57:34 | Completed in 303s
 US-013 | done | 2026-03-02 17:02:17 | Completed in 280s
-US-016 | done | 2026-03-02 18:22:35 | Completed in 729s
-US-014 | done | 2026-03-02 18:25:34 | All 20 tests passed - Password change validation complete
 US-014 | done | 2026-03-02 18:26:11 | Completed in 214s
 US-015 | done | 2026-03-02 18:27:53 | Completed in 99s
-US-001 | done | 2026-03-02 15:00:00 | Previously completed (restored)
+US-016 | done | 2026-03-02 18:22:35 | Completed in 729s
