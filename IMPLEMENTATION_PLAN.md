@@ -1,23 +1,9 @@
 # IMPLEMENTATION_PLAN
 
-## Project Overview
-
 **Project:** LES E-Commerce de Livros — Validação de Regras (DRS_LES_1_2026)
-**Description:** Ralph Loop para validação de TODAS as regras definidas no DRS_LES_1_2026.md, regra por regra com testes frontend mockados. Cada user story corresponde a uma regra (RF, RNF ou RN) e contém os critérios de aceite necessários para confirmar que a implementação está conforme o documento de requisitos.
-**Branch:** ralph/validate-drs-rules
-**Total Stories:** 84
-**Completed:** 2 / 84
+**Total:** 84 | **Done:** 2 / 84
 
-## Task List
-
-### Status Legend
-- `[ ]` = pending
-- `[→]` = in_progress  
-- `[✓]` = done
-- `[✗]` = failed
-- `[⏹]` = blocked
-
----
+## Tasks
 
 - [✓] **US-001** (P1) — VALIDAR RF0011: Cadastrar livro
 - [✓] **US-002** (P1) — VALIDAR RF0012: Inativar cadastro de livro
@@ -103,12 +89,3 @@
 - [ ] **US-047** (P3) — VALIDAR RNF0043: Gráfico de linhas
 - [ ] **US-062** (P3) — VALIDAR RN0027: Ranking de cliente
 - [ ] **US-048** (P4) — VALIDAR RNF0044: Recomendação com IA Generativa
-
----
-
-## Implementation Notes
-
-- Each story maps to acceptance criteria in prd.json
-- Run with: `./ralph-loop.sh --build`
-- To reset a task: `./ralph-loop.sh --reset <story-id>`
-- For status: `./ralph-loop.sh --status`
