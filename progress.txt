@@ -16,3 +16,5 @@ US-007 | done | 2026-03-02 16:48:06 | Completed in 534s
 US-008 | done | 2026-03-02 16:52:29 | Completed in 260s
 US-012 | done | 2026-03-02 16:57:34 | Completed in 303s
 US-013 | done | 2026-03-02 17:02:17 | Completed in 280s
+US-016 | done | 2026-03-02 18:22:35 | Completed in 729s
+US-014 | done | 2026-03-02 18:25:34 | All 20 tests passed - Password change validation complete
