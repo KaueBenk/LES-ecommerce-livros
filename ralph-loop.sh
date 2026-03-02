@@ -32,7 +32,7 @@ MODE="build"
 MAX_LOOPS="${MAX_LOOPS:-0}"  # 0 = unlimited
 MODEL_NAME="${MODEL_NAME:-claude-opus-4.5}"
 COPILOT_ARGS="${COPILOT_ARGS:-}"
-COPILOT_TIMEOUT="${COPILOT_TIMEOUT:-3600}"
+COPILOT_TIMEOUT="${COPILOT_TIMEOUT:-300}"  # 5 minutes default
 PRD_FILE="${PRD_FILE:-prd.json}"
 PROGRESS_FILE="${PROGRESS_FILE:-progress.txt}"
 PLAN_FILE="${PLAN_FILE:-IMPLEMENTATION_PLAN.md}"
@@ -55,6 +55,7 @@ RESET_STORY=""
 RESET_ALL=false
 while [[ $# -gt 0 ]]; do
   case $1 in
+    plan)          MODE="plan"; shift ;;
     --plan)        MODE="plan"; shift ;;
     --build)       MODE="build"; shift ;;
     --status)      MODE="status"; shift ;;
@@ -66,6 +67,7 @@ while [[ $# -gt 0 ]]; do
     -h|--help)
       sed -n '2,16p' "$0" | sed 's/^# \?//'
       exit 0 ;;
+    [0-9]*)        MODE="build"; MAX_LOOPS="$1"; shift ;;
     *)
       log_error "Unknown option: $1"
       exit 1 ;;
@@ -287,46 +289,38 @@ execute_iteration() {
   
   start_time=$(date +%s)
   
-  # Present the task to be implemented
-  echo "📋 NEXT TASK — $next_id"
-  echo "═══════════════════════════════════════════════════════════════"
-  echo ""
-  cat "$prompt_file"
-  echo ""
-  echo "═══════════════════════════════════════════════════════════════"
-  echo ""
-  echo "🎯 To implement this task:"
-  echo ""
-  echo "   Option 1: Using Copilot CLI (Recommended)"
-  echo "   ────────────────────────────────────"
-  echo "   $ copilot"
-  echo "   > Read IMPLEMENTATION_PLAN.md"
-  echo "   > Implement the task above"
-  echo "   > Run tests to verify"
-  echo "   > Commit your changes"
-  echo ""
-  echo "   Option 2: Manual implementation"
-  echo "   ────────────────────────────────"
-  echo "   Use your editor and implement following:"
-  echo "   - AGENTS.md (patterns and learnings)"
-  echo "   - PRD description (acceptance criteria)"
-  echo ""
-  echo "⏸️  Waiting for implementation..."
-  echo "   Press Enter when ready to continue, or Ctrl+C to exit."
+  # Show task header
+  log_header "Story: $next_id — $story_title"
   echo ""
   
-  read -r
+  # Call copilot to implement the task
+  prompt=$(cat "$prompt_file")
+  
+  exit_code=0
+  timeout "$COPILOT_TIMEOUT" copilot -p "$prompt" --yolo --model "$MODEL_NAME" 2>&1 || exit_code=$?
   
   elapsed=$(($(date +%s) - start_time))
   echo ""
-  log_ok "✓ Task context presented (${elapsed}s)"
-  echo ""
-  echo "✅ Task $next_id ready for implementation"
-  echo "   Next iteration will check if completed and mark accordingly."
-  echo ""
   
-  # Mark as pending (will be marked done automatically when detected)
-  return 0
+  if [[ $exit_code -eq 0 ]]; then
+    log_ok "✓ Copilot completed task (${elapsed}s)"
+  elif [[ $exit_code -eq 124 ]]; then
+    log_warn "⏱️  Copilot timed out after ${COPILOT_TIMEOUT}s"
+    exit_code=1
+  else
+    log_warn "✗ Copilot exited with code $exit_code"
+    exit_code=1
+  fi
+  
+  # Record result
+  timestamp=$(_timestamp)
+  if [[ $exit_code -eq 0 ]]; then
+    echo "$next_id | completed | $timestamp | Task implemented by Copilot" >> "$PROGRESS_FILE"
+  else
+    echo "$next_id | failed | $timestamp | Copilot execution failed (exit: $exit_code)" >> "$PROGRESS_FILE"
+  fi
+  
+  return $exit_code
 }
 
 # Main

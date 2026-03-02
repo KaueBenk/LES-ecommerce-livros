@@ -1,4 +1,5 @@
 import axios from 'axios';
+import createMockInterceptor from './demoInterceptor';
 
 /**
  * Axios instance configured for the LES ecommerce API.
@@ -12,6 +13,9 @@ const api = axios.create({
     'Content-Type': 'application/json',
   },
 });
+
+// Demo mode interceptor (must be first)
+createMockInterceptor(api);
 
 // Request interceptor — attach JWT Bearer token
 api.interceptors.request.use(

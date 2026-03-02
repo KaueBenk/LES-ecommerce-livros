@@ -16,12 +16,20 @@ import { ROUTES } from '../../utils/constants';
 const ProtectedRoute = ({ children, adminOnly }) => {
   const { isAuthenticated, user } = useAuth();
   const location = useLocation();
+  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
 
-  if (!isAuthenticated) {
+  // In demo mode, auto-login as admin
+  if (isDemoMode && !isAuthenticated) {
+    const { mockUser } = require('../../services/mockData');
+    const { login } = require('../../store/authContext');
+    // This will be handled by AuthContext initialization in demo mode
+  }
+
+  if (!isAuthenticated && !isDemoMode) {
     return <Navigate to={ROUTES.LOGIN} state={{ from: location }} replace />;
   }
 
-  if (adminOnly && !user?.roles?.includes('ADMIN') && user?.role !== 'ADMIN') {
+  if (adminOnly && !isDemoMode && !user?.roles?.includes('ADMIN') && user?.role !== 'ADMIN') {
     return <Navigate to={ROUTES.HOME} replace />;
   }
 
