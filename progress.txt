@@ -13,3 +13,6 @@ US-005 | done | 2026-03-02 16:39:10 | Completed in 323s
 - Implementation already existed in RegisterForm.jsx and RegisterPage.jsx
 - Commits: 7f0c96e, 7b5af04, 834a3ad
 US-007 | done | 2026-03-02 16:48:06 | Completed in 534s
+US-008 | done | 2026-03-02 16:52:29 | Completed in 260s
+US-012 | done | 2026-03-02 16:57:34 | Completed in 303s
+US-013 | done | 2026-03-02 17:02:17 | Completed in 280s
