@@ -316,8 +316,8 @@ case "$MODE" in
     fi
     
     # Build loop
-    local project iterations=0
     project=$(jq -r '.project' "$PRD_FILE")
+    iterations=0
     
     log_header "RALPH Loop — $project (BUILD MODE)"
     echo "  Model    : $MODEL_NAME"
