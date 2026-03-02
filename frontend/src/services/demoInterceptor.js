@@ -14,6 +14,9 @@ import {
   mockCreditCards,
   mockAnalytics,
   mockNotifications,
+  mockCustomers,
+  mockExchanges,
+  mockStock,
 } from './mockData';
 
 const DEMO_MODE = import.meta.env.VITE_DEMO_MODE === 'true';
@@ -538,6 +541,125 @@ const getMockResponse = (config) => {
       config,
       data: { data: [] },
     };
+  }
+
+  // ─── Admin Customers ───────────────────────────────────────────────────
+  if (url.includes('/admin/clientes')) {
+    if (method === 'get') {
+      const page = config.params?.page || 0;
+      const size = config.params?.size || 10;
+      const search = config.params?.search || '';
+      
+      let filtered = mockCustomers;
+      if (search) {
+        filtered = mockCustomers.filter(c =>
+          c.nome.toLowerCase().includes(search.toLowerCase()) ||
+          c.email.toLowerCase().includes(search.toLowerCase()) ||
+          c.cpf.includes(search)
+        );
+      }
+      
+      const startIdx = page * size;
+      const endIdx = startIdx + size;
+      
+      return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+        data: {
+          data: filtered.slice(startIdx, endIdx),
+          totalElements: filtered.length,
+          totalPages: Math.ceil(filtered.length / size),
+          currentPage: page,
+          pageSize: size,
+        },
+      };
+    }
+    
+    if (/\/admin\/clientes\/\d+$/.test(url)) {
+      const clientId = url.split('/').pop();
+      const client = mockCustomers.find(c => c.id === clientId);
+      return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+        data: { data: client || mockCustomers[0] },
+      };
+    }
+  }
+
+  // ─── Admin Exchanges/Returns ───────────────────────────────────────────
+  if (url.includes('/admin/trocas')) {
+    if (method === 'get') {
+      const page = config.params?.page || 0;
+      const size = config.params?.size || 10;
+      
+      const startIdx = page * size;
+      const endIdx = startIdx + size;
+      
+      return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+        data: {
+          data: mockExchanges.slice(startIdx, endIdx),
+          totalElements: mockExchanges.length,
+          totalPages: Math.ceil(mockExchanges.length / size),
+          currentPage: page,
+          pageSize: size,
+        },
+      };
+    }
+    
+    if (/\/admin\/trocas\/\d+$/.test(url)) {
+      const exchangeId = url.split('/').pop();
+      const exchange = mockExchanges.find(e => e.id === exchangeId);
+      return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+        data: { data: exchange || mockExchanges[0] },
+      };
+    }
+  }
+
+  // ─── Admin Stock ───────────────────────────────────────────────────────
+  if (url.includes('/admin/estoque')) {
+    if (method === 'get') {
+      const page = config.params?.page || 0;
+      const size = config.params?.size || 10;
+      
+      const startIdx = page * size;
+      const endIdx = startIdx + size;
+      
+      return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+        data: {
+          data: mockStock.slice(startIdx, endIdx),
+          totalElements: mockStock.length,
+          totalPages: Math.ceil(mockStock.length / size),
+          currentPage: page,
+          pageSize: size,
+        },
+      };
+    }
+    
+    if (method === 'post') {
+      return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
+        data: { data: { success: true, message: 'Estoque atualizado' } },
+      };
+    }
   }
 
   // ─── Fallback: Return empty response ────────────────────────────────
