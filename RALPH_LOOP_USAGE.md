@@ -22,29 +22,41 @@ $ ./ralph-loop.sh --build     # ✅ This works
 The Ralph Loop orchestrates multi-step task execution:
 
 ```
-┌─────────────────────────────────────┐
-│  ./ralph-loop.sh --build (Terminal) │
-└──────────────┬──────────────────────┘
+┌──────────────────────────────────────────────┐
+│  Terminal: ./ralph-loop.sh --build           │
+└──────────────┬───────────────────────────────┘
                │
-     ┌─────────▼──────────┐
-     │ Read prd.json      │
-     │ Generate plan      │
-     │ Check progress     │
-     └─────────┬──────────┘
+     ┌─────────▼──────────────────────────┐
+     │ 1. Read prd.json                   │
+     │ 2. Generate IMPLEMENTATION_PLAN.md │
+     │ 3. Check progress.txt              │
+     └─────────┬──────────────────────────┘
                │
-     ┌─────────▼────────────────────┐
-     │ For each iteration:          │
-     │ 1. Pick next pending task    │
-     │ 2. Display task context      │
-     │ 3. Record progress           │
-     │ 4. Mark as done/failed       │
-     └─────────┬────────────────────┘
+     ┌─────────▼──────────────────────┐
+     │ For each iteration:            │
+     │ ✓ Pick next pending task       │
+     │ ✓ Display task context         │
+     │ ✓ Show implementation guide    │
+     │ ✓ Wait for user input          │
+     └─────────┬──────────────────────┘
                │
-     ┌─────────▼──────────────────┐
-     │ YOU implement the task:    │
-     │ $ copilot                  │
-     │ > (implement US-002, etc)  │
-     └────────────────────────────┘
+     ┌─────────▼─────────────────────────────┐
+     │ YOU implement the task:               │
+     │                                       │
+     │ $ copilot                             │
+     │ > Read IMPLEMENTATION_PLAN.md         │
+     │ > Implement US-002 according to spec  │
+     │ > Run tests                           │
+     │ > Commit changes                      │
+     │ (Ctrl+D to exit copilot)              │
+     │                                       │
+     │ OR edit manually in your editor       │
+     └─────────┬─────────────────────────────┘
+               │
+     ┌─────────▼──────────────────────┐
+     │ Next run detects completion    │
+     │ and marks task as done         │
+     └───────────────────────────────┘
 ```
 
 ## Basic Commands
@@ -82,30 +94,41 @@ Creates/updates `IMPLEMENTATION_PLAN.md` from `prd.json`.
 ```bash
 $ ./ralph-loop.sh --build -l 1
 ```
-This displays the first pending task (US-002).
+
+Output shows:
+- Task summary
+- PROMPT.md instructions
+- Guide on how to implement
+- Prompt to press Enter when ready
 
 ### 2. Implement the task
-The script shows you what to implement. You then:
+
+You have two options:
+
+**Option A: Using Copilot CLI (Recommended)**
 ```bash
 $ copilot
-# Now you're in Copilot CLI
-> Please implement US-002: VALIDAR RF0012
-> - Read IMPLEMENTATION_PLAN.md for details
-> - Implement the feature
+# Now in Copilot CLI
+> Please implement US-002 as described
+> - Read IMPLEMENTATION_PLAN.md
+> - Write the feature code
 > - Write tests
-> - Commit changes
+> - Verify all tests pass
+> Commit the changes
 ```
 
-### 3. Mark as done
-Once you finish, the next run of `ralph-loop.sh` will:
-- Detect the implementation is complete
-- Mark US-002 as done in progress.txt
-- Move to the next task (US-004, etc)
+**Option B: Manual editing**
+- Edit files directly in your editor
+- Follow the acceptance criteria
+- Write tests as needed
+- Commit when done
 
-### 4. Check progress
+### 3. Next iteration
 ```bash
-$ ./ralph-loop.sh --status
+$ ./ralph-loop.sh --build -l 1
 ```
+
+The script detects your implementation and marks US-002 as done, moving to US-004.
 
 ## File Structure
 
@@ -152,12 +175,15 @@ Read these in order:
 
 ## Key Points
 
-✅ ralph-loop.sh is run FROM terminal
-✅ It orchestrates and tracks progress  
-✅ You implement tasks using `copilot` command
-✅ Progress is recorded automatically
-✅ Rerun `./ralph-loop.sh --build` to continue
+✅ ralph-loop.sh is run FROM terminal (not from Copilot CLI)
+✅ It coordinates and tracks progress
+✅ It presents tasks clearly with implementation guidance
+✅ You implement tasks using copilot or manual editing
+✅ Progress is recorded automatically in progress.txt
+✅ No automatic execution (which was causing hangs)
+✅ Next run automatically detects completion
 
 ❌ Don't run ralph-loop.sh FROM within Copilot CLI
-❌ Don't try to implement without reading the task context
-❌ Don't skip running --plan if PRD changes
+❌ Don't expect it to automatically implement tasks
+❌ Don't skip implementing - just press Enter and work
+❌ Don't modify progress.txt manually (let the script manage it)
