@@ -35,13 +35,32 @@ export const CartProvider = ({ children }) => {
   }, [items.length]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const addItem = (book, quantity = 1) => {
+    // Normalize quantity to integer
+    const normalizedQty = Math.floor(Number(quantity));
+
+    // RN0031: Validar quantidade antes de adicionar
+    if (normalizedQty <= 0) {
+      throw new Error('A quantidade deve ser maior que zero.');
+    }
+
     const existing = items.find((i) => i.id === book.id);
+    const currentQty = existing ? existing.quantity : 0;
+    const newTotal = currentQty + normalizedQty;
+    const availableStock = book.estoque?.quantidadeDisponivel;
+
+    // RN0031: Validar estoque disponível (se informado)
+    if (availableStock !== undefined && newTotal > availableStock) {
+      throw new Error(
+        `Quantidade indisponível em estoque. Disponível: ${availableStock}, Solicitado: ${newTotal}`
+      );
+    }
+
     if (existing) {
       setItems(
-        items.map((i) => (i.id === book.id ? { ...i, quantity: i.quantity + quantity } : i))
+        items.map((i) => (i.id === book.id ? { ...i, quantity: newTotal } : i))
       );
     } else {
-      setItems([...items, { ...book, quantity, addedAt: new Date().toISOString() }]);
+      setItems([...items, { ...book, quantity: normalizedQty, addedAt: new Date().toISOString() }]);
     }
   };
 
@@ -52,7 +71,18 @@ export const CartProvider = ({ children }) => {
   const updateQuantity = (bookId, quantity) => {
     if (quantity <= 0) {
       removeItem(bookId);
-    } else {
+      return;
+    }
+
+    // RN0031: Validar estoque disponível ao atualizar quantidade
+    const item = items.find((i) => i.id === bookId);
+    if (item) {
+      const availableStock = item.estoque?.quantidadeDisponivel;
+      if (availableStock !== undefined && quantity > availableStock) {
+        throw new Error(
+          `Quantidade indisponível em estoque. Disponível: ${availableStock}, Solicitado: ${quantity}`
+        );
+      }
       setItems(items.map((i) => (i.id === bookId ? { ...i, quantity } : i)));
     }
   };
