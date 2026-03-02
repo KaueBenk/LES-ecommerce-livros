@@ -64,7 +64,7 @@ while [[ $# -gt 0 ]]; do
     --reset-all)   RESET_ALL=true; shift ;;
     --prd)         PRD_FILE="$2"; shift 2 ;;
     -h|--help)
-      sed -n '2,19p' "$0" | sed 's/^# \?//'
+      sed -n '2,16p' "$0" | sed 's/^# \?//'
       exit 0 ;;
     *)
       log_error "Unknown option: $1"
