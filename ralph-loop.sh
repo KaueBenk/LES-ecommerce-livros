@@ -254,13 +254,32 @@ execute_iteration() {
   echo ""
   
   local exit_code=0
-  local prompt start_time elapsed
-  prompt=$(cat PROMPT.md; echo ""; echo "## Current Task"; echo ""; echo "**Story ID:** $next_id"; echo ""; echo "**Title:** $story_title"; echo ""; echo "**Description:** $story_desc"; echo ""; echo "**Acceptance Criteria:**"; echo "$story_criteria")
+  local prompt start_time elapsed prompt_file
+  prompt_file=$(mktemp)
+  trap "rm -f '$prompt_file'" RETURN
+  
+  # Write prompt to file instead of using command substitution for better handling
+  {
+    cat PROMPT.md
+    echo ""
+    echo "## Current Task"
+    echo ""
+    echo "**Story ID:** $next_id"
+    echo ""
+    echo "**Title:** $story_title"
+    echo ""
+    echo "**Description:** $story_desc"
+    echo ""
+    echo "**Acceptance Criteria:**"
+    echo "$story_criteria"
+  } > "$prompt_file"
   
   start_time=$(date +%s)
   
+  # Use unbuffered output and line buffering for better responsiveness
   timeout "$COPILOT_TIMEOUT" \
-    copilot -p "$prompt" $COPILOT_ARGS --model "$MODEL_NAME" \
+    stdbuf -oL -eL \
+    copilot -p "$(cat "$prompt_file")" $COPILOT_ARGS --model "$MODEL_NAME" \
     || exit_code=$?
   
   elapsed=$(($(date +%s) - start_time))
