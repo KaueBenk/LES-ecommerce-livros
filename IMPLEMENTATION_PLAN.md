@@ -6,7 +6,7 @@
 **Description:** Ralph Loop para validação de TODAS as regras definidas no DRS_LES_1_2026.md, regra por regra com testes frontend mockados. Cada user story corresponde a uma regra (RF, RNF ou RN) e contém os critérios de aceite necessários para confirmar que a implementação está conforme o documento de requisitos.
 **Branch:** ralph/validate-drs-rules
 **Total Stories:** 84
-**Completed:** 1 / 84
+**Completed:** 2 / 84
 
 ## Task List
 
@@ -20,7 +20,7 @@
 ---
 
 - [✓] **US-001** (P1) — VALIDAR RF0011: Cadastrar livro
-- [ ] **US-002** (P1) — VALIDAR RF0012: Inativar cadastro de livro
+- [✓] **US-002** (P1) — VALIDAR RF0012: Inativar cadastro de livro
 - [ ] **US-004** (P1) — VALIDAR RF0014: Alterar cadastro de livro
 - [ ] **US-005** (P1) — VALIDAR RF0015: Consulta de livros
 - [ ] **US-007** (P1) — VALIDAR RF0021: Cadastrar cliente
