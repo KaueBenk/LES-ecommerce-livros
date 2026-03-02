@@ -1,7 +1,7 @@
 # IMPLEMENTATION_PLAN
 
 **Project:** LES E-Commerce de Livros — Validação de Regras (DRS_LES_1_2026)
-**Total:** 84 | **Done:** 10 / 84
+**Total:** 84 | **Done:** 11 / 84
 
 ## Tasks
 
@@ -15,7 +15,7 @@
 - [✓] **US-013** (P1) — VALIDAR RF0027: Cadastro de cartões de crédito
 - [✓] **US-014** (P1) — VALIDAR RF0028: Alteração apenas de senha
 - [✓] **US-015** (P1) — VALIDAR RF0031: Gerenciar carrinho de compra
-- [ ] **US-016** (P1) — VALIDAR RF0032: Definir quantidade de itens no carrinho
+- [✓] **US-016** (P1) — VALIDAR RF0032: Definir quantidade de itens no carrinho
 - [ ] **US-017** (P1) — VALIDAR RF0033: Realizar compra
 - [ ] **US-018** (P1) — VALIDAR RF0034: Calcular frete
 - [ ] **US-019** (P1) — VALIDAR RF0035: Selecionar endereço de entrega
