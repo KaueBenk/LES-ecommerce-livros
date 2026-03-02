@@ -64,6 +64,20 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 - E2E tests for user workflows (if applicable)
 - Mock external APIs in tests (no actual API calls)
 
+### Vitest Setup
+- Test framework: Vitest + React Testing Library + jsdom
+- Config: Added test config block in `vite.config.js`
+- Setup file: `src/test/setup.js` with cleanup after each test
+- Scripts: `npm test` (run once), `npm run test:watch` (watch mode)
+
+### Component Testing Patterns
+- Mock services using `vi.mock()` at module level
+- Mock custom hooks (usePageTitle, useNotification) to avoid side effects
+- Use `data-testid` attributes for stable selectors
+- Trigger form validation by clicking buttons (not blur events)
+- Use `waitFor()` for async operations and state updates
+- Clear mocks with `vi.clearAllMocks()` in `beforeEach()`
+
 ## Known Issues / Blockers
 
 ### Cypress E2E Tests in Codespaces
@@ -86,3 +100,9 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 - Build time: ~5-8 seconds for production build
 - All 163 modules transform successfully
 - Final bundle: 368.67 kB (gzipped: 118.66 kB)
+
+### Testing
+- Unit tests run in ~1-2 seconds with Vitest
+- React Testing Library renders components in jsdom environment
+- Form validation tests should trigger validation by clicking buttons
+- Use unique test data to avoid conflicts with mock data
