@@ -287,33 +287,46 @@ execute_iteration() {
   
   start_time=$(date +%s)
   
-  # Display task for execution
-  # Note: ralph-loop.sh is designed to be run FROM your terminal, not FROM within Copilot CLI
-  # If you're seeing this message, you're trying to run it within Copilot context
-  
-  echo "📋 TASK CONTEXT"
+  # Present the task to be implemented
+  echo "📋 NEXT TASK — $next_id"
   echo "═══════════════════════════════════════════════════════════════"
   echo ""
   cat "$prompt_file"
   echo ""
   echo "═══════════════════════════════════════════════════════════════"
   echo ""
-  echo "⚠️  ralph-loop.sh cannot call copilot recursively."
+  echo "🎯 To implement this task:"
   echo ""
-  echo "✅ To run this properly:"
-  echo "   1. Exit the Copilot CLI (press Ctrl+D or /exit)"
-  echo "   2. Run in your terminal: ./ralph-loop.sh --build"
+  echo "   Option 1: Using Copilot CLI (Recommended)"
+  echo "   ────────────────────────────────────"
+  echo "   $ copilot"
+  echo "   > Read IMPLEMENTATION_PLAN.md"
+  echo "   > Implement the task above"
+  echo "   > Run tests to verify"
+  echo "   > Commit your changes"
   echo ""
-  echo "   OR use the task tool to execute subtasks:"
-  echo "   $ task -agent general-purpose -prompt 'Implement: $next_id'"
+  echo "   Option 2: Manual implementation"
+  echo "   ────────────────────────────────"
+  echo "   Use your editor and implement following:"
+  echo "   - AGENTS.md (patterns and learnings)"
+  echo "   - PRD description (acceptance criteria)"
+  echo ""
+  echo "⏸️  Waiting for implementation..."
+  echo "   Press Enter when ready to continue, or Ctrl+C to exit."
   echo ""
   
-  exit_code=1
+  read -r
   
   elapsed=$(($(date +%s) - start_time))
-  log_warn "✗ Story $next_id - Cannot proceed (requires terminal execution)"
-  _record_failed "$next_id" "Requires execution outside Copilot CLI context"
-  return 1
+  echo ""
+  log_ok "✓ Task context presented (${elapsed}s)"
+  echo ""
+  echo "✅ Task $next_id ready for implementation"
+  echo "   Next iteration will check if completed and mark accordingly."
+  echo ""
+  
+  # Mark as pending (will be marked done automatically when detected)
+  return 0
 }
 
 # Main
