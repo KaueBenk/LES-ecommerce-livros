@@ -370,55 +370,67 @@ export const mockNotifications = [
 ];
 
 // ─── Analytics Data ─────────────────────────────────────────────────────────
-
-const generateDailySalesData = () => {
-  const data = {};
-  const start = new Date('2026-01-01');
-  const end = new Date('2026-03-02');
-  
-  for (let d = new Date(start); d <= end; d.setDate(d.getDate() + 1)) {
-    const dateStr = d.toISOString().split('T')[0];
-    data[dateStr] = Math.floor(Math.random() * 5000) + 500;
-  }
-  
-  return data;
-};
+// Shape expected by AnalyticsDashboard:
+//   sales → { series: [{ nome, data: [{ mes, quantidade, valor }] }] }
+//   regional → { estados: [{ estado, quantidade, valor }] }
 
 export const mockAnalytics = {
-  totalVendas: 27000,
-  totalPedidos: 27,
-  totalClientes: 30,
-  ticketMedio: 1000,
-  vendsPorDia: generateDailySalesData(),
-  pedidosPorStatus: {
-    ENTREGUE: 14,
-    PROCESSANDO: 4,
-    ENVIADO: 4,
-    PENDENTE: 3,
-    CANCELADO: 2,
+  sales: {
+    series: [
+      {
+        nome: 'Programação',
+        data: [
+          { mes: '2026-01', quantidade: 12, valor: 1245.60 },
+          { mes: '2026-02', quantidade: 18, valor: 1876.40 },
+          { mes: '2026-03', quantidade: 6, valor: 634.20 },
+        ],
+      },
+      {
+        nome: 'Algoritmos',
+        data: [
+          { mes: '2026-01', quantidade: 5, valor: 724.50 },
+          { mes: '2026-02', quantidade: 8, valor: 1123.20 },
+          { mes: '2026-03', quantidade: 3, valor: 389.70 },
+        ],
+      },
+      {
+        nome: 'Web',
+        data: [
+          { mes: '2026-01', quantidade: 4, valor: 512.60 },
+          { mes: '2026-02', quantidade: 7, valor: 876.30 },
+          { mes: '2026-03', quantidade: 2, valor: 254.80 },
+        ],
+      },
+      {
+        nome: 'Machine Learning',
+        data: [
+          { mes: '2026-01', quantidade: 2, valor: 284.80 },
+          { mes: '2026-02', quantidade: 5, valor: 712.50 },
+          { mes: '2026-03', quantidade: 1, valor: 84.50 },
+        ],
+      },
+      {
+        nome: 'Arquitetura',
+        data: [
+          { mes: '2026-01', quantidade: 3, valor: 419.70 },
+          { mes: '2026-02', quantidade: 4, valor: 559.60 },
+          { mes: '2026-03', quantidade: 2, valor: 279.80 },
+        ],
+      },
+    ],
   },
-  top10Livros: [
-    { livroId: '1', titulo: 'Clean Code', vendas: 8, receita: 719.20 },
-    { livroId: '9', titulo: 'Learning Python', vendas: 6, receita: 539.40 },
-    { livroId: '4', titulo: 'Refactoring', vendas: 5, receita: 424.65 },
-    { livroId: '5', titulo: 'The Pragmatic Programmer', vendas: 5, receita: 395.55 },
-    { livroId: '11', titulo: 'System Design Interview', vendas: 4, receita: 299.60 },
-    { livroId: '2', titulo: 'Design Patterns', vendas: 4, receita: 303.60 },
-    { livroId: '12', titulo: 'Web Development with Node.js', vendas: 4, receita: 288.80 },
-    { livroId: '17', titulo: 'Machine Learning Basics', vendas: 4, receita: 336.40 },
-    { livroId: '20', titulo: 'Software Engineering: A Practitioner\'s Approach', vendas: 3, receita: 274.50 },
-    { livroId: '3', titulo: 'JavaScript: The Good Parts', vendas: 3, receita: 209.70 },
-  ],
-  categoriasMaisVendidas: [
-    { categoria: 'Programação', vendas: 18, receita: 3456.80 },
-    { categoria: 'Algoritmos', vendas: 8, receita: 1523.40 },
-    { categoria: 'Web', vendas: 7, receita: 1298.60 },
-    { categoria: 'Machine Learning', vendas: 5, receita: 924.30 },
-    { categoria: 'Design', vendas: 4, receita: 789.60 },
-  ],
-  clientesMaisAtivos: [
-    { clienteId: '4', nome: 'Carlos Oliveira', pedidos: 2, gastou: 594.30 },
-    { clienteId: '6', nome: 'Pedro Alves', pedidos: 2, gastou: 637.40 },
-    { clienteId: '14', nome: 'Felipe Castro', pedidos: 2, gastou: 534.50 },
-  ],
+  regional: {
+    estados: [
+      { estado: 'SP', quantidade: 32, valor: 4250.80 },
+      { estado: 'RJ', quantidade: 18, valor: 2340.60 },
+      { estado: 'MG', quantidade: 12, valor: 1560.40 },
+      { estado: 'PR', quantidade: 8, valor: 1040.20 },
+      { estado: 'RS', quantidade: 7, valor: 910.30 },
+      { estado: 'BA', quantidade: 5, valor: 650.50 },
+      { estado: 'SC', quantidade: 4, valor: 520.40 },
+      { estado: 'PE', quantidade: 3, valor: 390.30 },
+      { estado: 'CE', quantidade: 2, valor: 260.20 },
+      { estado: 'GO', quantidade: 2, valor: 260.20 },
+    ],
+  },
 };

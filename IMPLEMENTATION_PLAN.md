@@ -18,9 +18,9 @@
 - [✓] **US-015** (P1) — VALIDAR RF0031: Gerenciar carrinho de compra
 - [✓] **US-016** (P1) — VALIDAR RF0032: Definir quantidade de itens no carrinho
 - [✗] **US-017** (P1) — VALIDAR RF0033: Realizar compra
-- [ ] **US-018** (P1) — VALIDAR RF0034: Calcular frete
-- [ ] **US-019** (P1) — VALIDAR RF0035: Selecionar endereço de entrega
-- [ ] **US-020** (P1) — VALIDAR RF0036: Selecionar forma de pagamento
+- [✗] **US-018** (P1) — VALIDAR RF0034: Calcular frete
+- [✗] **US-019** (P1) — VALIDAR RF0035: Selecionar endereço de entrega
+- [✗] **US-020** (P1) — VALIDAR RF0036: Selecionar forma de pagamento
 - [ ] **US-021** (P1) — VALIDAR RF0037: Finalizar Compra
 - [ ] **US-029** (P1) — VALIDAR RF0051: Realizar entrada em estoque
 - [ ] **US-030** (P1) — VALIDAR RF0052: Calcular valor de venda
