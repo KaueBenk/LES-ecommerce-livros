@@ -1,5 +1,6 @@
 /**
  * Demo mode interceptor - Replaces API calls with mock data
+ * Strategy: Use a custom adapter for axios that serves mock data instead of making real requests
  */
 
 import {
@@ -29,6 +30,10 @@ const getMockResponse = (config) => {
   // ─── Auth Endpoints ────────────────────────────────────────────────────
   if (url.includes('/auth/login')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: {
         data: {
           token: 'demo-token-' + Date.now(),
@@ -40,6 +45,10 @@ const getMockResponse = (config) => {
 
   if (url.includes('/auth/register')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: {
         data: {
           token: 'demo-token-' + Date.now(),
@@ -50,32 +59,50 @@ const getMockResponse = (config) => {
   }
 
   if (url.includes('/auth/logout')) {
-    return { data: { success: true } };
+    return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+      data: { success: true },
+    };
   }
 
   if (url.includes('/auth/senha')) {
-    return { data: { message: 'Senha alterada com sucesso' } };
+    return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
+      data: { message: 'Senha alterada com sucesso' },
+    };
   }
 
   // ─── Admin Books Endpoints ────────────────────────────────────────────
   if (url.includes('/admin/livros') && !url.includes('/ativar') && !url.includes('/inativar')) {
     if (method === 'get') {
       if (/\/admin\/livros\/\d+/.test(url)) {
-        // GET single book
         const bookId = url.split('/').pop();
         const book = mockBooks.find((b) => b.id === bookId);
         return {
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
           data: { data: book || mockBooks[0] },
         };
       }
 
-      // GET all admin books with pagination
       const page = config.params?.page || 0;
       const size = config.params?.size || 12;
       const startIdx = page * size;
       const endIdx = startIdx + size;
 
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: {
           data: mockBooks.slice(startIdx, endIdx),
           totalElements: mockBooks.length,
@@ -88,6 +115,10 @@ const getMockResponse = (config) => {
 
     if (method === 'post') {
       return {
+        status: 201,
+        statusText: 'Created',
+        headers: {},
+        config,
         data: {
           data: {
             id: Math.random().toString(36),
@@ -100,6 +131,10 @@ const getMockResponse = (config) => {
     if (method === 'put') {
       const bookId = url.split('/').pop();
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: {
           data: {
             id: bookId,
@@ -113,6 +148,10 @@ const getMockResponse = (config) => {
   // ─── Admin Book Activation/Deactivation ────────────────────────────────
   if (url.includes('/admin/livros/') && (url.includes('/ativar') || url.includes('/inativar'))) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: { message: 'Status alterado com sucesso' },
     };
   }
@@ -121,21 +160,27 @@ const getMockResponse = (config) => {
   if (url.includes('/admin/pedidos')) {
     if (method === 'get') {
       if (/\/admin\/pedidos\/\d+/.test(url)) {
-        // GET single order
         const orderId = url.split('/').pop();
         const order = mockOrders.find((o) => o.id === orderId);
         return {
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
           data: { data: order || mockOrders[0] },
         };
       }
 
-      // GET all admin orders with pagination
       const page = config.params?.page || 0;
       const size = config.params?.size || 20;
       const startIdx = page * size;
       const endIdx = startIdx + size;
 
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: {
           data: mockOrders.slice(startIdx, endIdx),
           totalElements: mockOrders.length,
@@ -147,8 +192,11 @@ const getMockResponse = (config) => {
     }
 
     if (method === 'patch') {
-      // Dispatch or deliver order
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { message: 'Pedido atualizado com sucesso' },
       };
     }
@@ -157,6 +205,10 @@ const getMockResponse = (config) => {
   // ─── Admin Analytics ───────────────────────────────────────────────────
   if (url.includes('/admin/analytics') || url.includes('/admin/dashboard')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: { data: mockAnalytics },
     };
   }
@@ -165,21 +217,27 @@ const getMockResponse = (config) => {
   if (url.includes('/livros') && !url.includes('/admin') && !url.includes('/avaliacoes')) {
     if (method === 'get') {
       if (/\/livros\/\d+$/.test(url)) {
-        // GET single book
         const bookId = url.split('/').pop();
         const book = mockBooks.find((b) => b.id === bookId);
         return {
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
           data: { data: book || mockBooks[0] },
         };
       }
 
-      // GET all books with pagination
       const page = config.params?.page || 0;
       const size = config.params?.size || 12;
       const startIdx = page * size;
       const endIdx = startIdx + size;
 
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: {
           data: mockBooks.slice(startIdx, endIdx),
           totalElements: mockBooks.length,
@@ -194,6 +252,10 @@ const getMockResponse = (config) => {
   // ─── Categories ───────────────────────────────────────────────────────
   if (url.includes('/catalogo/categorias')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: { data: mockCategories },
     };
   }
@@ -201,6 +263,10 @@ const getMockResponse = (config) => {
   // ─── Authors ───────────────────────────────────────────────────────────
   if (url.includes('/catalogo/autores')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: { data: mockAuthors },
     };
   }
@@ -208,6 +274,10 @@ const getMockResponse = (config) => {
   // ─── Publishers (editoras) ──────────────────────────────────────────────
   if (url.includes('/catalogo/editoras')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: { data: [{ id: '1', nome: 'Editora Demo' }] },
     };
   }
@@ -218,12 +288,20 @@ const getMockResponse = (config) => {
 
     if (method === 'get') {
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { data: mockReviews[bookId] || [] },
       };
     }
 
     if (method === 'post') {
       return {
+        status: 201,
+        statusText: 'Created',
+        headers: {},
+        config,
         data: {
           data: {
             id: Math.random().toString(36),
@@ -242,21 +320,27 @@ const getMockResponse = (config) => {
   if (url.includes('/pedidos') && !url.includes('/admin')) {
     if (method === 'get') {
       if (/\/pedidos\/\d+/.test(url)) {
-        // GET single order
         const orderId = url.split('/').pop();
         const order = mockOrders.find((o) => o.id === orderId);
         return {
+          status: 200,
+          statusText: 'OK',
+          headers: {},
+          config,
           data: { data: order || mockOrders[0] },
         };
       }
 
-      // GET all customer orders with pagination
       const page = config.params?.page || 0;
       const size = config.params?.size || 20;
       const startIdx = page * size;
       const endIdx = startIdx + size;
 
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: {
           data: mockOrders.slice(startIdx, endIdx),
           totalElements: mockOrders.length,
@@ -269,6 +353,10 @@ const getMockResponse = (config) => {
 
     if (method === 'post') {
       return {
+        status: 201,
+        statusText: 'Created',
+        headers: {},
+        config,
         data: {
           data: {
             id: Math.random().toString(36),
@@ -286,6 +374,10 @@ const getMockResponse = (config) => {
   // ─── Checkout ─────────────────────────────────────────────────────────
   if (url.includes('/checkout')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: {
         data: {
           id: Math.random().toString(36),
@@ -302,12 +394,20 @@ const getMockResponse = (config) => {
   if (url.includes('/clientes/perfil') || url.includes('/clientes/me')) {
     if (method === 'get') {
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { data: mockUser },
       };
     }
 
     if (method === 'put') {
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { data: { ...mockUser, ...config.data } },
       };
     }
@@ -317,12 +417,20 @@ const getMockResponse = (config) => {
   if (url.includes('/enderecosEntrega') || url.includes('/enderecos')) {
     if (method === 'get') {
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { data: mockAddresses },
       };
     }
 
     if (method === 'post') {
       return {
+        status: 201,
+        statusText: 'Created',
+        headers: {},
+        config,
         data: {
           data: {
             id: Math.random().toString(36),
@@ -335,6 +443,10 @@ const getMockResponse = (config) => {
     if (method === 'put') {
       const id = url.split('/').pop();
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: {
           data: {
             id,
@@ -345,7 +457,13 @@ const getMockResponse = (config) => {
     }
 
     if (method === 'delete') {
-      return { data: { success: true } };
+      return {
+        status: 204,
+        statusText: 'No Content',
+        headers: {},
+        config,
+        data: {},
+      };
     }
   }
 
@@ -353,12 +471,20 @@ const getMockResponse = (config) => {
   if (url.includes('/cartoes')) {
     if (method === 'get') {
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { data: mockCreditCards },
       };
     }
 
     if (method === 'post') {
       return {
+        status: 201,
+        statusText: 'Created',
+        headers: {},
+        config,
         data: {
           data: {
             id: Math.random().toString(36),
@@ -370,7 +496,13 @@ const getMockResponse = (config) => {
     }
 
     if (method === 'delete') {
-      return { data: { success: true } };
+      return {
+        status: 204,
+        statusText: 'No Content',
+        headers: {},
+        config,
+        data: {},
+      };
     }
   }
 
@@ -378,12 +510,20 @@ const getMockResponse = (config) => {
   if (url.includes('/notificacoes')) {
     if (method === 'get') {
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { data: mockNotifications },
       };
     }
 
     if (method === 'put' || method === 'patch') {
       return {
+        status: 200,
+        statusText: 'OK',
+        headers: {},
+        config,
         data: { success: true },
       };
     }
@@ -392,51 +532,42 @@ const getMockResponse = (config) => {
   // ─── Pricing Groups ───────────────────────────────────────────────────
   if (url.includes('/grupos-precificacao')) {
     return {
+      status: 200,
+      statusText: 'OK',
+      headers: {},
+      config,
       data: { data: [] },
     };
   }
 
-  // ─── Fallback: Log and return empty ────────────────────────────────────
+  // ─── Fallback: Return empty response ────────────────────────────────
   console.warn('[DEMO MODE] No mock handler for:', method.toUpperCase(), url);
   return {
+    status: 200,
+    statusText: 'OK',
+    headers: {},
+    config,
     data: { data: [] },
   };
 };
 
 /**
  * Create axios interceptor for demo mode
- * Intercepts ALL responses to serve mock data
+ * Intercepts ALL requests to serve mock data
  */
 const createMockInterceptor = (axiosInstance) => {
   if (!DEMO_MODE) return;
 
-  // Intercept ALL responses (success and error) to serve mock data
-  axiosInstance.interceptors.response.use(
-    (response) => {
-      // Even successful responses get replaced with mock data
-      const mockData = getMockResponse(response.config);
-      return Promise.resolve({
-        ...response,
-        ...mockData,
-        status: 200,
-        statusText: 'OK',
-      });
-    },
-    (error) => {
-      // For errors, also serve mock data
-      if (error.config) {
-        const mockData = getMockResponse(error.config);
-        return Promise.resolve({
-          ...mockData,
-          status: 200,
-          statusText: 'OK',
-          config: error.config,
-        });
-      }
-      return Promise.reject(error);
-    }
-  );
+  // Replace the default adapter with a mock adapter
+  const originalAdapter = axiosInstance.defaults.adapter;
+
+  axiosInstance.defaults.adapter = (config) => {
+    // In demo mode, serve mock data immediately without making a real request
+    const response = getMockResponse(config);
+    return Promise.resolve(response);
+  };
 };
 
 export default createMockInterceptor;
 export { DEMO_MODE };
+
