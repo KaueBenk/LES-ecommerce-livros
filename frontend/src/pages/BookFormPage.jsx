@@ -545,7 +545,7 @@ const INITIAL_FORM = {
   autorizacaoGerencial: false,
 };
 
-const validateStep = (step, form) => {
+const validateStep = (step, form, existingBooks = [], currentBookId = null) => {
   const errs = {};
   if (step === 1) {
     if (!form.titulo.trim()) errs.titulo = 'Título é obrigatório.';
@@ -557,6 +557,16 @@ const validateStep = (step, form) => {
     }
     if (!form.isbn.trim() || !/^\d{10,13}$/.test(form.isbn.replace(/[- ]/g, ''))) {
       errs.isbn = 'ISBN deve ter entre 10 e 13 dígitos numéricos.';
+    } else {
+      // Check for ISBN duplicate
+      const normalizedIsbn = form.isbn.replace(/[- ]/g, '');
+      const duplicate = existingBooks.find((book) => {
+        const bookIsbn = (book.isbn || '').replace(/[- ]/g, '');
+        return bookIsbn === normalizedIsbn && String(book.id) !== String(currentBookId);
+      });
+      if (duplicate) {
+        errs.isbn = `ISBN já cadastrado no livro "${duplicate.titulo}".`;
+      }
     }
   }
   if (step === 2) {
@@ -569,7 +579,9 @@ const validateStep = (step, form) => {
     if (form.peso && isNaN(Number(form.peso))) errs.peso = 'Valor inválido.';
   }
   if (step === 3) {
-    if (form.precoVenda !== '' && form.precoVenda !== null) {
+    if (form.precoVenda === '' || form.precoVenda === null) {
+      errs.precoVenda = 'Preço de venda é obrigatório.';
+    } else {
       const v = parseFloat(form.precoVenda);
       if (isNaN(v) || v <= 0) errs.precoVenda = 'Informe um preço de venda válido.';
     }
@@ -586,7 +598,7 @@ const buildPayload = (form) => {
     editoraId: Number(form.editoraId),
     edicao: form.edicao.trim(),
     ano: Number(form.ano),
-    isbn: form.isbn.trim(),
+    isbn: form.isbn.replace(/[- ]/g, '').trim(), // Normalize ISBN (remove dashes/spaces)
   };
   if (form.numeroPaginas) payload.numeroPaginas = Number(form.numeroPaginas);
   if (form.sinopse) payload.sinopse = form.sinopse.trim();
@@ -633,23 +645,28 @@ const BookFormPage = () => {
   const [pricingGroups, setPricingGroups] = useState([]);
   const [loadingRefs, setLoadingRefs] = useState(true);
   const [loadingBook, setLoadingBook] = useState(isEdit);
+  
+  // Existing books for ISBN validation
+  const [existingBooks, setExistingBooks] = useState([]);
 
   // ── Load reference data + existing book ────────────────────────────────
   useEffect(() => {
     let cancelled = false;
     const loadAll = async () => {
       try {
-        const [authorsData, publishersData, categoriesData, pricingData] = await Promise.all([
+        const [authorsData, publishersData, categoriesData, pricingData, booksData] = await Promise.all([
           adminService.getAuthors(),
           adminService.getPublishers(),
           adminService.getCategories(),
           adminService.getPricingGroups(),
+          adminService.getBooks({ size: 1000 }), // Load all books for ISBN check
         ]);
         if (!cancelled) {
           setAuthors(Array.isArray(authorsData) ? authorsData : []);
           setPublishers(Array.isArray(publishersData) ? publishersData : []);
           setCategories(Array.isArray(categoriesData) ? categoriesData : []);
           setPricingGroups(Array.isArray(pricingData) ? pricingData : []);
+          setExistingBooks(booksData?.content || []);
         }
       } catch (err) {
         if (!cancelled) notifyError('Erro ao carregar dados de referência.');
@@ -708,7 +725,7 @@ const BookFormPage = () => {
 
   // ── Navigation ──────────────────────────────────────────────────────────
   const handleNext = () => {
-    const errs = validateStep(currentStep, form);
+    const errs = validateStep(currentStep, form, existingBooks, bookId);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -741,7 +758,7 @@ const BookFormPage = () => {
 
   // ── Submit ──────────────────────────────────────────────────────────────
   const handleSubmit = async () => {
-    const errs = validateStep(currentStep, form);
+    const errs = validateStep(currentStep, form, existingBooks, bookId);
     if (Object.keys(errs).length > 0) {
       setErrors(errs);
       return;
@@ -758,7 +775,7 @@ const BookFormPage = () => {
         await adminService.createBook(payload);
         success('Livro criado com sucesso!');
       }
-      navigate('/admin');
+      navigate('/admin/livros');
     } catch (err) {
       const msg = getErrorMessage(err) || 'Erro ao salvar livro. Tente novamente.';
       setSubmitError(msg);
