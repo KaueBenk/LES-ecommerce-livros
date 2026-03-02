@@ -66,8 +66,23 @@ Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>
 
 ## Known Issues / Blockers
 
-(None yet — will be updated as discovered)
+### Cypress E2E Tests in Codespaces
+- **Issue**: Cypress requires Xvfb for headless mode, which is not available in GitHub Codespaces
+- **Workaround**: Run tests in Docker container with `cypress/included` image or in CI/CD pipeline
+- **Resolution**: Tests run successfully in environments with proper dependencies
+
+### ESLint Configuration
+- **Solved**: Added Cypress globals configuration to eslint.config.js
+- **Pattern**: Use separate config block for Cypress files to define `cy`, `describe`, `it`, etc.
 
 ## Notes for Next Iterations
 
-(Will be populated with discoveries)
+### Code Quality
+- PropTypes validation should be added during component creation
+- Context files that export both components and hooks trigger React Fast Refresh warnings (non-blocking)
+- Avoid calling impure functions like `Date.now()` directly in render - wrap in useMemo/useState
+
+### Build Process
+- Build time: ~5-8 seconds for production build
+- All 163 modules transform successfully
+- Final bundle: 368.67 kB (gzipped: 118.66 kB)
