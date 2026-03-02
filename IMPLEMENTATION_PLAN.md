@@ -1,0 +1,92 @@
+# IMPLEMENTATION PLAN
+
+**Project:** LES E-Commerce de Livros — Validação de Regras (DRS_LES_1_2026)
+**Description:** Ralph Loop para validação de TODAS as regras definidas no DRS_LES_1_2026.md, regra por regra com testes frontend mockados. Cada user story corresponde a uma regra (RF, RNF ou RN) e contém os critérios de aceite necessários para confirmar que a implementação está conforme o documento de requisitos.
+**Progress:** 11 / 84 completed
+
+## Tasks
+
+- [✓] **US-001** (P1) — VALIDAR RF0011: Cadastrar livro
+- [✓] **US-002** (P1) — VALIDAR RF0012: Inativar cadastro de livro
+- [✓] **US-004** (P1) — VALIDAR RF0014: Alterar cadastro de livro
+- [✓] **US-005** (P1) — VALIDAR RF0015: Consulta de livros
+- [✓] **US-007** (P1) — VALIDAR RF0021: Cadastrar cliente
+- [✓] **US-008** (P1) — VALIDAR RF0022: Alterar cliente
+- [✓] **US-012** (P1) — VALIDAR RF0026: Cadastro de endereços de entrega
+- [✓] **US-013** (P1) — VALIDAR RF0027: Cadastro de cartões de crédito
+- [✓] **US-014** (P1) — VALIDAR RF0028: Alteração apenas de senha
+- [✓] **US-015** (P1) — VALIDAR RF0031: Gerenciar carrinho de compra
+- [✓] **US-016** (P1) — VALIDAR RF0032: Definir quantidade de itens no carrinho
+- [ ] **US-017** (P1) — VALIDAR RF0033: Realizar compra
+- [ ] **US-018** (P1) — VALIDAR RF0034: Calcular frete
+- [ ] **US-019** (P1) — VALIDAR RF0035: Selecionar endereço de entrega
+- [ ] **US-020** (P1) — VALIDAR RF0036: Selecionar forma de pagamento
+- [ ] **US-021** (P1) — VALIDAR RF0037: Finalizar Compra
+- [ ] **US-029** (P1) — VALIDAR RF0051: Realizar entrada em estoque
+- [ ] **US-030** (P1) — VALIDAR RF0052: Calcular valor de venda
+- [ ] **US-031** (P1) — VALIDAR RF0053: Dar baixa em estoque
+- [ ] **US-038** (P1) — VALIDAR RNF0012: Log de transação
+- [ ] **US-039** (P1) — VALIDAR RNF0021: Código de livro
+- [ ] **US-041** (P1) — VALIDAR RNF0031: Senha forte
+- [ ] **US-042** (P1) — VALIDAR RNF0032: Confirmação de senha
+- [ ] **US-043** (P1) — VALIDAR RNF0033: Senha criptografada
+- [ ] **US-045** (P1) — VALIDAR RNF0035: Código de cliente
+- [ ] **US-049** (P1) — VALIDAR RN0011: Dados obrigatórios para cadastro de livro
+- [ ] **US-050** (P1) — VALIDAR RN0012: Associação com categorias
+- [ ] **US-051** (P1) — VALIDAR RN0013: Definindo valor de venda
+- [ ] **US-056** (P1) — VALIDAR RN0021: Cadastro de endereço de cobrança
+- [ ] **US-057** (P1) — VALIDAR RN0022: Cadastro de endereço de entrega
+- [ ] **US-058** (P1) — VALIDAR RN0023: Composição do registro de endereços
+- [ ] **US-059** (P1) — VALIDAR RN0024: Composição do registro de cartões de crédito
+- [ ] **US-061** (P1) — VALIDAR RN0026: Dados obrigatórios para cadastro de cliente
+- [ ] **US-063** (P1) — VALIDAR RN0028: Validar retorno da operadora de cartão de crédito
+- [ ] **US-064** (P1) — VALIDAR RN0031: Validar estoque para adição de itens no carrinho
+- [ ] **US-065** (P1) — VALIDAR RN0032: Validar estoque para compra
+- [ ] **US-070** (P1) — VALIDAR RN0037: Validar Forma de Pagamento para finalização de compra
+- [ ] **US-071** (P1) — VALIDAR RN0038: Alterar status da compra conforme aprovação do pagamento
+- [ ] **US-080** (P1) — VALIDAR RN0051: Validar dados de estoque
+- [ ] **US-082** (P1) — VALIDAR RN0061: Quantidade de itens na entrada de estoque
+- [ ] **US-083** (P1) — VALIDAR RN0062: Valor de custo obrigatório na entrada de estoque
+- [ ] **US-084** (P1) — VALIDAR RNF0064: Data de entrada obrigatória no estoque
+- [ ] **US-003** (P2) — VALIDAR RF0013: Inativar livro de forma automática
+- [ ] **US-006** (P2) — VALIDAR RF0016: Ativar cadastro de livros
+- [ ] **US-009** (P2) — VALIDAR RF0023: Inativar cadastro de cliente
+- [ ] **US-010** (P2) — VALIDAR RF0024: Consulta de clientes
+- [ ] **US-011** (P2) — VALIDAR RF0025: Consulta de transações
+- [ ] **US-022** (P2) — VALIDAR RF0038: Despachar produtos para entrega
+- [ ] **US-023** (P2) — VALIDAR RF0039: Produtos entregues
+- [ ] **US-024** (P2) — VALIDAR RF0040: Solicitar troca
+- [ ] **US-025** (P2) — VALIDAR RF0041: Autorizar trocas
+- [ ] **US-026** (P2) — VALIDAR RF0042: Visualização de trocas
+- [ ] **US-027** (P2) — VALIDAR RF0043: Confirmar recebimento de itens para troca
+- [ ] **US-028** (P2) — VALIDAR RF0044: Gerar cupom de troca após recebimento de itens
+- [ ] **US-032** (P2) — VALIDAR RF0054: Realizar reentrada em estoque
+- [ ] **US-037** (P2) — VALIDAR RNF0011: Tempo de resposta para consultas
+- [ ] **US-040** (P2) — VALIDAR RNF0013: Cadastro de domínios
+- [ ] **US-044** (P2) — VALIDAR RF0034 (RNF): Alteração apenas de endereços
+- [ ] **US-046** (P2) — VALIDAR RNF0042: Apresentar itens retirados do carrinho
+- [ ] **US-052** (P2) — VALIDAR RN0014: Validar margem de lucro
+- [ ] **US-053** (P2) — VALIDAR RN0015: Associar motivo de inativação
+- [ ] **US-054** (P2) — VALIDAR RN0016: Associar motivo de inativação automática
+- [ ] **US-055** (P2) — VALIDAR RN0017: Associar motivo de ativação
+- [ ] **US-060** (P2) — VALIDAR RN0025: Bandeiras permitidas para cartões de crédito
+- [ ] **US-066** (P2) — VALIDAR RN0033: Uso de cupom promocional para pagamento
+- [ ] **US-067** (P2) — VALIDAR RN0034: Uso de diversos cartões de crédito
+- [ ] **US-068** (P2) — VALIDAR RN0035: Uso de cupons junto a cartão de crédito
+- [ ] **US-069** (P2) — VALIDAR RN0036: Gerar cupom de troca por pagamento com cupons excedentes
+- [ ] **US-072** (P2) — VALIDAR RN0039: Alterar status da compra para transporte
+- [ ] **US-073** (P2) — VALIDAR RN0040: Alterar status da compra após entrega
+- [ ] **US-074** (P2) — VALIDAR RN0041: Gerar pedido de troca
+- [ ] **US-075** (P2) — VALIDAR RN0042: Alterar status do pedido após recebimento de troca
+- [ ] **US-076** (P2) — VALIDAR RN0043: Validação para solicitar troca
+- [ ] **US-077** (P2) — VALIDAR RN0044: Bloqueio de produtos no carrinho
+- [ ] **US-078** (P2) — VALIDAR RNF0045: Retirar item do carrinho ao desbloquear
+- [ ] **US-079** (P2) — VALIDAR RNF0046: Gerar notificação de autorização de troca
+- [ ] **US-081** (P2) — VALIDAR RN005x: Definir valor de item com diferentes custos
+- [ ] **US-033** (P3) — VALIDAR RF0055: Analisar histórico de vendas
+- [ ] **US-034** (P3) — VALIDAR RF00063: Cadastro de avaliações
+- [ ] **US-035** (P3) — VALIDAR RF00064: Analisar histórico de vendas por região
+- [ ] **US-036** (P3) — VALIDAR RF00065: Gestão de avaliações
+- [ ] **US-047** (P3) — VALIDAR RNF0043: Gráfico de linhas
+- [ ] **US-062** (P3) — VALIDAR RN0027: Ranking de cliente
+- [ ] **US-048** (P4) — VALIDAR RNF0044: Recomendação com IA Generativa

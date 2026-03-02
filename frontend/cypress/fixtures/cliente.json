@@ -1,0 +1,49 @@
+{
+  "id": 1,
+  "nome": "Ana Beatriz Silva",
+  "email": "ana.silva@example.com",
+  "senha": "Senha@123",
+  "cpf": "741.534.414-65",
+  "dataNascimento": "1995-06-15",
+  "genero": "FEMININO",
+  "ranking": 0,
+  "ativo": true,
+  "roles": ["ROLE_CLIENTE"],
+  "telefones": [
+    {
+      "id": 1,
+      "tipo": "CELULAR",
+      "ddd": "11",
+      "numero": "987654321"
+    }
+  ],
+  "enderecos": [
+    {
+      "id": 1,
+      "apelido": "Minha Casa",
+      "tipoResidencia": "APARTAMENTO",
+      "tipoLogradouro": "RUA",
+      "logradouro": "Rua das Flores",
+      "numero": "123",
+      "complemento": "Apto 4B",
+      "bairro": "Centro",
+      "cidade": "São Paulo",
+      "estado": "SP",
+      "cep": "01310-100",
+      "pais": "Brasil",
+      "tipoEndereco": "AMBOS",
+      "observacoes": "",
+      "principal": true
+    }
+  ],
+  "cartoes": [
+    {
+      "id": 1,
+      "nomeImpresso": "ANA B SILVA",
+      "numeroMascarado": "**** **** **** 1234",
+      "bandeira": "VISA",
+      "codigoSeguranca": "***",
+      "preferencial": true
+    }
+  ]
+}

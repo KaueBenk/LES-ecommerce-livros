@@ -1,0 +1,8 @@
+/* Global overrides — Bootstrap handles most styles via main.scss */
+:root {
+  font-synthesis: none;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+

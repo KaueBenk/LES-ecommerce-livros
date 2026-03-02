@@ -1,0 +1,38 @@
+// Form styles
+.form-section {
+  background: #fff;
+  border-radius: $border-radius-lg;
+  padding: 2rem;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+  margin-bottom: 1.5rem;
+}
+
+.form-label {
+  font-weight: 500;
+  margin-bottom: 0.25rem;
+}
+
+.form-control,
+.form-select {
+  transition: border-color 0.15s ease-in-out, box-shadow 0.15s ease-in-out;
+
+  &:focus {
+    box-shadow: 0 0 0 0.2rem rgba($primary, 0.25);
+  }
+}
+
+.invalid-feedback {
+  font-size: 0.8rem;
+}
+
+.form-error {
+  color: var(--bs-danger);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.form-success {
+  color: var(--bs-success);
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}

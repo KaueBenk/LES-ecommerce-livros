@@ -1,0 +1,27 @@
+{
+  "id": 1,
+  "titulo": "Dom Casmurro",
+  "isbn": "978-85-359-0277-5",
+  "autor": { "id": 1, "nome": "Machado de Assis" },
+  "editora": { "id": 1, "nome": "Editora Abril" },
+  "ano": 1899,
+  "edicao": "1",
+  "numeroPaginas": 256,
+  "sinopse": "Um dos maiores clássicos da literatura brasileira. Bentinho, o narrador, relembra sua história de amor com Capitu e a suspeita de sua traição.",
+  "altura": 21.0,
+  "largura": 14.0,
+  "peso": 0.3,
+  "profundidade": 1.5,
+  "codigoBarras": "7891234567890",
+  "grupoPrecificacao": { "id": 1, "nome": "Padrão", "margemLucro": 30 },
+  "valorVenda": 35.91,
+  "estoque": 50,
+  "categorias": [
+    { "id": 1, "nome": "Literatura Brasileira" },
+    { "id": 2, "nome": "Romance" },
+    { "id": 3, "nome": "Clássicos" }
+  ],
+  "ativo": true,
+  "avaliacaoMedia": 4.5,
+  "totalAvaliacoes": 128
+}
