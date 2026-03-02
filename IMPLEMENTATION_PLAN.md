@@ -2,11 +2,11 @@
 
 ## Project Overview
 
-**Project:** LES E-Commerce de Livros — Frontend
-**Description:** Complete React + Vite frontend implementation for e-commerce bookstore with 37 features organized in 8 sprints following Ralph Loop methodology. Includes authentication, catalog, shopping cart, checkout, admin dashboard, and comprehensive E2E testing.
-**Branch:** ralph/frontend-implementation
-**Total Stories:** 52
-**Completed:** 52 / 52
+**Project:** LES E-Commerce de Livros — Validação de Regras (DRS_LES_1_2026)
+**Description:** Ralph Loop para validação de TODAS as regras definidas no DRS_LES_1_2026.md, regra por regra com testes frontend mockados. Cada user story corresponde a uma regra (RF, RNF ou RN) e contém os critérios de aceite necessários para confirmar que a implementação está conforme o documento de requisitos.
+**Branch:** ralph/validate-drs-rules
+**Total Stories:** 84
+**Completed:** 1 / 84
 
 ## Task List
 
@@ -19,58 +19,90 @@
 
 ---
 
-- [✓] **US-001** (P1) — FE-001: Setup Project Structure with Vite, Bootstrap, and React Router
-- [✓] **US-002** (P1) — Git Commit: feat(setup): initialize vite project with bootstrap and router
-- [✓] **US-003** (P1) — FE-002: Implement Authentication Forms (Login and Register)
-- [✓] **US-004** (P1) — Git Commit: feat(auth): add login and register forms with validation
-- [✓] **US-005** (P1) — FE-003: Create My Account - Personal Data Management
-- [✓] **US-006** (P1) — FE-004: Create Address Management (Add, Edit, Delete)
-- [✓] **US-007** (P1) — FE-005: Create Credit Card Management (Add, Edit, Delete, Set Preferred)
-- [✓] **US-008** (P1) — FE-006: Implement Change Password Feature
-- [✓] **US-009** (P1) — Git Commit: feat(account): implement account management pages (profile, addresses, cards, password)
-- [✓] **US-010** (P2) — FE-009: Implement Storefront / Homepage with Book Grid
-- [✓] **US-011** (P2) — FE-010: Create Advanced Search and Filters
-- [✓] **US-012** (P2) — FE-011: Create Book Detail Page
-- [✓] **US-013** (P2) — FE-012: Implement Book Reviews Section
-- [✓] **US-014** (P2) — Git Commit: feat(catalog): add storefront, search filters, book details, and reviews
-- [✓] **US-015** (P3) — FE-013: Implement Shopping Cart - Listing and Editing
-- [✓] **US-016** (P3) — FE-014: Add Cart Timer and Expiration Alerts
-- [✓] **US-017** (P3) — Git Commit: feat(cart): implement shopping cart with expiration timer
-- [✓] **US-023** (P3) — FE-007: Implement Order History Page
-- [✓] **US-024** (P3) — FE-008: Implement Request Exchange Feature
-- [✓] **US-025** (P3) — Git Commit: feat(orders): add order history and exchange request features
-- [✓] **US-018** (P4) — FE-015: Implement Checkout Step 1 - Address and Shipping Selection
-- [✓] **US-019** (P4) — FE-016: Implement Checkout Step 2a - Coupon Selection
-- [✓] **US-020** (P4) — FE-017: Implement Checkout Step 2b - Payment Method Selection
-- [✓] **US-021** (P4) — FE-018: Implement Checkout Step 3 - Order Review and Confirmation
-- [✓] **US-022** (P4) — Git Commit: feat(checkout): implement 3-step checkout flow with address, coupons, and payment
-- [✓] **US-026** (P5) — FE-020: Implement Admin - Book CRUD Create/Edit Form (Multi-step)
-- [✓] **US-027** (P5) — FE-022: Implement Admin - Book Listing and Management
-- [✓] **US-028** (P5) — FE-021: Implement Pricing and Margin Indicator
-- [✓] **US-029** (P5) — FE-023: Implement Stock Management Entry
-- [✓] **US-030** (P5) — FE-024: Implement Logistics Panel - Order Status Management
-- [✓] **US-031** (P5) — Git Commit: feat(admin-books): implement book crud, pricing controls, and stock management
-- [✓] **US-032** (P6) — FE-025: Implement Admin - Client Search and Details
-- [✓] **US-033** (P6) — FE-026: Implement Exchanges Workflow - Authorization and Confirmation
-- [✓] **US-034** (P6) — FE-027: Implement Reviews Moderation Panel
-- [✓] **US-035** (P6) — Git Commit: feat(admin-advanced): add client search, exchange workflow, and review moderation
-- [✓] **US-036** (P7) — FE-019: Implement Floating Chatbot Widget
-- [✓] **US-037** (P7) — FE-028: Implement Analytics Dashboard - Sales by Period
-- [✓] **US-038** (P7) — FE-029: Implement Analytics Dashboard - Sales by Region
-- [✓] **US-039** (P7) — FE-030: Implement Notification System - Bell Icon and Dropdown
-- [✓] **US-040** (P7) — Git Commit: feat(analytics): add sales dashboards, chatbot widget, and notifications
-- [✓] **US-041** (P8) — FE-031: Setup Cypress E2E Testing Framework
-- [✓] **US-042** (P8) — FE-032: Write E2E Tests - Authentication and Profile Management
-- [✓] **US-043** (P8) — FE-033: Write E2E Tests - Book CRUD and Stock Management
-- [✓] **US-044** (P8) — FE-034: Write E2E Tests - Complete Purchase Flow
-- [✓] **US-045** (P8) — FE-035: Write E2E Tests - Cart Expiration and Alerts
-- [✓] **US-046** (P8) — FE-036: Write E2E Tests - Exchanges and Reviews
-- [✓] **US-047** (P8) — FE-037: Write E2E Tests - Analytics Dashboards
-- [✗] **US-048** (P8) — Git Commit: test(e2e): add comprehensive cypress test suite for all features
-- [✗] **US-049** (P9) — Documentation: Create Frontend Setup Readme and Contributing Guide
-- [✓] **US-050** (P9) — Git Commit: docs(frontend): add setup guide and contributing guidelines
-- [✓] **US-051** (P10) — Final: Verify Complete Frontend Implementation
-- [✓] **US-052** (P10) — Git Commit: release(frontend): complete implementation of all 37 features
+- [✓] **US-001** (P1) — VALIDAR RF0011: Cadastrar livro
+- [ ] **US-002** (P1) — VALIDAR RF0012: Inativar cadastro de livro
+- [ ] **US-004** (P1) — VALIDAR RF0014: Alterar cadastro de livro
+- [ ] **US-005** (P1) — VALIDAR RF0015: Consulta de livros
+- [ ] **US-007** (P1) — VALIDAR RF0021: Cadastrar cliente
+- [ ] **US-008** (P1) — VALIDAR RF0022: Alterar cliente
+- [ ] **US-012** (P1) — VALIDAR RF0026: Cadastro de endereços de entrega
+- [ ] **US-013** (P1) — VALIDAR RF0027: Cadastro de cartões de crédito
+- [ ] **US-014** (P1) — VALIDAR RF0028: Alteração apenas de senha
+- [ ] **US-015** (P1) — VALIDAR RF0031: Gerenciar carrinho de compra
+- [ ] **US-016** (P1) — VALIDAR RF0032: Definir quantidade de itens no carrinho
+- [ ] **US-017** (P1) — VALIDAR RF0033: Realizar compra
+- [ ] **US-018** (P1) — VALIDAR RF0034: Calcular frete
+- [ ] **US-019** (P1) — VALIDAR RF0035: Selecionar endereço de entrega
+- [ ] **US-020** (P1) — VALIDAR RF0036: Selecionar forma de pagamento
+- [ ] **US-021** (P1) — VALIDAR RF0037: Finalizar Compra
+- [ ] **US-029** (P1) — VALIDAR RF0051: Realizar entrada em estoque
+- [ ] **US-030** (P1) — VALIDAR RF0052: Calcular valor de venda
+- [ ] **US-031** (P1) — VALIDAR RF0053: Dar baixa em estoque
+- [ ] **US-038** (P1) — VALIDAR RNF0012: Log de transação
+- [ ] **US-039** (P1) — VALIDAR RNF0021: Código de livro
+- [ ] **US-041** (P1) — VALIDAR RNF0031: Senha forte
+- [ ] **US-042** (P1) — VALIDAR RNF0032: Confirmação de senha
+- [ ] **US-043** (P1) — VALIDAR RNF0033: Senha criptografada
+- [ ] **US-045** (P1) — VALIDAR RNF0035: Código de cliente
+- [ ] **US-049** (P1) — VALIDAR RN0011: Dados obrigatórios para cadastro de livro
+- [ ] **US-050** (P1) — VALIDAR RN0012: Associação com categorias
+- [ ] **US-051** (P1) — VALIDAR RN0013: Definindo valor de venda
+- [ ] **US-056** (P1) — VALIDAR RN0021: Cadastro de endereço de cobrança
+- [ ] **US-057** (P1) — VALIDAR RN0022: Cadastro de endereço de entrega
+- [ ] **US-058** (P1) — VALIDAR RN0023: Composição do registro de endereços
+- [ ] **US-059** (P1) — VALIDAR RN0024: Composição do registro de cartões de crédito
+- [ ] **US-061** (P1) — VALIDAR RN0026: Dados obrigatórios para cadastro de cliente
+- [ ] **US-063** (P1) — VALIDAR RN0028: Validar retorno da operadora de cartão de crédito
+- [ ] **US-064** (P1) — VALIDAR RN0031: Validar estoque para adição de itens no carrinho
+- [ ] **US-065** (P1) — VALIDAR RN0032: Validar estoque para compra
+- [ ] **US-070** (P1) — VALIDAR RN0037: Validar Forma de Pagamento para finalização de compra
+- [ ] **US-071** (P1) — VALIDAR RN0038: Alterar status da compra conforme aprovação do pagamento
+- [ ] **US-080** (P1) — VALIDAR RN0051: Validar dados de estoque
+- [ ] **US-082** (P1) — VALIDAR RN0061: Quantidade de itens na entrada de estoque
+- [ ] **US-083** (P1) — VALIDAR RN0062: Valor de custo obrigatório na entrada de estoque
+- [ ] **US-084** (P1) — VALIDAR RNF0064: Data de entrada obrigatória no estoque
+- [ ] **US-003** (P2) — VALIDAR RF0013: Inativar livro de forma automática
+- [ ] **US-006** (P2) — VALIDAR RF0016: Ativar cadastro de livros
+- [ ] **US-009** (P2) — VALIDAR RF0023: Inativar cadastro de cliente
+- [ ] **US-010** (P2) — VALIDAR RF0024: Consulta de clientes
+- [ ] **US-011** (P2) — VALIDAR RF0025: Consulta de transações
+- [ ] **US-022** (P2) — VALIDAR RF0038: Despachar produtos para entrega
+- [ ] **US-023** (P2) — VALIDAR RF0039: Produtos entregues
+- [ ] **US-024** (P2) — VALIDAR RF0040: Solicitar troca
+- [ ] **US-025** (P2) — VALIDAR RF0041: Autorizar trocas
+- [ ] **US-026** (P2) — VALIDAR RF0042: Visualização de trocas
+- [ ] **US-027** (P2) — VALIDAR RF0043: Confirmar recebimento de itens para troca
+- [ ] **US-028** (P2) — VALIDAR RF0044: Gerar cupom de troca após recebimento de itens
+- [ ] **US-032** (P2) — VALIDAR RF0054: Realizar reentrada em estoque
+- [ ] **US-037** (P2) — VALIDAR RNF0011: Tempo de resposta para consultas
+- [ ] **US-040** (P2) — VALIDAR RNF0013: Cadastro de domínios
+- [ ] **US-044** (P2) — VALIDAR RF0034 (RNF): Alteração apenas de endereços
+- [ ] **US-046** (P2) — VALIDAR RNF0042: Apresentar itens retirados do carrinho
+- [ ] **US-052** (P2) — VALIDAR RN0014: Validar margem de lucro
+- [ ] **US-053** (P2) — VALIDAR RN0015: Associar motivo de inativação
+- [ ] **US-054** (P2) — VALIDAR RN0016: Associar motivo de inativação automática
+- [ ] **US-055** (P2) — VALIDAR RN0017: Associar motivo de ativação
+- [ ] **US-060** (P2) — VALIDAR RN0025: Bandeiras permitidas para cartões de crédito
+- [ ] **US-066** (P2) — VALIDAR RN0033: Uso de cupom promocional para pagamento
+- [ ] **US-067** (P2) — VALIDAR RN0034: Uso de diversos cartões de crédito
+- [ ] **US-068** (P2) — VALIDAR RN0035: Uso de cupons junto a cartão de crédito
+- [ ] **US-069** (P2) — VALIDAR RN0036: Gerar cupom de troca por pagamento com cupons excedentes
+- [ ] **US-072** (P2) — VALIDAR RN0039: Alterar status da compra para transporte
+- [ ] **US-073** (P2) — VALIDAR RN0040: Alterar status da compra após entrega
+- [ ] **US-074** (P2) — VALIDAR RN0041: Gerar pedido de troca
+- [ ] **US-075** (P2) — VALIDAR RN0042: Alterar status do pedido após recebimento de troca
+- [ ] **US-076** (P2) — VALIDAR RN0043: Validação para solicitar troca
+- [ ] **US-077** (P2) — VALIDAR RN0044: Bloqueio de produtos no carrinho
+- [ ] **US-078** (P2) — VALIDAR RNF0045: Retirar item do carrinho ao desbloquear
+- [ ] **US-079** (P2) — VALIDAR RNF0046: Gerar notificação de autorização de troca
+- [ ] **US-081** (P2) — VALIDAR RN005x: Definir valor de item com diferentes custos
+- [ ] **US-033** (P3) — VALIDAR RF0055: Analisar histórico de vendas
+- [ ] **US-034** (P3) — VALIDAR RF00063: Cadastro de avaliações
+- [ ] **US-035** (P3) — VALIDAR RF00064: Analisar histórico de vendas por região
+- [ ] **US-036** (P3) — VALIDAR RF00065: Gestão de avaliações
+- [ ] **US-047** (P3) — VALIDAR RNF0043: Gráfico de linhas
+- [ ] **US-062** (P3) — VALIDAR RN0027: Ranking de cliente
+- [ ] **US-048** (P4) — VALIDAR RNF0044: Recomendação com IA Generativa
 
 ---
 

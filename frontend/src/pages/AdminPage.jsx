@@ -46,6 +46,8 @@ const StatusModal = ({ book, isActivating, categories, onConfirm, onClose }) => 
     setSaving(true);
     try {
       await onConfirm({ motivo: motivo.trim(), categoriaId: Number(categoriaId) });
+    } catch (err) {
+      // Error is handled by parent (notifyError), just stop saving state
     } finally {
       setSaving(false);
     }
@@ -242,7 +244,7 @@ const AdminBooksSection = () => {
       fetchBooks();
     } catch (err) {
       notifyError(getErrorMessage(err) || 'Erro ao alterar status do livro.');
-      throw err; // propagate to keep modal open with spinner off
+      // Error is now caught - modal stays open due to StatusModal state management
     }
   };
 

@@ -1,0 +1,854 @@
+{
+  "project": "LES E-Commerce de Livros — Frontend",
+  "branchName": "ralph/frontend-implementation",
+  "description": "Complete React + Vite frontend implementation for e-commerce bookstore with 37 features organized in 8 sprints following Ralph Loop methodology. Includes authentication, catalog, shopping cart, checkout, admin dashboard, and comprehensive E2E testing.",
+  "userStories": [
+    {
+      "id": "US-001",
+      "title": "FE-001: Setup Project Structure with Vite, Bootstrap, and React Router",
+      "description": "Initialize React project with Vite, configure Bootstrap 5, React Router v6, and establish base project structure following the defined architecture. Configure ESLint, Prettier, and create initial layout components (Header, Footer, Navbar).",
+      "acceptanceCriteria": [
+        "Project initialized with Vite React template",
+        "Bootstrap 5 and React Router dependencies installed",
+        "ESLint and Prettier configured",
+        "Base directory structure created: src/components, src/pages, src/services, src/store, src/hooks, src/styles",
+        "AuthContext and CartContext created in src/store",
+        "api.js axios instance configured with baseURL /api/v1 and JWT interceptor",
+        "Header, Footer, and Navbar components created",
+        "App.jsx with routing setup for all main routes",
+        "Dockerfile multi-stage and docker-compose.yml created",
+        "Dev server runs on port 5173 with hot reload"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-002",
+      "title": "Git Commit: feat(setup): initialize vite project with bootstrap and router",
+      "description": "Stage all changes and commit to git with message: 'feat(setup): initialize vite project with bootstrap, router, and docker configuration'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-003",
+      "title": "FE-002: Implement Authentication Forms (Login and Register)",
+      "description": "Create LoginForm and RegisterForm components with real-time validation. Implement password strength indicator, CPF validation, email validation, and proper error handling. Store JWT token in localStorage and set up automatic redirect after login.",
+      "acceptanceCriteria": [
+        "LoginForm component with email/password inputs and login button",
+        "RegisterForm with all required fields: nome, genero, cpf, dataNascimento, email, senha, confirmacaoSenha, telefones, enderecos",
+        "Real-time password strength validation (≥8 chars, uppercase, lowercase, special char)",
+        "CPF and email format validation",
+        "Error messages displayed inline",
+        "JWT token saved to localStorage on successful login",
+        "Automatic redirect to home page after login",
+        "Data-testid attributes on all interactive elements",
+        "PropTypes validation on components"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-004",
+      "title": "Git Commit: feat(auth): add login and register forms with validation",
+      "description": "Stage all changes and commit to git with message: 'feat(auth): implement login and register forms with real-time validation'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-005",
+      "title": "FE-003: Create My Account - Personal Data Management",
+      "description": "Build ProfileForm component to display and edit personal client data. Include fields for name, gender, birth date, phone. Implement edit mode toggle and save/cancel buttons. Display read-only ranking value calculated from total spent.",
+      "acceptanceCriteria": [
+        "ProfileForm displays current user data from API",
+        "Edit mode toggles between read-only and editable",
+        "Fields for nome, genero, dataNascimento, telefones",
+        "Ranking displayed as read-only value",
+        "Save button calls PUT /clientes/perfil",
+        "Cancel button discards changes",
+        "Success/error messages displayed",
+        "Form validation before submit",
+        "Data-testid attributes on form elements"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-006",
+      "title": "FE-004: Create Address Management (Add, Edit, Delete)",
+      "description": "Implement AddressList and AddressForm components for managing delivery and billing addresses. Support adding new addresses, editing existing ones, and deleting with confirmation. Prevent deletion of last required address type (billing or delivery).",
+      "acceptanceCriteria": [
+        "AddressList displays all addresses as cards with type badges",
+        "AddressForm modal for create/edit with all fields (apelido, tipoResidencia, logradouro, numero, bairro, cep, cidade, estado, tipoEndereco)",
+        "Add button opens new address form",
+        "Edit button pre-fills form with existing address data",
+        "Delete button with confirmation dialog",
+        "Prevents deletion of last billing or delivery address",
+        "Save calls POST /clientes/enderecos or PUT /clientes/enderecos/{id}",
+        "Delete calls DELETE /clientes/enderecos/{id}",
+        "Proper error handling for validation"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-007",
+      "title": "FE-005: Create Credit Card Management (Add, Edit, Delete, Set Preferred)",
+      "description": "Implement CreditCardList and CreditCardForm components. Allow adding new cards, displaying last 4 digits with brand icons, setting preferred card, and deletion. Enforce only one preferred card per customer.",
+      "acceptanceCriteria": [
+        "CreditCardList displays cards with brand logos and last 4 digits",
+        "Preferred card marked with special badge",
+        "Add button opens card form modal",
+        "Card form with fields: numero, nomeImpresso, bandeira, codigoSeguranca",
+        "Set as preferred button (only one allowed)",
+        "Delete button with confirmation",
+        "Save calls POST /clientes/cartoes or PUT /clientes/cartoes/{id}",
+        "Set preferred calls PATCH /clientes/cartoes/{id}/preferencial",
+        "Delete calls DELETE /clientes/cartoes/{id}"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-008",
+      "title": "FE-006: Implement Change Password Feature",
+      "description": "Create ChangePasswordForm component requiring current password, new password, and confirmation. Implement same password strength validation as registration. Show success/error messages after submission.",
+      "acceptanceCriteria": [
+        "ChangePasswordForm with fields: senhaAtual, novaSenha, confirmacaoSenha",
+        "Password strength validation (same as registration)",
+        "Passwords must match validation",
+        "Submit calls PUT /auth/senha",
+        "Success message on completion",
+        "Error message on failure",
+        "Form clears after successful submission",
+        "PropTypes validation"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-009",
+      "title": "Git Commit: feat(account): implement account management pages (profile, addresses, cards, password)",
+      "description": "Stage all changes and commit to git with message: 'feat(account): add profile, address, credit card, and password management'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 1
+    },
+    {
+      "id": "US-010",
+      "title": "FE-009: Implement Storefront / Homepage with Book Grid",
+      "description": "Create HomePage with responsive grid of book cards. Each card shows image placeholder, title, author, price, and category badges. Implement pagination for browsing multiple pages. Add 'Add to Cart' button on each card.",
+      "acceptanceCriteria": [
+        "HomePage displays book grid from GET /livros with pagination",
+        "Each card shows: placeholder image, titulo, autor, preço, categorias badges",
+        "Responsive grid (3 columns desktop, 2 tablet, 1 mobile)",
+        "Pagination controls at bottom",
+        "Add to Cart button on each card",
+        "Loading spinner while fetching",
+        "Error message if API fails",
+        "Click on card navigates to book detail page",
+        "Page size configurable (default 20)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-011",
+      "title": "FE-010: Create Advanced Search and Filters",
+      "description": "Build FilterPanel component with search functionality. Support filtering by titulo, autor, categoria, ano, isbn. Implement filter state update with real-time search results. Add Clear Filters button to reset all.",
+      "acceptanceCriteria": [
+        "Text input for title search",
+        "Select dropdown for author (from GET /catalogo/autores)",
+        "Select dropdown for category (from GET /catalogo/categorias)",
+        "Text input for year",
+        "Text input for ISBN",
+        "Filters update results in real-time",
+        "Query params reflect current filters (for shareability)",
+        "Clear Filters button resets all",
+        "Sidebar layout on desktop, offcanvas on mobile",
+        "Proper loading states while filtering"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-012",
+      "title": "FE-011: Create Book Detail Page",
+      "description": "Implement BookDetails component showing complete book information: title, author, publisher, edition, year, ISBN, page count, dimensions, weight, synopsis. Display add to cart with quantity selector.",
+      "acceptanceCriteria": [
+        "Page fetches book from GET /livros/{id}",
+        "Displays all fields: titulo, autor, editora, edicao, ano, isbn, numeroPaginas, sinopse, altura, largura, profundidade, peso",
+        "Large placeholder image on left side",
+        "Book details on right side",
+        "Price displayed prominently",
+        "Quantity selector (1-99)",
+        "Add to Cart button calls POST /carrinho/itens",
+        "Toast notification on successful add",
+        "Error handling for out of stock",
+        "Related books section (optional enhancement)"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-013",
+      "title": "FE-012: Implement Book Reviews Section",
+      "description": "Create ReviewList component showing approved reviews with stars and text. Implement ReviewForm for authenticated customers who purchased the book. Display pending moderation status for newly submitted reviews.",
+      "acceptanceCriteria": [
+        "ReviewList displays approved reviews from GET /livros/{id}/avaliacoes",
+        "Each review shows: cliente nome, estrelas (★★★☆☆), texto, dataAvaliacao",
+        "ReviewForm visible only for authenticated users who purchased the book",
+        "Star rating selector (1-5) with visual feedback",
+        "Text textarea for review content",
+        "Submit button calls POST /livros/{id}/avaliacoes",
+        "Success message: 'Avaliação enviada para moderação'",
+        "Form clears after submission",
+        "Error handling for validation failures"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-014",
+      "title": "Git Commit: feat(catalog): add storefront, search filters, book details, and reviews",
+      "description": "Stage all changes and commit to git with message: 'feat(catalog): implement storefront, advanced filters, book detail page, and reviews'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 2
+    },
+    {
+      "id": "US-015",
+      "title": "FE-013: Implement Shopping Cart - Listing and Editing",
+      "description": "Create CartPage component showing all cart items in table format. Support quantity editing inline with PUT request. Show subtotal, shipping fee (fixed R$10), and total. Implement Remove and Clear Cart buttons.",
+      "acceptanceCriteria": [
+        "CartPage fetches cart from GET /carrinho",
+        "Table displays: book image, title, unit price, quantity (editable), subtotal, remove button",
+        "Quantity input accepts 1-99, submits via PUT /carrinho/itens/{id}",
+        "Remove button calls DELETE /carrinho/itens/{id} with confirmation",
+        "Clear Cart button calls DELETE /carrinho with confirmation",
+        "Shows: subtotal, frete (R$10.00), total",
+        "Checkout button navigates to /checkout",
+        "Empty cart message if no items",
+        "Loading states while updating"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-016",
+      "title": "FE-014: Add Cart Timer and Expiration Alerts",
+      "description": "Implement countdown timer showing remaining time for each cart item (30 minutes default). Display warning alert when item has 5 minutes remaining. Automatically remove expired items and show notification.",
+      "acceptanceCriteria": [
+        "Each cart item shows countdown timer (HH:MM:SS format)",
+        "Warning badge appears when ≤5 minutes remaining",
+        "Toast notification 5 minutes before expiration",
+        "Expired items automatically removed",
+        "Toast notification when item removed due to expiration",
+        "Polling every 30 seconds to sync with backend",
+        "Countdown updates in real-time",
+        "User cannot proceed to checkout with expired items",
+        "Configurable timeout via localStorage or API parameter"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-017",
+      "title": "Git Commit: feat(cart): implement shopping cart with expiration timer",
+      "description": "Stage all changes and commit to git with message: 'feat(cart): add cart listing, editing, and item expiration timer'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-018",
+      "title": "FE-015: Implement Checkout Step 1 - Address and Shipping Selection",
+      "description": "Create CheckoutFlow component with stepper (3 steps). Step 1: select delivery address from customer's addresses or add new. Show shipping fee calculation (fixed R$10). Display order summary sidebar with running total.",
+      "acceptanceCriteria": [
+        "Stepper component showing 3 steps",
+        "Step 1: List customer addresses as radio cards",
+        "Add New Address button opens modal with AddressForm",
+        "Selected address highlights visually",
+        "Shipping fee displays as R$10.00",
+        "Order summary sidebar shows: subtotal, shipping, total",
+        "Next button disabled until address selected",
+        "Previous button disabled on step 1",
+        "Selected data persists when navigating between steps",
+        "Calls POST /checkout/frete to calculate (though fixed)"
+      ],
+      "priority": 4
+    },
+    {
+      "id": "US-019",
+      "title": "FE-016: Implement Checkout Step 2a - Coupon Selection",
+      "description": "Create CouponInput component for Step 2a. Display list of customer's trade coupons with checkboxes. Add select dropdown for single promotional coupon. Show real-time discount calculation and remaining balance.",
+      "acceptanceCriteria": [
+        "Step 2a: Display trade coupons from GET /clientes/cupons-troca as checkboxes",
+        "Each coupon shows: value, used status, generation date",
+        "Single promotional coupon select dropdown",
+        "Real-time calculation: 'Desconto: R$ XX' and 'Restante: R$ YY'",
+        "Alert if remaining < R$10",
+        "Calls POST /checkout/validar-cupons",
+        "Total updates dynamically as coupons selected",
+        "Coupon data persists between steps",
+        "Error handling if coupons invalid/expired"
+      ],
+      "priority": 4
+    },
+    {
+      "id": "US-020",
+      "title": "FE-017: Implement Checkout Step 2b - Payment Method Selection",
+      "description": "Create payment form for Step 2b. Display customer's credit cards with value input for each (minimum R$10). Show real-time sum of card values. Block checkout if sum doesn't match remaining balance.",
+      "acceptanceCriteria": [
+        "Step 2b: Display customer's credit cards from GET /clientes/cartoes",
+        "Each card shows: brand icon, last 4 digits, checkbox",
+        "Value input field for each selected card (min R$10)",
+        "Real-time sum display and validation",
+        "Visual indicator if sum matches remaining balance",
+        "Block Submit if sum ≠ remaining (red highlight)",
+        "Support multiple cards for payment",
+        "Selected cards and values persist between steps",
+        "Error message if trying to use card with value < R$10"
+      ],
+      "priority": 4
+    },
+    {
+      "id": "US-021",
+      "title": "FE-018: Implement Checkout Step 3 - Order Review and Confirmation",
+      "description": "Create OrderReview component for Step 3. Display read-only summary: items, quantities, pricing, address, payment methods. Implement Confirm Purchase button that calls checkout finalization endpoint and handles approval/rejection responses.",
+      "acceptanceCriteria": [
+        "Step 3: Read-only display of cart items with quantities",
+        "Order summary: subtotal, coupons discount, shipping, total",
+        "Selected delivery address displayed",
+        "Payment methods and amounts displayed",
+        "Confirm Purchase button calls POST /checkout/finalizar",
+        "Success response: display order number and confirmation page",
+        "Failure response: display error message with card digits and reason",
+        "Clear cart after successful order",
+        "Redirect to /order-confirmation on success",
+        "Error messages with actionable feedback"
+      ],
+      "priority": 4
+    },
+    {
+      "id": "US-022",
+      "title": "Git Commit: feat(checkout): implement 3-step checkout flow with address, coupons, and payment",
+      "description": "Stage all changes and commit to git with message: 'feat(checkout): add complete 3-step checkout flow with address, coupons, and payment'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 4
+    },
+    {
+      "id": "US-023",
+      "title": "FE-007: Implement Order History Page",
+      "description": "Create OrderHistory component displaying timeline of customer's past orders. Each order card shows: order number, date, status badge, total amount, items list. Expandable detail view with full information.",
+      "acceptanceCriteria": [
+        "OrderHistory displays customer orders from GET /clientes/transacoes",
+        "Timeline vertical layout with order cards",
+        "Each card shows: PED-XXX number, date, status badge, total, item count",
+        "Status badge colored: EM_PROCESSAMENTO=yellow, ENTREGUE=green, REPROVADA=red, EM_TRANSITO=blue",
+        "Click to expand shows: items with quantity and price, shipping address, payment method",
+        "Link to order detail page for each order",
+        "Pagination support (default 20 per page)",
+        "Loading spinner while fetching",
+        "Empty state message if no orders"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-024",
+      "title": "FE-008: Implement Request Exchange Feature",
+      "description": "Add exchange request button to delivered orders. Modal form to select items for exchange, specify quantities, and provide justification. Submit POST request to create trade request and show confirmation.",
+      "acceptanceCriteria": [
+        "Exchange button visible only on ENTREGUE orders",
+        "Modal shows checkboxes for each order item",
+        "Quantity input for each item (cannot exceed ordered quantity)",
+        "Justification textarea (required)",
+        "Submit calls POST /pedidos/{id}/trocas",
+        "Success message: 'Solicitação de troca enviada'",
+        "Order status updates to EM_TROCA",
+        "Modal closes and order list refreshes",
+        "Error handling for validation failures"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-025",
+      "title": "Git Commit: feat(orders): add order history and exchange request features",
+      "description": "Stage all changes and commit to git with message: 'feat(orders): implement order history timeline and exchange request functionality'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 3
+    },
+    {
+      "id": "US-026",
+      "title": "FE-020: Implement Admin - Book CRUD Create/Edit Form (Multi-step)",
+      "description": "Create BookForm component with 3-step form for book creation/editing. Step 1: basic info (título, autor, editora, edicao, ano, isbn). Step 2: physical properties (páginas, sinopse, dimensões, código barras). Step 3: pricing and categories. Include preview of calculated price based on margin.",
+      "acceptanceCriteria": [
+        "Multi-step form with stepper",
+        "Step 1: titulo, autorId select, editoraId select, edicao, ano, isbn (all required)",
+        "Step 2: numeroPaginas, sinopse textarea, altura, largura, profundidade, peso, codigoBarras",
+        "Step 3: categoriaIds multi-select, grupoPrecificacaoId select",
+        "Price preview showing calculated value based on margin",
+        "All fields with validation",
+        "Submit calls POST /admin/livros or PUT /admin/livros/{id}",
+        "Success message on completion",
+        "Back button goes to book list",
+        "Cancel option at each step"
+      ],
+      "priority": 5
+    },
+    {
+      "id": "US-027",
+      "title": "FE-022: Implement Admin - Book Listing and Management",
+      "description": "Create BookListAdmin component displaying table of books with columns: code, title, author, price, stock, status badge. Implement inline filters, edit button, activate/inactivate button with justification modal.",
+      "acceptanceCriteria": [
+        "Table displays books from GET /admin/livros",
+        "Columns: código, título, autor, preço, estoque, status (badge)",
+        "Inline filters: nome, ativo, autor",
+        "Edit button navigates to edit form",
+        "Activate/Inactivate button opens modal with justification field",
+        "Inactivate requires: motivoInativacao, categoriaInativacaoId",
+        "Activate requires: motivoAtivacao, categoriaAtivacaoId",
+        "Calls PATCH /admin/livros/{id}/ativar or /inativar",
+        "Pagination (default 20 per page)",
+        "Delete confirmation dialog"
+      ],
+      "priority": 5
+    },
+    {
+      "id": "US-028",
+      "title": "FE-021: Implement Pricing and Margin Indicator",
+      "description": "In book edit form, add visual indicator for pricing margin. Show green indicator if price within margin, red if outside (requires manager approval). Add toggle for manager authorization when price outside margin.",
+      "acceptanceCriteria": [
+        "In Step 3 of BookForm: show calculated price range based on margin",
+        "Live price input with real-time validation",
+        "Green indicator: price within margin",
+        "Red indicator: price outside margin",
+        "When red: show 'Requer autorização gerencial' message",
+        "Checkbox for manager authorization (autorizacaoGerencial)",
+        "Submit disabled if price outside margin without authorization",
+        "Checkbox enables submit when checked",
+        "Visual clear feedback to user"
+      ],
+      "priority": 5
+    },
+    {
+      "id": "US-029",
+      "title": "FE-023: Implement Stock Management Entry",
+      "description": "Create StockEntry component for recording inventory entries. Form with: book select (search by title/isbn), quantity, cost value, supplier select, entry date. Display history of entries for selected book below form.",
+      "acceptanceCriteria": [
+        "Form with: livroId (searchable select), quantidade, valorCusto, fornecedorId, dataEntrada",
+        "Book select searchable by titulo or isbn",
+        "All fields required with validation",
+        "Submit calls POST /admin/estoque/entradas",
+        "Success message on completion",
+        "History table below showing entries for selected book",
+        "History from GET /admin/estoque/entradas?livroId={id}",
+        "History columns: quantidade, valorCusto, fornecedor, dataEntrada",
+        "Pagination in history (default 10 per page)"
+      ],
+      "priority": 5
+    },
+    {
+      "id": "US-030",
+      "title": "FE-024: Implement Logistics Panel - Order Status Management",
+      "description": "Create LogisticsPanel component displaying orders DataGrid. Show columns: order number, client, date, status, amount. Filter by status. Dispatch button (for APROVADA orders), Delivery confirmation button (for EM_TRANSITO orders).",
+      "acceptanceCriteria": [
+        "DataGrid from GET /admin/pedidos",
+        "Columns: nº, cliente, data, status, valor",
+        "Status filter dropdown",
+        "Dispatch button visible only for APROVADA status",
+        "Calls PATCH /admin/pedidos/{id}/despachar",
+        "Changes status to EM_TRANSITO",
+        "Delivery button visible only for EM_TRANSITO status",
+        "Calls PATCH /admin/pedidos/{id}/entregar",
+        "Changes status to ENTREGUE",
+        "Order detail view on row click",
+        "Success/error notifications"
+      ],
+      "priority": 5
+    },
+    {
+      "id": "US-031",
+      "title": "Git Commit: feat(admin-books): implement book crud, pricing controls, and stock management",
+      "description": "Stage all changes and commit to git with message: 'feat(admin-books): add book CRUD, pricing margin control, stock entry, and logistics panel'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 5
+    },
+    {
+      "id": "US-032",
+      "title": "FE-025: Implement Admin - Client Search and Details",
+      "description": "Create ClientSearchAdmin component with table of clients and inline filters (nome, cpf, email, ativo). Click on client opens detail modal/page showing complete profile: personal data, addresses, cards, ranking, transactions.",
+      "acceptanceCriteria": [
+        "Table from GET /admin/clientes with pagination (default 20)",
+        "Columns: nome, cpf, email, ranking, ativo (badge),dataCadastro",
+        "Inline filters: nome, cpf, email, ativo",
+        "Click row opens detail view (modal or page)",
+        "Detail view: all personal data, list of addresses, list of cards, ranking, transaction history",
+        "Detail view fetches from GET /admin/clientes/{id}",
+        "Edit capabilities for admin (optional enhancement)",
+        "Loading states while fetching"
+      ],
+      "priority": 6
+    },
+    {
+      "id": "US-033",
+      "title": "FE-026: Implement Exchanges Workflow - Authorization and Confirmation",
+      "description": "Create ExchangeWorkflow component with two sections: Pending exchanges (EM_TROCA status) and Authorized exchanges (TROCA_AUTORIZADA status). Pending: show authorize button. Authorized: show checkboxes for returning to stock and confirm receipt button.",
+      "acceptanceCriteria": [
+        "Tab 1 - Pending: Table from GET /admin/trocas?status=EM_TROCA",
+        "Pending columns: pedidoNota, dataSolicitacao, itens (detalhes), justificativa",
+        "Authorize button calls PATCH /admin/trocas/{id}/autorizar",
+        "Tab 2 - Authorized: Table from GET /admin/trocas?status=TROCA_AUTORIZADA",
+        "Each item has checkbox 'Retornar ao Estoque'",
+        "Confirm Receipt button calls PATCH /admin/trocas/{id}/confirmar-recebimento",
+        "Request body: itens[{id, retornarAoEstoque}]",
+        "Success: generates trade coupon for customer (shown in notification)",
+        "Pagination in both tabs"
+      ],
+      "priority": 6
+    },
+    {
+      "id": "US-034",
+      "title": "FE-027: Implement Reviews Moderation Panel",
+      "description": "Create ReviewModeration component displaying table of pending reviews (aprovada=false). Columns: livro, cliente, estrelas, texto (preview). Action buttons: Approve (green), Reject (red). Filter by approval status.",
+      "acceptanceCriteria": [
+        "Table from GET /admin/avaliacoes?aprovada=false",
+        "Columns: livroTitulo, clienteName, estrelas, texto (preview, truncated)",
+        "Approve button calls PATCH /admin/avaliacoes/{id}/aprovar",
+        "Reject button calls PATCH /admin/avaliacoes/{id}/rejeitar",
+        "Success message on action",
+        "Row removes from table after action",
+        "Status filter: pending, approved, rejected",
+        "Pagination (default 10 per page)",
+        "Full text view in modal on click",
+        "Error handling"
+      ],
+      "priority": 6
+    },
+    {
+      "id": "US-035",
+      "title": "Git Commit: feat(admin-advanced): add client search, exchange workflow, and review moderation",
+      "description": "Stage all changes and commit to git with message: 'feat(admin-advanced): implement client search, exchange authorization workflow, and review moderation'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 6
+    },
+    {
+      "id": "US-036",
+      "title": "FE-019: Implement Floating Chatbot Widget",
+      "description": "Create ChatbotWidget component as fixed floating button in bottom-right corner. Click opens panel (350×500px) with conversation history, message bubbles (user/bot), typing indicator, and text input. Maintain sessionId for conversation continuity.",
+      "acceptanceCriteria": [
+        "Floating button in bottom-right corner (fixed position)",
+        "Click toggles chat panel visibility",
+        "Panel shows conversation history with user/bot bubbles",
+        "User messages on right (blue), bot on left (gray)",
+        "Text input at bottom with send button",
+        "Typing indicator ('digitando...') while awaiting response",
+        "sessionId maintained in state (generated on first message)",
+        "Messages from POST /chat with sessionId",
+        "Smooth animations on open/close",
+        "Responsive on mobile (fullscreen or adjusted)"
+      ],
+      "priority": 7
+    },
+    {
+      "id": "US-037",
+      "title": "FE-028: Implement Analytics Dashboard - Sales by Period",
+      "description": "Create AnalyticsDashboard component with date pickers (start/end date) and grouping select (PRODUTO/CATEGORIA). Display line chart using Chart.js showing sales quantity/value over time. Series color-coded by product/category.",
+      "acceptanceCriteria": [
+        "Date pickers for dataInicio and dataFim (required inputs)",
+        "Select dropdown: agrupar por (PRODUTO or CATEGORIA)",
+        "Calls GET /admin/analise/vendas with query params",
+        "Chart.js line chart renders response data",
+        "X-axis: months (2026-01, 2026-02, etc.)",
+        "Y-axis: quantity or value (toggle option)",
+        "Series: each product/category as separate line, color-coded",
+        "Legend with series names",
+        "Responsive chart size",
+        "Loading spinner while fetching",
+        "Error message if API fails"
+      ],
+      "priority": 7
+    },
+    {
+      "id": "US-038",
+      "title": "FE-029: Implement Analytics Dashboard - Sales by Region",
+      "description": "Create regional sales view in dashboard with same date pickers. Display bar chart (horizontal or vertical) showing sales quantity by Brazilian state. Use GET /admin/analise/vendas-regiao endpoint.",
+      "acceptanceCriteria": [
+        "Date pickers for dataInicio and dataFim (reuse from FE-028)",
+        "Calls GET /admin/analise/vendas-regiao",
+        "Chart.js bar chart with states on Y-axis, quantity/value on X-axis",
+        "Bars color-coded by value (gradient)",
+        "Hover shows exact values",
+        "Legend with state names",
+        "Responsive sizing",
+        "Loading and error states",
+        "Tab on same dashboard as sales-by-period"
+      ],
+      "priority": 7
+    },
+    {
+      "id": "US-039",
+      "title": "FE-030: Implement Notification System - Bell Icon and Dropdown",
+      "description": "Add notification bell icon in Navbar. Display badge with unread count from GET /notificacoes/nao-lidas/count. Click opens dropdown with recent notifications. Click notification marks as read via PATCH and navigates to relevant page.",
+      "acceptanceCriteria": [
+        "Bell icon in Navbar (right side)",
+        "Badge showing unread count (GET /notificacoes/nao-lidas/count)",
+        "Polling every 60 seconds to update count",
+        "Click bell opens dropdown (like Bootstrap dropdown)",
+        "Dropdown shows 5 most recent notifications from GET /notificacoes?size=5",
+        "Each notification: titulo, mensagem, dataCriacao, status (lida/nao-lida)",
+        "Click notification calls PATCH /notificacoes/{id}/lida",
+        "Badge count updates after marking read",
+        "Smooth animations",
+        "Mobile responsive (full-width dropdown on mobile)"
+      ],
+      "priority": 7
+    },
+    {
+      "id": "US-040",
+      "title": "Git Commit: feat(analytics): add sales dashboards, chatbot widget, and notifications",
+      "description": "Stage all changes and commit to git with message: 'feat(analytics): implement sales dashboards by period/region, chatbot widget, and notification system'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 7
+    },
+    {
+      "id": "US-041",
+      "title": "FE-031: Setup Cypress E2E Testing Framework",
+      "description": "Install Cypress and create configuration. Setup custom commands for login, API mocking, cart operations. Create fixtures with test data (cliente.json, livro.json). Configure baseUrl, viewports, and plugins.",
+      "acceptanceCriteria": [
+        "Cypress installed and cypress.config.js configured",
+        "baseUrl set to http://localhost:5173",
+        "Viewport configured for desktop/tablet/mobile",
+        "Screenshot and video on failure enabled",
+        "Custom commands in cypress/support/commands.js:",
+        "  - cy.login(email, password): POST /auth/login, set token, navigate to home",
+        "  - cy.mockAPI(method, url, response): cy.intercept wrapper",
+        "  - cy.addToCart(bookId, quantity): navigate, select qty, click add",
+        "  - cy.logout(): clear localStorage, navigate to /login",
+        "Test fixtures created: cliente.json, livro.json, pedido.json",
+        "cypress/fixtures/ directory with JSON data",
+        "Run command: npm run test:e2e",
+        "Open command: npm run test:e2e:open"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-042",
+      "title": "FE-032: Write E2E Tests - Authentication and Profile Management",
+      "description": "Create cypress/e2e/auth.cy.js and account.cy.js with tests for: successful registration, validation errors, login/logout, edit profile, add/edit/delete addresses, add/edit/delete cards, change password.",
+      "acceptanceCriteria": [
+        "auth.cy.js with describe blocks: Registration, Login, Logout",
+        "Registration: valid data → success; weak password → error; duplicate email → error",
+        "Login: valid credentials → redirect to /; invalid → error message",
+        "account.cy.js: Edit Profile, Addresses, Cards, Password Change",
+        "Edit profile: change nome → success; verify API called with PUT",
+        "Add address: fill form → POST → appears in list",
+        "Delete address: confirmation → DELETE → removed from list",
+        "Add card: fill form → POST → appears in list",
+        "Set preferred card: click → PATCH → badge updates",
+        "Change password: current+new → success; weak password → error",
+        "All tests use data-testid selectors (not CSS classes)"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-043",
+      "title": "FE-033: Write E2E Tests - Book CRUD and Stock Management",
+      "description": "Create cypress/e2e/admin-books.cy.js with tests for: create book, edit book, list with filters, activate/inactivate with justification, stock entry creation and history display.",
+      "acceptanceCriteria": [
+        "admin-books.cy.js with admin-only tests",
+        "Create book: fill form (3 steps) → POST → appears in list",
+        "Edit book: modify field → PUT → updates in list",
+        "List books: filter by name → results updated, filter cleared",
+        "Activate book: click button → modal → justify → PATCH → status updates",
+        "Inactivate book: click button → modal → justify → PATCH → status updates",
+        "Stock entry: select book → qty, cost → POST → history appears",
+        "Stock history: displays entries for selected book, pagination works",
+        "All API calls intercepted and verified",
+        "Error cases: missing fields, invalid values → error messages",
+        "All tests pass when run with npm run test:e2e against mock API responses"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-044",
+      "title": "FE-034: Write E2E Tests - Complete Purchase Flow",
+      "description": "Create cypress/e2e/checkout.cy.js with complete happy-path purchase: login, add items to cart, proceed to checkout, select address, apply coupons, select payment, confirm order, verify success.",
+      "acceptanceCriteria": [
+        "checkout.cy.js: single test or describe with multiple scenarios",
+        "Happy path: login → browse → add 2 items → cart → checkout",
+        "Step 1 (address): select address → next enabled",
+        "Step 2a (coupons): apply coupon → discount shows → total updates",
+        "Step 2b (payment): select card → enter amount → sum matches",
+        "Step 3 (review): all data correct → confirm → POST /checkout/finalizar",
+        "Success: order confirmation page, order number displayed",
+        "API mocking for all responses",
+        "Variant: card last digit even (rejected) → error message",
+        "Variant: expired item → warning shown → cannot checkout until cleared",
+        "All tests pass when run with npm run test:e2e against mock API responses"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-045",
+      "title": "FE-035: Write E2E Tests - Cart Expiration and Alerts",
+      "description": "Create cypress/e2e/cart-timer.cy.js testing: countdown display, warning at 5min, expiration notification, automatic removal, sync with backend polling.",
+      "acceptanceCriteria": [
+        "cart-timer.cy.js with timer/expiration tests",
+        "Add item → timer displays → counts down",
+        "Mock slow countdown by manipulating timestamps",
+        "Set timer to 5min → warning badge appears",
+        "Wait for expiration → toast notification",
+        "Item removed from cart automatically",
+        "Checkout button disabled with message about expired item",
+        "Polling every 30sec syncs with backend",
+        "UI updates reflect backend state changes",
+        "Multiple items with different expiration times",
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-046",
+      "title": "FE-036: Write E2E Tests - Exchanges and Reviews",
+      "description": "Create cypress/e2e/exchanges-reviews.cy.js testing: submit exchange request, admin authorize/confirm, review submission and moderation workflow.",
+      "acceptanceCriteria": [
+        "exchanges-reviews.cy.js with two describe blocks",
+        "User flow: delivered order → request exchange → modal → select items → justify → POST",
+        "Success: status changes to EM_TROCA",
+        "Admin flow: pending exchange → authorize → status EM_TROCA_AUTORIZADA",
+        "Admin: confirm receipt → checkboxes return to stock → status TROCADO",
+        "Review: authenticated user on delivered order → ReviewForm visible",
+        "Submit review: stars, text → POST → success message",
+        "Admin moderation: pending reviews → approve/reject → status updates",
+        "Approved reviews appear in book detail page",
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-047",
+      "title": "FE-037: Write E2E Tests - Analytics Dashboards",
+      "description": "Create cypress/e2e/admin-analytics.cy.js testing: sales-by-period chart rendering, sales-by-region chart rendering, filter interactions, data transformations.",
+      "acceptanceCriteria": [
+        "admin-analytics.cy.js with analytics tests",
+        "Sales by period: date pickers → grouping select → chart renders",
+        "Chart shows multiple series (products/categories)",
+        "Legend displays correctly",
+        "Hover shows data point values",
+        "Regional sales: date pickers → bar chart renders",
+        "States appear on axis",
+        "Colors represent value magnitude",
+        "Tab switching between views works",
+        "Mock API responses with realistic data",
+        "Export/download options (if implemented)",
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"        
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-048",
+      "title": "Git Commit: test(e2e): add comprehensive cypress test suite for all features",
+      "description": "Stage all changes and commit to git with message: 'test(e2e): add cypress test suite covering authentication, CRUD, checkout, cart, exchanges, reviews, and analytics'",
+      "acceptanceCriteria": [
+        "All test files created and committed",
+        "All tests runnable with npm run test:e2e",
+        "All tests pass against mock API responses",
+        "Commit message follows conventional format",
+        "Test coverage spans all 37 features",
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Run all tests before complete"
+      ],
+      "priority": 8
+    },
+    {
+      "id": "US-049",
+      "title": "Documentation: Create Frontend Setup Readme and Contributing Guide",
+      "description": "Write frontend/SETUP.md documenting: installation, environment variables, running dev server, building for production, running tests, Docker usage. Create CONTRIBUTING.md with coding standards, component patterns, and PR guidelines.",
+      "acceptanceCriteria": [
+        "frontend/SETUP.md with: prerequisites, installation steps, env vars, development commands",
+        "Docker setup instructions: docker-compose up, docker-compose run commands",
+        "Build and test instructions",
+        "Troubleshooting section",
+        "Docs linked in main README.md",
+        "CONTRIBUTING.md with: coding standards, component pattern example, commit message guide",
+        "Reference to API_CONTRACT.md",
+        "Code review checklist",
+        "Clear and accessible language",
+        "All tests pass when run with npm run test:e2e against mock API responses",
+        "Frontend is running using docker",
+        "Run all tests before complete"
+      ],
+      "priority": 9
+    },
+    {
+      "id": "US-050",
+      "title": "Git Commit: docs(frontend): add setup guide and contributing guidelines",
+      "description": "Stage all changes and commit to git with message: 'docs(frontend): add comprehensive setup guide and contributing guidelines'",
+      "acceptanceCriteria": [
+        "All documentation files created",
+        "Files are committed with descriptive message",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 9
+    },
+    {
+      "id": "US-051",
+      "title": "Final: Verify Complete Frontend Implementation",
+      "description": "Perform final verification: all 37 features (FE-001 to FE-037) implemented, all tests passing, Docker builds successfully, API contract followed, no console errors, responsive design on mobile/tablet/desktop.",
+      "acceptanceCriteria": [
+        "All 37 features implemented and functional",
+        "Cypress test suite: 100% passing",
+        "No console errors or warnings",
+        "Responsive design verified: mobile (375px), tablet (768px), desktop (1280px)",
+        "Docker images build without errors",
+        "docker-compose up starts both frontend and backend",
+        "Frontend accessible at http://localhost:5173",
+        "API endpoints match API_CONTRACT.md exactly",
+        "Git history clean with meaningful commits",
+        "Code formatted with Prettier",
+        "ESLint passes with no errors"
+      ],
+      "priority": 10
+    },
+    {
+      "id": "US-052",
+      "title": "Git Commit: release(frontend): complete implementation of all 37 features",
+      "description": "Stage all changes and commit to git with message: 'release(frontend): complete implementation of ralph loop with 37 features, full test coverage, and documentation'",
+      "acceptanceCriteria": [
+        "All changes are staged",
+        "Changes are committed with descriptive message",
+        "Commit includes version number if applicable",
+        "Commit follows conventional commit format"
+      ],
+      "priority": 10
+    }
+  ]
+}

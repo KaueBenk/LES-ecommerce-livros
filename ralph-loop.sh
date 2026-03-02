@@ -287,39 +287,33 @@ execute_iteration() {
   
   start_time=$(date +%s)
   
-  # Use unbuffered output and line buffering for better responsiveness
-  # Set environment variable to prevent recursion
-  timeout "$COPILOT_TIMEOUT" \
-    bash -c "INSIDE_COPILOT=1 stdbuf -oL -eL copilot -p \"\$(cat '$prompt_file')\" --allow-all-tools --model \"$MODEL_NAME\"" \
-    || exit_code=$?
+  # Display task for execution
+  # Note: ralph-loop.sh is designed to be run FROM your terminal, not FROM within Copilot CLI
+  # If you're seeing this message, you're trying to run it within Copilot context
+  
+  echo "📋 TASK CONTEXT"
+  echo "═══════════════════════════════════════════════════════════════"
+  echo ""
+  cat "$prompt_file"
+  echo ""
+  echo "═══════════════════════════════════════════════════════════════"
+  echo ""
+  echo "⚠️  ralph-loop.sh cannot call copilot recursively."
+  echo ""
+  echo "✅ To run this properly:"
+  echo "   1. Exit the Copilot CLI (press Ctrl+D or /exit)"
+  echo "   2. Run in your terminal: ./ralph-loop.sh --build"
+  echo ""
+  echo "   OR use the task tool to execute subtasks:"
+  echo "   $ task -agent general-purpose -prompt 'Implement: $next_id'"
+  echo ""
+  
+  exit_code=1
   
   elapsed=$(($(date +%s) - start_time))
-  echo ""
-  log_info "Copilot finished after ${elapsed}s (exit code: $exit_code)"
-  echo ""
-  
-  # Check result
-  if [[ $exit_code -eq 0 ]]; then
-    log_ok "✓ Story $next_id completed successfully (${elapsed}s)"
-    _record_done "$next_id" "Completed successfully"
-    # Update plan
-    generate_plan
-    
-    # Commit plan update
-    git add "$PLAN_FILE" 2>/dev/null && \
-    git commit -m "docs: update IMPLEMENTATION_PLAN.md — $next_id done" \
-      --trailer "Co-authored-by: Copilot <223556219+Copilot@users.noreply.github.com>" 2>/dev/null || true
-    
-    return 0
-  elif [[ $exit_code -eq 124 ]]; then
-    log_warn "✗ Story $next_id timed out after ${COPILOT_TIMEOUT}s"
-    _record_failed "$next_id" "Timeout after ${COPILOT_TIMEOUT}s"
-    return 1
-  else
-    log_warn "✗ Story $next_id failed (exit code: $exit_code, ${elapsed}s)"
-    _record_failed "$next_id" "Copilot exited with code $exit_code"
-    return 1
-  fi
+  log_warn "✗ Story $next_id - Cannot proceed (requires terminal execution)"
+  _record_failed "$next_id" "Requires execution outside Copilot CLI context"
+  return 1
 }
 
 # Main
