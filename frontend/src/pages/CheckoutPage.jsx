@@ -1308,7 +1308,7 @@ const CheckoutPage = () => {
             />
           )}
 
-          {/* Navigation buttons */}}
+          {/* Navigation buttons */}
           <div className="d-flex justify-content-between mt-4 pt-3 border-top">
             <button
               type="button"

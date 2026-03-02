@@ -19,11 +19,6 @@ const catalogService = {
     return response.data.data;
   },
 
-  getBook: async (bookId) => {
-    const response = await api.get(`/livros/${bookId}`);
-    return response.data.data;
-  },
-
   getCategories: async () => {
     const response = await api.get('/catalogo/categorias');
     return response.data.data;
