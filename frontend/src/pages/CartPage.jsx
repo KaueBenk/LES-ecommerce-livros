@@ -125,6 +125,9 @@ const CartPage = () => {
   // Track which items we've already auto-removed to avoid duplicate removals
   const autoRemovedRef = useRef(new Set());
 
+  // Track if component has mounted for initial fetch
+  const mountedRef = useRef(false);
+
   const fetchCart = useCallback(async (silent = false) => {
     if (!silent) setLoading(true);
     setFetchError(null);
@@ -138,16 +141,24 @@ const CartPage = () => {
     }
   }, []);
 
-  // Initial load
+  // Initial load - only run once on mount
   useEffect(() => {
-    fetchCart();
-  }, [fetchCart]);
+    if (!mountedRef.current) {
+      mountedRef.current = true;
+      fetchCart();
+    }
+  }, []);
 
   // Polling every 30 seconds (silent refresh)
   useEffect(() => {
-    const id = setInterval(() => fetchCart(true), POLL_INTERVAL_MS);
+    const id = setInterval(() => {
+      // Call fetchCart without changing state to avoid re-renders during polling
+      cartService.getCart()
+        .then(data => setCart(data))
+        .catch(() => {}); // silent fail on poll
+    }, POLL_INTERVAL_MS);
     return () => clearInterval(id);
-  }, [fetchCart]);
+  }, []);
 
   // ── Timer callbacks ──
   const handleItemWarn = useCallback(

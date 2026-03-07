@@ -249,6 +249,70 @@ const getMockResponse = (config) => {
     if (method === 'delete') return ok(config, null, 204);
   }
 
+  // ─── Cart (Carrinho) ──────────────────────────────────────────────────
+  if (url.includes('/carrinho')) {
+    // Get cart from localStorage
+    const cartSession = typeof window !== 'undefined' ? JSON.parse(localStorage.getItem('cart_session') || '{"items":[]}') : { items: [] };
+    const cartItems = cartSession.items || [];
+
+    if (method === 'get' && !url.includes('/itens')) {
+      // GET /carrinho - Retorna o carrinho completo
+      const frete = cartItems.length > 0 ? 10.0 : 0;
+      const subtotal = cartItems.reduce((sum, item) => {
+        const price = item.precoVenda || item.price || 0;
+        return sum + price * item.quantity;
+      }, 0);
+      return ok(config, {
+        id: '1',
+        itens: cartItems.map(item => ({
+          id: item.id + '_cart',
+          livroId: item.id,
+          titulo: item.titulo,
+          precoUnitario: item.precoVenda || item.price || 0,
+          quantidade: item.quantity,
+          desconto: item.desconto || 0,
+        })),
+        valorSubtotal: subtotal,
+        valorFrete: frete,
+        valorTotal: subtotal + frete,
+        dataAtualizacao: new Date().toISOString(),
+      });
+    }
+
+    if (method === 'post' && url.includes('/itens')) {
+      // POST /carrinho/itens - Adicionar item
+      const { livroId, quantidade } = body(config);
+      const book = mockBooks.find(b => b.id === String(livroId));
+      if (book) {
+        return ok(config, {
+          id: String(Date.now()),
+          livroId,
+          titulo: book.titulo,
+          precoUnitario: book.preco,
+          quantidade,
+          desconto: book.desconto,
+        }, 201);
+      }
+      return ok(config, { message: 'Livro não encontrado' }, 404);
+    }
+
+    if (method === 'put' && url.includes('/itens')) {
+      // PUT /carrinho/itens/{id} - Atualizar quantidade
+      return ok(config, {
+        id: url.split('/').pop(),
+        quantidade: body(config).quantidade,
+      });
+    }
+
+    if (method === 'delete') {
+      // DELETE /carrinho - Limpar carrinho ou DELETE /carrinho/itens/{id}
+      if (url.includes('/itens')) {
+        return ok(config, null, 204);
+      }
+      return ok(config, { message: 'Carrinho limpo' });
+    }
+  }
+
   // ─── Customer Orders (vendas/minhas) ─────────────────────────────────
   if (url.includes('/vendas/minhas')) {
     return ok(config, paginate(mockOrders, config));

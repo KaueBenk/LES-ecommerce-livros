@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useCallback } from 'react';
-import { useParams, Link } from 'react-router-dom';
+import { useParams, Link, useNavigate } from 'react-router-dom';
 import usePageTitle from '../hooks/usePageTitle';
 import useCart from '../hooks/useCart';
 import useNotification from '../hooks/useNotification';
@@ -80,6 +80,7 @@ const QuantitySelector = ({ value, onChange, max = 99 }) => (
 
 const ProductPage = () => {
   const { id } = useParams();
+  const navigate = useNavigate();
   const { addItem } = useCart();
   const { success, error: notifyError } = useNotification();
 
@@ -116,10 +117,24 @@ const ProductPage = () => {
     if (!book) return;
     setAdding(true);
     try {
-      await addItem(book.id, quantity);
+      await addItem(book, quantity);
       success(`"${book.titulo}" adicionado ao carrinho!`);
     } catch (err) {
       notifyError(getErrorMessage(err) || 'Erro ao adicionar ao carrinho.');
+    } finally {
+      setAdding(false);
+    }
+  };
+
+  const handleBuyNow = async () => {
+    if (!book) return;
+    setAdding(true);
+    try {
+      await addItem(book, quantity);
+      success(`"${book.titulo}" adicionado ao carrinho!`);
+      navigate(ROUTES.CHECKOUT);
+    } catch (err) {
+      notifyError(getErrorMessage(err) || 'Erro ao processar compra.');
     } finally {
       setAdding(false);
     }
@@ -219,7 +234,7 @@ const ProductPage = () => {
             </p>
           )}
 
-          {/* Quantity + Add to Cart */}
+          {/* Quantity + Add to Cart / Buy Now */}
           {!outOfStock && (
             <div className="d-flex flex-wrap align-items-center gap-3 mb-4">
               <QuantitySelector
@@ -241,6 +256,22 @@ const ProductPage = () => {
                   </>
                 ) : (
                   '🛒 Adicionar ao Carrinho'
+                )}
+              </button>
+              <button
+                type="button"
+                className="btn btn-success"
+                onClick={handleBuyNow}
+                disabled={adding}
+                data-testid="buy-now-btn"
+              >
+                {adding ? (
+                  <>
+                    <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
+                    Processando...
+                  </>
+                ) : (
+                  '⚡ Comprar Agora'
                 )}
               </button>
             </div>
