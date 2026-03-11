@@ -1,13 +1,15 @@
 import axios from 'axios';
 import createMockInterceptor, { DEMO_MODE } from './demoInterceptor';
 
+const API_BASE_URL = import.meta.env.VITE_API_BASE_URL || '/api/v1';
+
 /**
  * Axios instance configured for the LES ecommerce API.
  * Base URL: /api/v1
  * Automatically attaches JWT Bearer token from localStorage.
  */
 const api = axios.create({
-  baseURL: '/api/v1',
+  baseURL: API_BASE_URL,
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',

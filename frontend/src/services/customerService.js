@@ -1,5 +1,47 @@
 import api from './api';
 
+const BRAND_NAME_BY_CODE = {
+  VISA: 'Visa',
+  MASTERCARD: 'MasterCard',
+  ELO: 'Elo',
+  AMEX: 'American Express',
+};
+
+const BRAND_CODE_BY_NAME = {
+  VISA: 'VISA',
+  MASTERCARD: 'MASTERCARD',
+  ELO: 'ELO',
+  AMERICAN_EXPRESS: 'AMEX',
+  AMEX: 'AMEX',
+};
+
+const normalizeBrandCode = (bandeira) => {
+  if (!bandeira) return '';
+  const rawName = typeof bandeira === 'string' ? bandeira : bandeira?.nome;
+  if (!rawName) return '';
+  const key = rawName.toUpperCase().replace(/\s+/g, '_');
+  return BRAND_CODE_BY_NAME[key] || key;
+};
+
+const normalizeBrandName = (bandeira) => {
+  if (!bandeira) return '';
+  if (typeof bandeira === 'string') {
+    return BRAND_NAME_BY_CODE[bandeira] || bandeira;
+  }
+  return bandeira.nome || '';
+};
+
+const normalizeCreditCard = (card) => {
+  const numero = card?.numero ? String(card.numero) : '';
+  return {
+    ...card,
+    numero,
+    ultimosDigitos: numero.replace(/\D/g, '').slice(-4),
+    bandeira: normalizeBrandCode(card?.bandeira),
+    bandeiraNome: normalizeBrandName(card?.bandeira),
+  };
+};
+
 /**
  * customerService — Customer profile and account API calls
  */
@@ -36,7 +78,8 @@ const customerService = {
 
   getCreditCards: async () => {
     const response = await api.get('/clientes/cartoes');
-    return response.data.data;
+    const cards = Array.isArray(response.data.data) ? response.data.data : [];
+    return cards.map(normalizeCreditCard);
   },
 
   addCreditCard: async (cardData) => {
@@ -66,7 +109,11 @@ const customerService = {
 
   getTransactions: async (page = 0, size = 20, sort = 'dataPedido,desc') => {
     const response = await api.get('/clientes/transacoes', { params: { page, size, sort } });
-    return response.data.data;
+    const data = response.data.data || {};
+    return {
+      ...data,
+      content: Array.isArray(data.content) ? data.content : [],
+    };
   },
 
   requestExchange: async (orderId, itens) => {
@@ -81,4 +128,3 @@ const customerService = {
 };
 
 export default customerService;
-

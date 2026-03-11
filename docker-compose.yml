@@ -1,6 +1,42 @@
 version: '3.8'
 
 services:
+  # Database
+  db:
+    image: postgres:15-alpine
+    container_name: les-db
+    environment:
+      POSTGRES_DB: les_db
+      POSTGRES_USER: les_user
+      POSTGRES_PASSWORD: les_password
+    ports:
+      - "5432:5432"
+    networks:
+      - les-network
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+  # Backend
+  backend:
+    build:
+      context: ./backend/lesecommercelivros
+      dockerfile: Dockerfile
+    container_name: les-backend
+    ports:
+      - "8080:8080"
+    environment:
+      - SPRING_DATASOURCE_URL=jdbc:postgresql://db:5432/les_db
+      - SPRING_DATASOURCE_USERNAME=les_user
+      - SPRING_DATASOURCE_PASSWORD=les_password
+      - SPRING_JPA_HIBERNATE_DDL_AUTO=update
+      - SPRING_SQL_INIT_CONTINUE_ON_ERROR=true
+    depends_on:
+      - db
+    networks:
+      - les-network
+    restart: unless-stopped
+
   # Frontend — development mode with hot reload
   frontend:
     build:
@@ -14,10 +50,12 @@ services:
       - ./frontend:/app
       - /app/node_modules
     environment:
-      - VITE_API_URL=http://localhost:8080
+      - VITE_API_URL=http://backend:8080
     networks:
       - les-network
     restart: unless-stopped
+    profiles:
+      - dev
 
   # Frontend — production build served by nginx
   frontend-prod:
@@ -37,3 +75,6 @@ services:
 networks:
   les-network:
     driver: bridge
+
+volumes:
+  db-data:

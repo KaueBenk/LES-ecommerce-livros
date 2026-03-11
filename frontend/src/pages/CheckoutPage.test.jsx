@@ -4,9 +4,9 @@ import userEvent from '@testing-library/user-event';
 import { BrowserRouter } from 'react-router-dom';
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import CheckoutPage from './CheckoutPage';
-import * as cartService from '../services/cartService';
-import * as customerService from '../services/customerService';
-import * as checkoutService from '../services/checkoutService';
+import cartService from '../services/cartService';
+import customerService from '../services/customerService';
+import checkoutService from '../services/checkoutService';
 
 // ─── Mocks ────────────────────────────────────────────────────────────────
 
@@ -53,7 +53,7 @@ const MOCK_ADDRESSES = [
     id: 1,
     apelido: 'Casa',
     tipoEndereco: 'ENTREGA',
-    rua: 'Av. Paulista',
+    logradouro: 'Av. Paulista',
     numero: '1000',
     complemento: 'Apto 123',
     bairro: 'Bela Vista',
@@ -66,7 +66,7 @@ const MOCK_ADDRESSES = [
     id: 2,
     apelido: 'Escritório',
     tipoEndereco: 'ENTREGA',
-    rua: 'Rua Augusta',
+    logradouro: 'Rua Augusta',
     numero: '2500',
     complemento: '',
     bairro: 'Centro',
@@ -79,7 +79,7 @@ const MOCK_ADDRESSES = [
     id: 3,
     apelido: 'Cobrança',
     tipoEndereco: 'FINANCEIRO',
-    rua: 'Rua das Flores',
+    logradouro: 'Rua das Flores',
     numero: '500',
     complemento: '',
     bairro: 'Vila Mariana',
@@ -144,12 +144,12 @@ describe('RF0033: Realizar compra', () => {
   beforeEach(() => {
     vi.clearAllMocks();
     // Setup default mock implementations
-    cartService.getCart = vi.fn().mockResolvedValue(MOCK_CART);
-    customerService.getAddresses = vi.fn().mockResolvedValue(MOCK_ADDRESSES);
-    customerService.getCreditCards = vi.fn().mockResolvedValue(MOCK_CREDIT_CARDS);
-    customerService.getCuponsTraoca = vi.fn().mockResolvedValue([]);
-    checkoutService.calculateShipping = vi.fn().mockResolvedValue({ valorFrete: 10.0 });
-    checkoutService.finalizeOrder = vi.fn().mockResolvedValue(MOCK_FINALIZED_ORDER);
+    cartService.getCart.mockResolvedValue(MOCK_CART);
+    customerService.getAddresses.mockResolvedValue(MOCK_ADDRESSES);
+    customerService.getCreditCards.mockResolvedValue(MOCK_CREDIT_CARDS);
+    customerService.getCuponsTraoca.mockResolvedValue([]);
+    checkoutService.calculateShipping.mockResolvedValue({ valorFrete: 10.0 });
+    checkoutService.finalizeOrder.mockResolvedValue(MOCK_FINALIZED_ORDER);
   });
 
   describe('AC1: Dados são mockados localmente no componente (sem API)', () => {
@@ -181,11 +181,11 @@ describe('RF0033: Realizar compra', () => {
     it('Should not make API calls for checkout finalization when data is mocked', async () => {
       // This test verifies that the checkout works with mocked service data
       vi.clearAllMocks();
-      cartService.getCart = vi.fn().mockResolvedValue(MOCK_CART);
-      customerService.getAddresses = vi.fn().mockResolvedValue(MOCK_ADDRESSES);
-      customerService.getCreditCards = vi.fn().mockResolvedValue(MOCK_CREDIT_CARDS);
-      customerService.getCuponsTraoca = vi.fn().mockResolvedValue([]);
-      checkoutService.calculateShipping = vi.fn().mockResolvedValue({ valorFrete: 10.0 });
+      cartService.getCart.mockResolvedValue(MOCK_CART);
+      customerService.getAddresses.mockResolvedValue(MOCK_ADDRESSES);
+      customerService.getCreditCards.mockResolvedValue(MOCK_CREDIT_CARDS);
+      customerService.getCuponsTraoca.mockResolvedValue([]);
+      checkoutService.calculateShipping.mockResolvedValue({ valorFrete: 10.0 });
 
       renderWithRouter(<CheckoutPage />);
 
@@ -220,11 +220,11 @@ describe('RF0033: Realizar compra', () => {
       });
 
       // Subtotal should be 275.90 (from MOCK_CART)
-      expect(screen.getByTestId('summary-subtotal')).toHaveTextContent('275,90');
+      expect(screen.getByTestId('summary-subtotal')).toHaveTextContent(/R\$\s*275,90/);
     });
 
     it('Should show empty cart message when cart is empty', async () => {
-      cartService.getCart = vi.fn().mockResolvedValue({
+      cartService.getCart.mockResolvedValue({
         itens: [],
         valorSubtotal: 0,
       });
@@ -244,7 +244,6 @@ describe('RF0033: Realizar compra', () => {
       });
     });
   });
-
   describe('AC3: O fluxo de compra exige seleção de endereço de entrega (RF0035)', () => {
     it('Should display all delivery addresses', async () => {
       renderWithRouter(<CheckoutPage />);
@@ -284,7 +283,7 @@ describe('RF0033: Realizar compra', () => {
       fireEvent.click(screen.getByTestId('address-radio-1'));
 
       await waitFor(() => {
-        expect(screen.getByTestId('summary-shipping')).toHaveTextContent('10,00');
+        expect(screen.getByTestId('summary-shipping')).toHaveTextContent(/R\$\s*10,00/);
       });
     });
 
@@ -343,19 +342,41 @@ describe('RF0033: Realizar compra', () => {
       expect(screen.getByTestId('checkout-stepper')).toBeInTheDocument();
     });
 
-    it('Should load credit cards for payment selection', async () => {
+    it('Should load credit cards for payment selection after navigating to step 3', async () => {
       renderWithRouter(<CheckoutPage />);
 
+      // Step 1: Address
+      await waitFor(() => expect(screen.getByTestId('address-radio-1')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('address-radio-1'));
+      
+      const nextBtn = await screen.findByTestId('checkout-next-btn');
+      fireEvent.click(nextBtn);
+
+      // Step 2: Cupons
+      await waitFor(() => expect(screen.getByTestId('step-circle-2')).toHaveClass('bg-primary'));
+      fireEvent.click(screen.getByTestId('checkout-next-btn'));
+
+      // Step 3: Pagamento
       await waitFor(() => {
         expect(customerService.getCreditCards).toHaveBeenCalled();
       });
     });
 
-    it('Should display available credit cards', async () => {
-      customerService.getCreditCards = vi.fn().mockResolvedValue(MOCK_CREDIT_CARDS);
+    it('Should display available credit cards at step 3', async () => {
+      customerService.getCreditCards.mockResolvedValue(MOCK_CREDIT_CARDS);
 
       renderWithRouter(<CheckoutPage />);
 
+      // Step 1: Address
+      await waitFor(() => expect(screen.getByTestId('address-radio-1')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('address-radio-1'));
+      fireEvent.click(await screen.findByTestId('checkout-next-btn'));
+
+      // Step 2: Cupons
+      await waitFor(() => expect(screen.getByTestId('step-circle-2')).toHaveClass('bg-primary'));
+      fireEvent.click(screen.getByTestId('checkout-next-btn'));
+
+      // Step 3: Pagamento
       await waitFor(() => {
         expect(customerService.getCreditCards).toHaveBeenCalled();
       });
@@ -364,7 +385,7 @@ describe('RF0033: Realizar compra', () => {
 
   describe('AC4: A compra é finalizada com status EM PROCESSAMENTO (RF0037)', () => {
     it('Should finalize order with EM_PROCESSAMENTO status', async () => {
-      checkoutService.finalizeOrder = vi.fn().mockResolvedValue(MOCK_FINALIZED_ORDER);
+      checkoutService.finalizeOrder.mockResolvedValue(MOCK_FINALIZED_ORDER);
 
       renderWithRouter(<CheckoutPage />);
 
@@ -382,8 +403,8 @@ describe('RF0033: Realizar compra', () => {
     });
 
     it('Should clear cart after successful order finalization', async () => {
-      cartService.clearCart = vi.fn().mockResolvedValue(undefined);
-      checkoutService.finalizeOrder = vi.fn().mockResolvedValue(MOCK_FINALIZED_ORDER);
+      cartService.clearCart.mockResolvedValue(undefined);
+      checkoutService.finalizeOrder.mockResolvedValue(MOCK_FINALIZED_ORDER);
 
       renderWithRouter(<CheckoutPage />);
 
@@ -414,7 +435,7 @@ describe('RF0033: Realizar compra', () => {
         ],
       };
 
-      cartService.getCart = vi.fn().mockResolvedValue(cartWithStock);
+      cartService.getCart.mockResolvedValue(cartWithStock);
 
       renderWithRouter(<CheckoutPage />);
 
@@ -428,7 +449,7 @@ describe('RF0033: Realizar compra', () => {
     });
 
     it('Should include all items in finalization payload', async () => {
-      checkoutService.finalizeOrder = vi.fn().mockResolvedValue(MOCK_FINALIZED_ORDER);
+      checkoutService.finalizeOrder.mockResolvedValue(MOCK_FINALIZED_ORDER);
 
       renderWithRouter(<CheckoutPage />);
 
@@ -505,11 +526,11 @@ describe('RF0033: Realizar compra', () => {
       });
 
       // MOCK_CART subtotal is 275.90
-      expect(screen.getByTestId('summary-subtotal')).toHaveTextContent('275,90');
+      expect(screen.getByTestId('summary-subtotal')).toHaveTextContent(/R\$\s*275,90/);
     });
 
     it('Should validate cart has items before allowing checkout', async () => {
-      cartService.getCart = vi.fn().mockResolvedValue({
+      cartService.getCart.mockResolvedValue({
         itens: [],
         valorSubtotal: 0,
       });
@@ -591,8 +612,17 @@ describe('RF0033: Realizar compra', () => {
       expect(screen.getByTestId('address-card-3')).toBeInTheDocument();
     });
 
-    it('Should use mocked credit card data', async () => {
+    it('Should use mocked credit card data at step 3', async () => {
       renderWithRouter(<CheckoutPage />);
+
+      // Step 1: Address
+      await waitFor(() => expect(screen.getByTestId('address-radio-1')).toBeInTheDocument());
+      fireEvent.click(screen.getByTestId('address-radio-1'));
+      fireEvent.click(await screen.findByTestId('checkout-next-btn'));
+
+      // Step 2: Cupons
+      await waitFor(() => expect(screen.getByTestId('step-circle-2')).toHaveClass('bg-primary'));
+      fireEvent.click(screen.getByTestId('checkout-next-btn'));
 
       await waitFor(() => {
         expect(customerService.getCreditCards).toHaveBeenCalled();
@@ -604,7 +634,7 @@ describe('RF0033: Realizar compra', () => {
     });
 
     it('Should return finalized order with mocked payment response', async () => {
-      checkoutService.finalizeOrder = vi.fn().mockResolvedValue(MOCK_FINALIZED_ORDER);
+      checkoutService.finalizeOrder.mockResolvedValue(MOCK_FINALIZED_ORDER);
 
       const result = await checkoutService.finalizeOrder({});
 
@@ -613,7 +643,7 @@ describe('RF0033: Realizar compra', () => {
     });
 
     it('Should handle shipping fee calculation with mocked response', async () => {
-      checkoutService.calculateShipping = vi.fn().mockResolvedValue({ valorFrete: 10.0 });
+      checkoutService.calculateShipping.mockResolvedValue({ valorFrete: 10.0 });
 
       const result = await checkoutService.calculateShipping(1);
 
@@ -659,8 +689,7 @@ describe('RF0033: Realizar compra', () => {
 
       const addressCard1 = screen.getByTestId('address-card-1');
       expect(addressCard1).toHaveTextContent('Casa');
-      expect(addressCard1).toHaveTextContent('Av. Paulista');
-      expect(addressCard1).toHaveTextContent('1000');
+      expect(addressCard1).toHaveTextContent('Avenida Av. Paulista, 1000');
     });
 
     it('Should support address selection flow', async () => {
@@ -678,7 +707,7 @@ describe('RF0033: Realizar compra', () => {
     });
 
     it('Should finalize order with all required data', async () => {
-      checkoutService.finalizeOrder = vi.fn().mockResolvedValue(MOCK_FINALIZED_ORDER);
+      checkoutService.finalizeOrder.mockResolvedValue(MOCK_FINALIZED_ORDER);
 
       const orderData = {
         enderecoEntregaId: 1,
@@ -714,15 +743,15 @@ describe('RF0033: Realizar compra', () => {
 
       await waitFor(() => {
         const subtotal = screen.getByTestId('summary-subtotal').textContent;
-        expect(subtotal).toBe('275,90');
+        expect(subtotal).toMatch(/R\$\s*275,90/);
       });
     });
   });
 
   describe('Error handling', () => {
     it('Should handle cart loading error gracefully', async () => {
-      cartService.getCart = vi.fn().mockRejectedValue(new Error('Cart load failed'));
-      customerService.getAddresses = vi.fn().mockResolvedValue([]);
+      cartService.getCart.mockRejectedValue(new Error('Cart load failed'));
+      customerService.getAddresses.mockResolvedValue([]);
 
       renderWithRouter(<CheckoutPage />);
 
@@ -733,7 +762,7 @@ describe('RF0033: Realizar compra', () => {
     });
 
     it('Should handle address loading error gracefully', async () => {
-      customerService.getAddresses = vi.fn().mockRejectedValue(new Error('Address load failed'));
+      customerService.getAddresses.mockRejectedValue(new Error('Address load failed'));
 
       renderWithRouter(<CheckoutPage />);
 
@@ -745,7 +774,7 @@ describe('RF0033: Realizar compra', () => {
     it('Should handle finalization error', async () => {
       const error = new Error('Finalization failed');
       error.response = { data: { message: 'Order finalization error' } };
-      checkoutService.finalizeOrder = vi.fn().mockRejectedValue(error);
+      checkoutService.finalizeOrder.mockRejectedValue(error);
 
       renderWithRouter(<CheckoutPage />);
 

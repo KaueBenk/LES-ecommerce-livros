@@ -438,9 +438,9 @@ describe('RegisterPage - US-007: VALIDAR RF0021: Cadastrar cliente', () => {
     // Verify address with type that includes delivery
     expect(submittedData.enderecos).toHaveLength(1);
     
-    // Default address type should be ENTREGA_E_FINANCEIRO (both delivery and billing)
+    // Default address type should be AMBOS (both delivery and billing)
     // This satisfies both RN0021 and RN0022
-    expect(submittedData.enderecos[0].tipoEndereco).toBe('ENTREGA_E_FINANCEIRO');
+    expect(submittedData.enderecos[0].tipoEndereco).toBe('AMBOS');
   });
 
   // ─────────────────────────────────────────────────────────────────────────────

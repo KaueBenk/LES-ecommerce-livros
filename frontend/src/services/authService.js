@@ -12,7 +12,20 @@ const authService = {
    */
   login: async (email, senha) => {
     const response = await api.post('/auth/login', { email, senha });
-    return response.data.data;
+    const data = response.data.data;
+    const role = data.role?.startsWith('ROLE_') ? data.role.replace('ROLE_', '') : data.role;
+    return {
+      token: data.token,
+      user: {
+        id: data.id,
+        nome: data.nome,
+        email: data.email,
+        cpf: data.cpf,
+        ranking: data.ranking,
+        role,
+        roles: role ? [role] : [],
+      },
+    };
   },
 
   /**

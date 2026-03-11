@@ -35,6 +35,11 @@ const adminService = {
     return response.data;
   },
 
+  runAutomaticBookInactivation: async () => {
+    const response = await api.post('/admin/livros/inativacao-automatica');
+    return response.data.data;
+  },
+
   // ── Catalog reference data ─────────────────────────────────────────────────
   getAuthors: async () => {
     const response = await api.get('/catalogo/autores');
@@ -89,6 +94,16 @@ const adminService = {
 
   getCustomer: async (customerId) => {
     const response = await api.get(`/admin/clientes/${customerId}`);
+    return response.data.data;
+  },
+
+  inactivateCustomer: async (customerId) => {
+    const response = await api.patch(`/admin/clientes/${customerId}/inativar`);
+    return response.data.data;
+  },
+
+  activateCustomer: async (customerId) => {
+    const response = await api.patch(`/admin/clientes/${customerId}/ativar`);
     return response.data.data;
   },
 

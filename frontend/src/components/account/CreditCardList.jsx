@@ -4,8 +4,12 @@ import { CREDIT_CARD_BRANDS } from '../../utils/constants';
 
 // ── Brand helpers ─────────────────────────────────────────────────────────────
 
-const getBrandLabel = (bandeira) =>
-  CREDIT_CARD_BRANDS.find((b) => b.value === bandeira)?.label || bandeira || '—';
+const normalizeBrand = (bandeira) => (typeof bandeira === 'object' ? bandeira?.nome : bandeira);
+
+const getBrandLabel = (bandeira) => {
+  const normalized = normalizeBrand(bandeira);
+  return CREDIT_CARD_BRANDS.find((b) => b.value === normalized)?.label || normalized || '—';
+};
 
 /**
  * Returns a colored badge class and text for each card brand.
@@ -21,7 +25,7 @@ const BRAND_STYLES = {
 };
 
 const getBrandStyle = (bandeira) =>
-  BRAND_STYLES[bandeira] || { bg: 'bg-secondary', text: 'text-white' };
+  BRAND_STYLES[normalizeBrand(bandeira)] || { bg: 'bg-secondary', text: 'text-white' };
 
 /** Returns last 4 digits, or the whole string if < 4 chars */
 const lastFour = (numero) => {

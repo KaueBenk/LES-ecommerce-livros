@@ -188,10 +188,10 @@ const CatalogPage = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
   };
 
-  const handleAddToCart = (book) => {
+  const handleAddToCart = async (book) => {
     setAddingId(book.id);
     try {
-      addItem(book, 1);
+      await addItem(book, 1);
       success(`"${book.titulo}" adicionado ao carrinho!`);
     } catch {
       notifyError('Não foi possível adicionar ao carrinho.');
