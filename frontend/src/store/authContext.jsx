@@ -1,7 +1,6 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import authService from '../services/authService';
-import { mockUser } from '../services/mockData';
 
 const AuthContext = createContext(null);
 
@@ -11,31 +10,13 @@ const AuthContext = createContext(null);
  * @description Provides authentication state and actions globally.
  */
 export const AuthProvider = ({ children }) => {
-  const isDemoMode = import.meta.env.VITE_DEMO_MODE === 'true';
-
   const [user, setUser] = useState(() => {
-    if (isDemoMode) {
-      localStorage.setItem('user_profile', JSON.stringify(mockUser));
-      localStorage.setItem('auth_token', 'demo-token-' + Date.now());
-      return mockUser;
-    }
     const stored = localStorage.getItem('user_profile');
     return stored ? JSON.parse(stored) : null;
   });
-
-  const [token, setToken] = useState(() => {
-    if (isDemoMode) {
-      const token = 'demo-token-' + Date.now();
-      localStorage.setItem('auth_token', token);
-      return token;
-    }
-    return localStorage.getItem('auth_token');
-  });
-
+  const [token, setToken] = useState(() => localStorage.getItem('auth_token'));
   const [loading, setLoading] = useState(false);
-  const [isAuthenticated, setIsAuthenticated] = useState(() => {
-    return isDemoMode || !!localStorage.getItem('auth_token');
-  });
+  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('auth_token'));
 
   useEffect(() => {
     if (token) {
