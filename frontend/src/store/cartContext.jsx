@@ -1,6 +1,7 @@
 import React, { createContext, useCallback, useContext, useEffect, useMemo, useState } from 'react';
 import PropTypes from 'prop-types';
 import cartService from '../services/cartService';
+import logger from '@utils/logger';
 
 const CartContext = createContext(null);
 
@@ -46,16 +47,28 @@ export const CartProvider = ({ children }) => {
   }, []);
 
   const syncFromBackend = useCallback(async () => {
-    const data = await cartService.getCart();
-    const nextItems = (data?.itens || []).map(mapServerItemToLocal);
-    const nextExpiresAt = data?.expiresAt
-      ? new Date(data.expiresAt).getTime()
-      : Date.now() + CART_TTL_MS;
+    try {
+      logger.logCart('SYNC_START', { fonte: 'backend' });
+      const data = await cartService.getCart();
+      const nextItems = (data?.itens || []).map(mapServerItemToLocal);
+      const nextExpiresAt = data?.expiresAt
+        ? new Date(data.expiresAt).getTime()
+        : Date.now() + CART_TTL_MS;
 
-    setItems(nextItems);
-    setExpiresAt(nextExpiresAt);
-    persistLocalSession(nextItems, nextExpiresAt);
-    return data;
+      setItems(nextItems);
+      setExpiresAt(nextExpiresAt);
+      persistLocalSession(nextItems, nextExpiresAt);
+      
+      logger.logCart('SYNC_SUCCESS', { 
+        totalItens: nextItems.length,
+        expiresAt: new Date(nextExpiresAt).toISOString()
+      });
+      
+      return data;
+    } catch (error) {
+      logger.logCart('SYNC_ERROR', { erro: error.message });
+      throw error;
+    }
   }, [persistLocalSession]);
 
   // Keep local session persisted (legacy + non-auth flows)
@@ -102,9 +115,17 @@ export const CartProvider = ({ children }) => {
       throw new Error('A quantidade deve ser maior que zero.');
     }
 
+    logger.logCart('ADD_ITEM', { 
+      livroId: book.id, 
+      titulo: book.titulo,
+      quantidade: normalizedQty,
+      autenticado: hasAuthToken()
+    });
+
     if (hasAuthToken()) {
       await cartService.addItem(book.id, normalizedQty);
       await syncFromBackend();
+      logger.logCart('ADD_ITEM_SUCCESS', { livroId: book.id, quantidade: normalizedQty });
       return;
     }
 
@@ -114,6 +135,11 @@ export const CartProvider = ({ children }) => {
     const availableStock = book.estoque?.quantidadeDisponivel;
 
     if (availableStock !== undefined && newTotal > availableStock) {
+      logger.logWarn('CART', 'Estoque insuficiente', { 
+        livroId: book.id, 
+        disponivel: availableStock, 
+        solicitado: newTotal 
+      });
       throw new Error(
         `Quantidade indisponível em estoque. Disponível: ${availableStock}, Solicitado: ${newTotal}`,
       );
@@ -124,21 +150,27 @@ export const CartProvider = ({ children }) => {
     } else {
       setItems([...items, { ...book, quantity: normalizedQty, addedAt: new Date().toISOString() }]);
     }
+    
+    logger.logCart('ADD_ITEM_SUCCESS', { livroId: book.id, quantidade: normalizedQty, local: true });
   };
 
   const resolveServerItem = (bookIdOrServerItemId) =>
     items.find((i) => i.id === bookIdOrServerItemId || i.serverItemId === bookIdOrServerItemId);
 
   const removeItem = async (bookIdOrServerItemId) => {
+    logger.logCart('REMOVE_ITEM', { itemId: bookIdOrServerItemId, autenticado: hasAuthToken() });
+    
     if (hasAuthToken()) {
       const item = resolveServerItem(bookIdOrServerItemId);
       if (!item?.serverItemId) return;
       await cartService.removeItem(item.serverItemId);
       await syncFromBackend();
+      logger.logCart('REMOVE_ITEM_SUCCESS', { itemId: bookIdOrServerItemId });
       return;
     }
 
     setItems(items.filter((i) => i.id !== bookIdOrServerItemId));
+    logger.logCart('REMOVE_ITEM_SUCCESS', { itemId: bookIdOrServerItemId, local: true });
   };
 
   const updateQuantity = async (bookIdOrServerItemId, quantity) => {

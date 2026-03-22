@@ -23,6 +23,7 @@ import com.kauebenk.lesecommercelivros.repository.EnderecoRepository;
 import com.kauebenk.lesecommercelivros.repository.EstoqueRepository;
 import com.kauebenk.lesecommercelivros.repository.ItemCarrinhoRepository;
 import com.kauebenk.lesecommercelivros.repository.PedidoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -41,6 +42,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 public class CheckoutService {
@@ -91,11 +93,15 @@ public class CheckoutService {
         CarrinhoCompra carrinho = getCarrinhoAtual(cliente);
         List<ItemCarrinho> itens = carrinho.getItens() == null ? List.of() : carrinho.getItens();
         if (itens.isEmpty()) {
+            log.warn("[FRETE] Tentativa de calcular frete com carrinho vazio - Cliente: {}", cliente.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho vazio");
         }
 
         Endereco endereco = resolveEnderecoEntrega(cliente, asLong(req.get("enderecoId")));
         BigDecimal valorFrete = calcularFreteInterno(endereco, itens);
+        
+        log.info("[FRETE] Frete calculado - Cliente: {} - CEP: {} - Valor: R${} - Itens: {}", 
+                cliente.getEmail(), endereco.getCep(), valorFrete, itens.size());
 
         Map<String, Object> response = new HashMap<>();
         response.put("valorFrete", valorFrete);
@@ -109,6 +115,7 @@ public class CheckoutService {
         CarrinhoCompra carrinho = getCarrinhoAtual(cliente);
         List<ItemCarrinho> itens = carrinho.getItens() == null ? List.of() : carrinho.getItens();
         if (itens.isEmpty()) {
+            log.warn("[CUPOM] Tentativa de validar cupons com carrinho vazio - Cliente: {}", cliente.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho vazio");
         }
 
@@ -118,6 +125,9 @@ public class CheckoutService {
         BigDecimal total = subtotal.add(frete);
 
         DiscountResult desconto = calcularDesconto(cliente, total, req);
+        
+        log.info("[CUPOM] Cupons validados - Cliente: {} - Desconto total: R${} - Cupons troca: R${} - Cupom promocional: R${}", 
+                cliente.getEmail(), desconto.descontoAplicado, desconto.cupomsTrocaValor, desconto.cupomPromocionalValor);
 
         Map<String, Object> response = new HashMap<>();
         response.put("cupomsTrocaValor", desconto.cupomsTrocaValor);
@@ -134,11 +144,13 @@ public class CheckoutService {
 
         List<ItemCarrinho> itensCarrinho = carrinho.getItens() == null ? List.of() : carrinho.getItens();
         if (itensCarrinho.isEmpty()) {
+            log.warn("[CHECKOUT] Tentativa de finalizar compra com carrinho vazio - Cliente: {}", cliente.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho vazio");
         }
 
         long ttlMinutos = getCarrinhoTtlMinutos();
         if (reservaExpirada(itensCarrinho, ttlMinutos)) {
+            log.warn("[CHECKOUT] Reserva do carrinho expirada - Cliente: {} - TTL: {} minutos", cliente.getEmail(), ttlMinutos);
             liberarEstoqueReservado(itensCarrinho);
             itemCarrinhoRepository.deleteAllByCarrinhoIdQuery(carrinho.getId());
             throw new ResponseStatusException(
@@ -151,6 +163,7 @@ public class CheckoutService {
 
         Long enderecoId = asLong(req.get("enderecoEntregaId"));
         if (enderecoId == null) {
+            log.warn("[CHECKOUT] Tentativa de finalizar compra sem endereço de entrega - Cliente: {}", cliente.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "enderecoEntregaId é obrigatório");
         }
         Endereco endereco = resolveEnderecoEntrega(cliente, enderecoId);
@@ -163,16 +176,23 @@ public class CheckoutService {
 
         List<Map<String, Object>> pagamentosReq = asListOfMaps(req.get("formasPagamento"));
         if (valorAPagar.compareTo(BigDecimal.ZERO) > 0 && pagamentosReq.isEmpty()) {
+            log.warn("[CHECKOUT] Tentativa de finalizar compra sem forma de pagamento - Cliente: {} - Valor a pagar: R${}", 
+                    cliente.getEmail(), valorAPagar);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Informe ao menos uma forma de pagamento");
         }
 
         PaymentBuildResult paymentBuild = construirFormasPagamento(cliente, pagamentosReq, valorAPagar);
         if (paymentBuild.somaPagamentos.compareTo(valorAPagar) != 0) {
+            log.warn("[CHECKOUT] Soma dos pagamentos incorreta - Cliente: {} - Esperado: R${} - Recebido: R${}", 
+                    cliente.getEmail(), valorAPagar, paymentBuild.somaPagamentos);
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "A soma dos pagamentos deve ser exatamente " + valorAPagar
             );
         }
+
+        log.info("[CHECKOUT] Iniciando processamento de compra - Cliente: {} - Valor total: R${} - Valor a pagar: R${} - Itens: {}", 
+                cliente.getEmail(), valorTotal, valorAPagar, itensCarrinho.size());
 
         Pedido pedido = criarPedidoEmProcessamento(
                 cliente,
@@ -184,6 +204,8 @@ public class CheckoutService {
         );
 
         if (!paymentBuild.errosPagamento.isEmpty()) {
+            log.error("[PAGAMENTO] Pagamento recusado - Cliente: {} - PedidoID: {} - Erros: {}", 
+                    cliente.getEmail(), pedido.getId(), paymentBuild.errosPagamento.size());
             StatusPedido statusAnterior = pedido.getStatus();
             pedido.setStatus(StatusPedido.REPROVADA);
             Pedido reprovado = pedidoRepository.save(pedido);
@@ -205,6 +227,8 @@ public class CheckoutService {
             );
         }
 
+        log.info("[PAGAMENTO] Pagamento aprovado - Cliente: {} - PedidoID: {}", cliente.getEmail(), pedido.getId());
+        
         atualizarEstoquePosCompra(itensCarrinho);
 
         StatusPedido statusAnterior = pedido.getStatus();
@@ -219,11 +243,15 @@ public class CheckoutService {
         );
 
         if (!desconto.cuponsTrocaAplicados.isEmpty()) {
+            log.info("[CUPOM] Marcando {} cupons de troca como utilizados - Cliente: {} - PedidoID: {}", 
+                    desconto.cuponsTrocaAplicados.size(), cliente.getEmail(), aprovado.getId());
             desconto.cuponsTrocaAplicados.forEach(cupom -> cupom.setUtilizado(true));
             cupomTrocaRepository.saveAll(desconto.cuponsTrocaAplicados);
         }
 
         if (desconto.excedenteCupom.compareTo(BigDecimal.ZERO) > 0) {
+            log.info("[CUPOM] Gerando cupom de troca por excedente - Cliente: {} - Valor: R${} - PedidoID: {}", 
+                    cliente.getEmail(), desconto.excedenteCupom, aprovado.getId());
             CupomTroca novoCupom = new CupomTroca();
             novoCupom.setCliente(cliente);
             novoCupom.setPedidoOrigem(aprovado);
@@ -267,6 +295,9 @@ public class CheckoutService {
                 "/account/orders",
                 "PEDIDO_APROVADO"
         );
+
+        log.info("[CHECKOUT] Pedido finalizado com sucesso - PedidoID: {} - Cliente: {} - Valor total: R${} - Valor pago: R${} - Frete: R${}", 
+                aprovado.getId(), cliente.getEmail(), valorTotal, valorAPagar, valorFrete);
 
         Map<String, Object> response = new HashMap<>();
         response.put("pedidoId", aprovado.getId());
@@ -331,11 +362,13 @@ public class CheckoutService {
             fp.setTipo(parseTipoPagamento(asString(pagamentoReq.get("tipo"))));
             BigDecimal valor = asBigDecimal(pagamentoReq.get("valor"));
             if (valor == null || valor.compareTo(BigDecimal.ZERO) <= 0) {
+                log.warn("[PAGAMENTO] Valor de pagamento inválido - Valor: {}", valor);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Valor de pagamento inválido");
             }
             if (fp.getTipo() == TipoPagamento.CARTAO_CREDITO
                     && valor.compareTo(MINIMO_CARTAO) < 0
                     && valorAPagar.compareTo(MINIMO_CARTAO) >= 0) {
+                log.warn("[PAGAMENTO] Valor do cartão abaixo do mínimo - Valor: R${} - Mínimo: R${}", valor, MINIMO_CARTAO);
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Cada cartão deve pagar no mínimo R$ 10,00"
@@ -351,10 +384,14 @@ public class CheckoutService {
                         .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cartão inválido"));
                 fp.setCartaoCredito(cartao);
                 if (isCartaoPar(cartao.getNumero())) {
+                    log.warn("[PAGAMENTO] Cartão recusado (dígito par) - Últimos dígitos: {}", getUltimosDigitos(cartao.getNumero()));
                     Map<String, Object> erro = new HashMap<>();
                     erro.put("cartaoUltimosDigitos", getUltimosDigitos(cartao.getNumero()));
                     erro.put("motivo", "CardBlocked");
                     errosPagamento.add(erro);
+                } else {
+                    log.info("[PAGAMENTO] Cartão aprovado - Últimos dígitos: {} - Valor: R${}", 
+                            getUltimosDigitos(cartao.getNumero()), valor);
                 }
             }
             formasPagamento.add(fp);
@@ -371,20 +408,29 @@ public class CheckoutService {
                 ? List.of()
                 : cupomTrocaRepository.findByIdInAndClienteIdAndUtilizadoFalse(cupomIds, cliente.getId());
         if (cuponsTrocaSelecionados.size() != cupomIds.size()) {
+            log.warn("[CUPOM] Cupom de troca inválido ou já utilizado - Cliente: {} - Cupons solicitados: {} - Cupons válidos: {}", 
+                    cliente.getEmail(), cupomIds.size(), cuponsTrocaSelecionados.size());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cupom de troca inválido");
         }
 
         BigDecimal valorPromocional = BigDecimal.ZERO;
         if (cupomPromocionalCodigo != null && !cupomPromocionalCodigo.isBlank()) {
             CupomPromocional cupomPromocional = cupomPromocionalRepository.findByCodigoIgnoreCase(cupomPromocionalCodigo.trim())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cupom promocional inválido"));
+                    .orElseThrow(() -> {
+                        log.warn("[CUPOM] Cupom promocional não encontrado - Código: {}", cupomPromocionalCodigo);
+                        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cupom promocional inválido");
+                    });
             if (!Boolean.TRUE.equals(cupomPromocional.getValido())) {
+                log.warn("[CUPOM] Cupom promocional inválido - Código: {} - Válido: {}", cupomPromocionalCodigo, cupomPromocional.getValido());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cupom promocional inválido");
             }
             if (cupomPromocional.getDataValidade() != null && cupomPromocional.getDataValidade().isBefore(LocalDate.now())) {
+                log.warn("[CUPOM] Cupom promocional expirado - Código: {} - Data validade: {}", 
+                        cupomPromocionalCodigo, cupomPromocional.getDataValidade());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Cupom promocional expirado");
             }
             valorPromocional = nullSafe(cupomPromocional.getValor());
+            log.info("[CUPOM] Cupom promocional aplicado - Código: {} - Valor: R${}", cupomPromocionalCodigo, valorPromocional);
         }
 
         BigDecimal restanteAposPromocional = totalCompra.subtract(valorPromocional).max(BigDecimal.ZERO);
@@ -435,24 +481,32 @@ public class CheckoutService {
     private void validarEstoqueParaCompra(List<ItemCarrinho> itensCarrinho) {
         for (ItemCarrinho item : itensCarrinho) {
             if (item.getLivro() == null || item.getLivro().getId() == null) {
+                log.warn("[CHECKOUT] Item inválido no carrinho - ItemID: {}", item.getId());
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Item inválido no carrinho");
             }
             Estoque estoque = estoqueRepository.findByLivroId(item.getLivro().getId())
-                    .orElseThrow(() -> new ResponseStatusException(
-                            HttpStatus.BAD_REQUEST,
-                            "Livro sem estoque: " + item.getLivro().getTitulo()
-                    ));
+                    .orElseThrow(() -> {
+                        log.warn("[CHECKOUT] Livro sem estoque cadastrado - LivroID: {} - Título: {}", 
+                                item.getLivro().getId(), item.getLivro().getTitulo());
+                        return new ResponseStatusException(
+                                HttpStatus.BAD_REQUEST,
+                                "Livro sem estoque: " + item.getLivro().getTitulo()
+                        );
+                    });
             int quantidade = safeInt(item.getQuantidade());
             int total = safeInt(estoque.getQuantidadeTotal());
             int bloqueado = safeInt(estoque.getQuantidadeBloqueada());
 
             if (quantidade <= 0 || quantidade > total || quantidade > bloqueado) {
+                log.warn("[CHECKOUT] Estoque insuficiente - LivroID: {} - Título: {} - Solicitado: {} - Total: {} - Bloqueado: {}", 
+                        item.getLivro().getId(), item.getLivro().getTitulo(), quantidade, total, bloqueado);
                 throw new ResponseStatusException(
                         HttpStatus.BAD_REQUEST,
                         "Estoque insuficiente para o livro: " + item.getLivro().getTitulo()
                 );
             }
         }
+        log.info("[CHECKOUT] Validação de estoque concluída - Itens validados: {}", itensCarrinho.size());
     }
 
     private void atualizarEstoquePosCompra(List<ItemCarrinho> itensCarrinho) {
@@ -535,10 +589,14 @@ public class CheckoutService {
 
     private Endereco resolveEnderecoEntrega(Cliente cliente, Long enderecoId) {
         if (enderecoId == null) {
+            log.warn("[CHECKOUT] Endereço de entrega não informado - Cliente: {}", cliente.getEmail());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Endereço de entrega é obrigatório");
         }
         return enderecoRepository.findByIdAndClienteId(enderecoId, cliente.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Endereço de entrega inválido"));
+                .orElseThrow(() -> {
+                    log.warn("[CHECKOUT] Endereço de entrega inválido - Cliente: {} - EndereçoID: {}", cliente.getEmail(), enderecoId);
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Endereço de entrega inválido");
+                });
     }
 
     private Endereco resolveEnderecoOpcional(Cliente cliente, Long enderecoId) {
@@ -548,16 +606,23 @@ public class CheckoutService {
 
     private CarrinhoCompra getCarrinhoAtual(Cliente cliente) {
         return carrinhoRepository.findByClienteId(cliente.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CHECKOUT] Carrinho não encontrado - Cliente: {}", cliente.getEmail());
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Carrinho não encontrado");
+                });
     }
 
     private Cliente getAuthenticatedCliente() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
+            log.warn("[CHECKOUT] Tentativa de acesso sem autenticação");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
         }
         return clienteRepository.findFirstByEmailIgnoreCaseOrderByIdAsc(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cliente não encontrado"));
+                .orElseThrow(() -> {
+                    log.error("[CHECKOUT] Cliente autenticado não encontrado no banco - Email: {}", authentication.getName());
+                    return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cliente não encontrado");
+                });
     }
 
     private BigDecimal calcularSubtotal(List<ItemCarrinho> itens) {
@@ -577,6 +642,7 @@ public class CheckoutService {
         try {
             return TipoPagamento.valueOf(raw);
         } catch (IllegalArgumentException ex) {
+            log.warn("[PAGAMENTO] Tipo de pagamento inválido - Valor recebido: {}", raw);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Tipo de pagamento inválido");
         }
     }

@@ -10,6 +10,7 @@ import com.kauebenk.lesecommercelivros.repository.ClienteRepository;
 import com.kauebenk.lesecommercelivros.repository.EstoqueRepository;
 import com.kauebenk.lesecommercelivros.repository.ItemCarrinhoRepository;
 import com.kauebenk.lesecommercelivros.repository.LivroRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 public class CarrinhoService {
@@ -52,6 +54,10 @@ public class CarrinhoService {
 
     public Map<String, Object> getCarrinho() {
         CarrinhoCompra carrinho = getOrCreateCarrinho();
+        Cliente cliente = carrinho.getCliente();
+        String clienteEmail = cliente != null ? cliente.getEmail() : "unknown";
+        log.info("[CARRINHO] Buscando carrinho - Cliente: {}", clienteEmail);
+        
         List<Map<String, Object>> itensRemovidos = processarExpiracaoCarrinho(carrinho);
         CarrinhoCompra atualizado = carrinhoRepository.findById(carrinho.getId()).orElse(carrinho);
         return toCartResponse(atualizado, itensRemovidos);
@@ -69,18 +75,23 @@ public class CarrinhoService {
         }
 
         CarrinhoCompra carrinho = getOrCreateCarrinho();
+        Cliente cliente = carrinho.getCliente();
+        String clienteEmail = cliente != null ? cliente.getEmail() : "unknown";
         processarExpiracaoCarrinho(carrinho);
 
         Long livroId = livroIdRaw.longValue();
         Livro livro = livroRepository.findById(livroId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CARRINHO] Livro não encontrado - Cliente: {} - LivroID: {}", clienteEmail, livroId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado");
+                });
 
         ItemCarrinho item = itemRepository.findByCarrinhoIdAndLivroId(carrinho.getId(), livroId).orElse(null);
         int quantidadeAnterior = item == null ? 0 : safeInt(item.getQuantidade());
         int novaQuantidade = quantidadeAnterior + quantidade;
         int delta = novaQuantidade - quantidadeAnterior;
         if (delta > 0) {
-            bloquearEstoque(livro, delta);
+            bloquearEstoque(livro, delta, clienteEmail);
         }
 
         if (item == null) {
@@ -90,10 +101,18 @@ public class CarrinhoService {
         }
         item.setQuantidade(novaQuantidade);
         item.setBloqueadoEm(LocalDateTime.now());
+        
+        log.info("[CARRINHO] Salvando item no carrinho - Cliente: {} - LivroID: {} - QuantidadeFinal: {}", 
+                clienteEmail, livroId, novaQuantidade);
         ItemCarrinho saved = itemRepository.save(item);
+        log.info("[CARRINHO] Item salvo no carrinho - ItemID: {} - LivroID: {} - Quantidade: {}", 
+                saved.getId(), livroId, saved.getQuantidade());
 
         carrinho.setUltimaAtualizacao(LocalDateTime.now());
         carrinhoRepository.save(carrinho);
+
+        log.info("[CARRINHO] Item adicionado - Cliente: {} - LivroID: {} - Quantidade: {} - QuantidadeTotal: {}", 
+                clienteEmail, livroId, quantidade, novaQuantidade);
 
         Map<String, Object> res = new HashMap<>();
         res.put("id", saved.getId());
@@ -108,57 +127,101 @@ public class CarrinhoService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade é obrigatória");
         }
         CarrinhoCompra carrinho = getOrCreateCarrinho();
+        Cliente cliente = carrinho.getCliente();
+        String clienteEmail = cliente != null ? cliente.getEmail() : "unknown";
         processarExpiracaoCarrinho(carrinho);
 
         ItemCarrinho item = itemRepository.findByIdAndCarrinhoId(id, carrinho.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado no carrinho"));
+                .orElseThrow(() -> {
+                    log.warn("[CARRINHO] Item não encontrado no carrinho - Cliente: {} - ItemID: {}", clienteEmail, id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado no carrinho");
+                });
 
+        Long livroId = item.getLivro() != null ? item.getLivro().getId() : null;
         int quantidadeAnterior = safeInt(item.getQuantidade());
         if (quantidade <= 0) {
             desbloquearEstoque(item.getLivro(), quantidadeAnterior);
+            
+            log.info("[CARRINHO] Removendo item via update (quantidade <= 0) - Cliente: {} - ItemID: {} - LivroID: {}", 
+                    clienteEmail, id, livroId);
             itemRepository.delete(item);
+            log.info("[CARRINHO] Item removido via update - ItemID: {} - LivroID: {}", id, livroId);
+            
             carrinho.setUltimaAtualizacao(LocalDateTime.now());
             carrinhoRepository.save(carrinho);
+            log.info("[CARRINHO] Item removido via update (quantidade <= 0) - Cliente: {} - ItemID: {} - LivroID: {}", 
+                    clienteEmail, id, livroId);
             return;
         }
 
         int delta = quantidade - quantidadeAnterior;
         if (delta > 0) {
-            bloquearEstoque(item.getLivro(), delta);
+            bloquearEstoque(item.getLivro(), delta, clienteEmail);
         } else if (delta < 0) {
             desbloquearEstoque(item.getLivro(), Math.abs(delta));
         }
 
         item.setQuantidade(quantidade);
         item.setBloqueadoEm(LocalDateTime.now());
+        
+        log.info("[CARRINHO] Atualizando quantidade do item - Cliente: {} - ItemID: {} - QuantidadeAnterior: {} - NovaQuantidade: {}", 
+                clienteEmail, id, quantidadeAnterior, quantidade);
         itemRepository.save(item);
+        log.info("[CARRINHO] Quantidade do item atualizada - ItemID: {} - NovaQuantidade: {}", id, quantidade);
 
         carrinho.setUltimaAtualizacao(LocalDateTime.now());
         carrinhoRepository.save(carrinho);
+        
+        log.info("[CARRINHO] Quantidade atualizada - Cliente: {} - ItemID: {} - LivroID: {} - QuantidadeAnterior: {} - NovaQuantidade: {}", 
+                clienteEmail, id, livroId, quantidadeAnterior, quantidade);
     }
 
     public void deleteItem(Long id) {
         CarrinhoCompra carrinho = getOrCreateCarrinho();
+        Cliente cliente = carrinho.getCliente();
+        String clienteEmail = cliente != null ? cliente.getEmail() : "unknown";
         processarExpiracaoCarrinho(carrinho);
 
         ItemCarrinho item = itemRepository.findByIdAndCarrinhoId(id, carrinho.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado no carrinho"));
+                .orElseThrow(() -> {
+                    log.warn("[CARRINHO] Item não encontrado no carrinho - Cliente: {} - ItemID: {}", clienteEmail, id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Item não encontrado no carrinho");
+                });
 
+        Long livroId = item.getLivro() != null ? item.getLivro().getId() : null;
         desbloquearEstoque(item.getLivro(), safeInt(item.getQuantidade()));
+        
+        log.info("[CARRINHO] Excluindo item do carrinho - Cliente: {} - ItemID: {} - LivroID: {}", 
+                clienteEmail, id, livroId);
         itemRepository.delete(item);
+        log.info("[CARRINHO] Item excluído do carrinho - ItemID: {} - LivroID: {}", id, livroId);
+        
         carrinho.setUltimaAtualizacao(LocalDateTime.now());
         carrinhoRepository.save(carrinho);
+        
+        log.info("[CARRINHO] Item removido - Cliente: {} - ItemID: {} - LivroID: {}", clienteEmail, id, livroId);
     }
 
     public void clearCart() {
         CarrinhoCompra carrinho = getOrCreateCarrinho();
+        Cliente cliente = carrinho.getCliente();
+        String clienteEmail = cliente != null ? cliente.getEmail() : "unknown";
         List<ItemCarrinho> itens = itemRepository.findByCarrinhoId(carrinho.getId());
+        
+        int totalItens = itens.size();
         for (ItemCarrinho item : itens) {
             desbloquearEstoque(item.getLivro(), safeInt(item.getQuantidade()));
         }
+        
+        log.info("[CARRINHO] Excluindo todos os itens do carrinho - Cliente: {} - TotalItens: {}", 
+                clienteEmail, totalItens);
         itemRepository.deleteAllByCarrinhoIdQuery(carrinho.getId());
+        log.info("[CARRINHO] Todos os itens excluídos do carrinho - TotalItens: {}", totalItens);
+        
         carrinho.setUltimaAtualizacao(LocalDateTime.now());
         carrinhoRepository.save(carrinho);
+        
+        log.info("[CARRINHO] Carrinho limpo - Cliente: {} - TotalItensRemovidos: {}", clienteEmail, totalItens);
     }
 
     private List<Map<String, Object>> processarExpiracaoCarrinho(CarrinhoCompra carrinho) {
@@ -179,6 +242,9 @@ public class CarrinhoService {
             return List.of();
         }
 
+        Cliente cliente = carrinho.getCliente();
+        String clienteEmail = cliente != null ? cliente.getEmail() : "unknown";
+        
         List<Map<String, Object>> removidos = new ArrayList<>();
         for (ItemCarrinho item : itens) {
             Map<String, Object> removido = new HashMap<>();
@@ -190,15 +256,23 @@ public class CarrinhoService {
             removidos.add(removido);
 
             desbloquearEstoque(item.getLivro(), safeInt(item.getQuantidade()));
+            
+            log.info("[CARRINHO] Excluindo item expirado - Cliente: {} - ItemID: {} - LivroID: {}", 
+                    clienteEmail, item.getId(), item.getLivro() != null ? item.getLivro().getId() : null);
             itemRepository.delete(item);
+            log.info("[CARRINHO] Item expirado excluído - ItemID: {}", item.getId());
         }
 
         carrinho.setUltimaAtualizacao(LocalDateTime.now());
         carrinhoRepository.save(carrinho);
+        
+        log.info("[CARRINHO] Itens expirados removidos - Cliente: {} - TotalItensExpirados: {} - TTL: {} minutos", 
+                clienteEmail, removidos.size(), ttlMinutos);
+        
         return removidos;
     }
 
-    private void bloquearEstoque(Livro livro, int quantidade) {
+    private void bloquearEstoque(Livro livro, int quantidade, String clienteEmail) {
         if (livro == null || livro.getId() == null) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Livro inválido");
         }
@@ -212,6 +286,8 @@ public class CarrinhoService {
         int bloqueado = safeInt(estoque.getQuantidadeBloqueada());
         int livre = Math.max(0, total - bloqueado);
         if (quantidade > livre) {
+            log.warn("[CARRINHO] Estoque insuficiente - Cliente: {} - LivroID: {} - Solicitado: {} - Disponível: {}", 
+                    clienteEmail, livro.getId(), quantidade, livre);
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Quantidade indisponível em estoque. Disponível: " + livre
@@ -221,7 +297,16 @@ public class CarrinhoService {
         int novoBloqueado = bloqueado + quantidade;
         estoque.setQuantidadeBloqueada(novoBloqueado);
         estoque.setQuantidadeDisponivel(Math.max(0, total - novoBloqueado));
+        
+        log.info("[ESTOQUE] Bloqueando estoque - LivroID: {} - Cliente: {} - Quantidade: {} - NovoBloqueado: {}", 
+                livro.getId(), clienteEmail, quantidade, novoBloqueado);
         estoqueRepository.save(estoque);
+        log.info("[ESTOQUE] Estoque bloqueado - LivroID: {} - QuantidadeBloqueada: {} - QuantidadeDisponivel: {}", 
+                livro.getId(), estoque.getQuantidadeBloqueada(), estoque.getQuantidadeDisponivel());
+    }
+    
+    private void bloquearEstoque(Livro livro, int quantidade) {
+        bloquearEstoque(livro, quantidade, "unknown");
     }
 
     private void desbloquearEstoque(Livro livro, int quantidade) {
@@ -235,7 +320,12 @@ public class CarrinhoService {
 
         estoque.setQuantidadeBloqueada(novoBloqueado);
         estoque.setQuantidadeDisponivel(Math.max(0, total - novoBloqueado));
+        
+        log.info("[ESTOQUE] Desbloqueando estoque - LivroID: {} - Quantidade: {} - NovoBloqueado: {}", 
+                livro.getId(), quantidade, novoBloqueado);
         estoqueRepository.save(estoque);
+        log.info("[ESTOQUE] Estoque desbloqueado - LivroID: {} - QuantidadeBloqueada: {} - QuantidadeDisponivel: {}", 
+                livro.getId(), estoque.getQuantidadeBloqueada(), estoque.getQuantidadeDisponivel());
     }
 
     private long getCartTtlMinutos() {
@@ -249,7 +339,11 @@ public class CarrinhoService {
             CarrinhoCompra novo = new CarrinhoCompra();
             novo.setCliente(current);
             novo.setUltimaAtualizacao(LocalDateTime.now());
-            return carrinhoRepository.save(novo);
+            
+            log.info("[CARRINHO] Criando novo carrinho - Cliente: {}", current.getEmail());
+            CarrinhoCompra saved = carrinhoRepository.save(novo);
+            log.info("[CARRINHO] Novo carrinho criado - CarrinhoID: {} - Cliente: {}", saved.getId(), current.getEmail());
+            return saved;
         });
     }
 

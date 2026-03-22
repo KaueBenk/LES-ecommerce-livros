@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState, useCallback } from 'react';
 import PropTypes from 'prop-types';
+import logger from '@utils/logger';
 
 const NotificationContext = createContext(null);
 
@@ -16,6 +17,9 @@ export const NotificationProvider = ({ children }) => {
   const addNotification = useCallback((message, type = 'info', duration = 5000) => {
     const id = ++notificationId;
     setNotifications((prev) => [...prev, { id, message, type, duration }]);
+    
+    logger.logInfo('NOTIFICATION', 'Notificação exibida', { tipo: type, mensagem: message });
+    
     if (duration > 0) {
       setTimeout(() => {
         removeNotification(id);

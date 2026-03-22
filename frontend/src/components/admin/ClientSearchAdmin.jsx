@@ -383,6 +383,30 @@ const ClientSearchAdmin = () => {
     }
   };
 
+  const handleDeleteClient = async (client, event) => {
+    event.stopPropagation();
+    if (!client?.id) return;
+
+    const confirmed = window.confirm(
+      `Tem certeza que deseja excluir o cliente "${client.nome}"? Esta ação não pode ser desfeita.`,
+    );
+    if (!confirmed) return;
+
+    setProcessingClientId(client.id);
+    try {
+      await adminService.deleteCustomer(client.id);
+      notifySuccess(`Cliente "${client.nome}" excluído com sucesso.`);
+      if (selectedClientId === client.id) {
+        setSelectedClientId(null);
+      }
+      await fetchClients();
+    } catch (err) {
+      notifyError(getErrorMessage(err) || 'Erro ao excluir cliente.');
+    } finally {
+      setProcessingClientId(null);
+    }
+  };
+
   return (
     <div data-testid="admin-clients-section">
       {/* Toolbar */}
@@ -550,15 +574,26 @@ const ClientSearchAdmin = () => {
                         {client.dataCadastro ? formatDate(client.dataCadastro) : '—'}
                       </td>
                       <td className="text-end">
-                        <button
-                          type="button"
-                          className={`btn btn-sm ${isActive ? 'btn-outline-warning' : 'btn-outline-success'}`}
-                          onClick={(event) => handleToggleClientStatus(client, event)}
-                          disabled={isProcessing}
-                          data-testid={`toggle-client-${client.id}`}
-                        >
-                          {isProcessing ? 'Processando…' : isActive ? 'Inativar' : 'Ativar'}
-                        </button>
+                        <div className="d-inline-flex gap-1">
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${isActive ? 'btn-outline-warning' : 'btn-outline-success'}`}
+                            onClick={(event) => handleToggleClientStatus(client, event)}
+                            disabled={isProcessing}
+                            data-testid={`toggle-client-${client.id}`}
+                          >
+                            {isProcessing ? 'Processando…' : isActive ? 'Inativar' : 'Ativar'}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={(event) => handleDeleteClient(client, event)}
+                            disabled={isProcessing}
+                            data-testid={`delete-client-${client.id}`}
+                          >
+                            Excluir
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

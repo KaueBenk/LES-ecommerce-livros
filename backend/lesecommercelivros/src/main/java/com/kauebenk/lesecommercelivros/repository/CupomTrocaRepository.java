@@ -8,6 +8,7 @@ import java.util.List;
 
 @Repository
 public interface CupomTrocaRepository extends JpaRepository<CupomTroca, Long> {
+    List<CupomTroca> findByClienteId(Long clienteId);
     List<CupomTroca> findByClienteIdAndUtilizadoFalseOrderByDataGeracaoDesc(Long clienteId);
     List<CupomTroca> findByIdInAndClienteIdAndUtilizadoFalse(List<Long> ids, Long clienteId);
 }

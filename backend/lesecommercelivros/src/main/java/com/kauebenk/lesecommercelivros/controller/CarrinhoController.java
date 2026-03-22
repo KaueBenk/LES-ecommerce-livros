@@ -2,12 +2,14 @@ package com.kauebenk.lesecommercelivros.controller;
 
 import com.kauebenk.lesecommercelivros.dto.ApiResponse;
 import com.kauebenk.lesecommercelivros.service.CarrinhoService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/carrinho")
 public class CarrinhoController {
@@ -22,6 +24,7 @@ public class CarrinhoController {
 
     @PostMapping("/itens")
     public ResponseEntity<ApiResponse<Map<String, Object>>> addItem(@RequestBody Map<String, Integer> request) {
+        log.info("[CARRINHO-CTRL] POST /api/v1/carrinho/itens - Adicionando item ao carrinho");
         return ResponseEntity.status(201).body(ApiResponse.created(carrinhoService.addItem(request), "Item adicionado ao carrinho"));
     }
 
@@ -33,12 +36,14 @@ public class CarrinhoController {
 
     @DeleteMapping("/itens/{id}")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> deleteItem(@PathVariable Long id) {
+        log.info("[CARRINHO-CTRL] DELETE /api/v1/carrinho/itens/{} - Removendo item do carrinho", id);
         carrinhoService.deleteItem(id);
         return ResponseEntity.ok(ApiResponse.success(Map.of("success", true), "Item removido"));
     }
 
     @DeleteMapping
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> clearCarrinho() {
+        log.info("[CARRINHO-CTRL] DELETE /api/v1/carrinho - Esvaziando carrinho");
         carrinhoService.clearCart();
         return ResponseEntity.ok(ApiResponse.success(Map.of("success", true), "Carrinho esvaziado"));
     }

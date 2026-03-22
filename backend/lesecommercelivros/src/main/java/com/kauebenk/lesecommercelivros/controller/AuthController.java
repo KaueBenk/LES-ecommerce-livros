@@ -4,12 +4,14 @@ import com.kauebenk.lesecommercelivros.dto.ApiResponse;
 import com.kauebenk.lesecommercelivros.dto.LoginRequest;
 import com.kauebenk.lesecommercelivros.dto.RegisterRequest;
 import com.kauebenk.lesecommercelivros.service.AuthService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/auth")
 public class AuthController {
@@ -19,16 +21,19 @@ public class AuthController {
 
     @PostMapping("/register")
     public ResponseEntity<ApiResponse<Map<String, Object>>> register(@RequestBody RegisterRequest request) {
+        log.info("[AUTH-CTRL] POST /api/v1/auth/register - Registrando novo cliente");
         return ResponseEntity.status(201).body(ApiResponse.created(authService.register(request), "Cliente cadastrado com sucesso"));
     }
 
     @PostMapping("/login")
     public ResponseEntity<ApiResponse<Map<String, Object>>> login(@RequestBody LoginRequest request) {
+        log.info("[AUTH-CTRL] POST /api/v1/auth/login - Realizando login");
         return ResponseEntity.ok(ApiResponse.success(authService.login(request), "Login realizado com sucesso"));
     }
 
     @PutMapping("/senha")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> updateSenha(@RequestBody Map<String, String> request) {
+        log.info("[AUTH-CTRL] PUT /api/v1/auth/senha - Alterando senha do usuário");
         authService.updateSenha(request.get("senhaAtual"), request.get("novaSenha"), request.get("confirmacaoSenha"));
         return ResponseEntity.ok(ApiResponse.success(Map.of("success", true), "Senha alterada com sucesso"));
     }

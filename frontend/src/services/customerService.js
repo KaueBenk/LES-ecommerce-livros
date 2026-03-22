@@ -1,4 +1,5 @@
 import api from './api';
+import logger from '@utils/logger';
 
 const BRAND_NAME_BY_CODE = {
   VISA: 'Visa',
@@ -52,7 +53,11 @@ const customerService = {
   },
 
   updateProfile: async (profileData) => {
+    logger.logInfo('CLIENTE', 'Atualizando perfil', { 
+      campos: Object.keys(profileData) 
+    });
     const response = await api.put('/clientes/perfil', profileData);
+    logger.logInfo('CLIENTE', 'Perfil atualizado com sucesso');
     return response.data.data;
   },
 
@@ -62,16 +67,25 @@ const customerService = {
   },
 
   addAddress: async (addressData) => {
+    logger.logInfo('CLIENTE', 'Adicionando endereço', { 
+      cep: addressData.cep,
+      tipo: addressData.tipoResidencia 
+    });
     const response = await api.post('/clientes/enderecos', addressData);
+    logger.logInfo('CLIENTE', 'Endereço adicionado', { 
+      enderecoId: response.data.data?.id 
+    });
     return response.data.data;
   },
 
   updateAddress: async (addressId, addressData) => {
+    logger.logInfo('CLIENTE', 'Atualizando endereço', { enderecoId });
     const response = await api.put(`/clientes/enderecos/${addressId}`, addressData);
     return response.data.data;
   },
 
   deleteAddress: async (addressId) => {
+    logger.logInfo('CLIENTE', 'Removendo endereço', { enderecoId: addressId });
     const response = await api.delete(`/clientes/enderecos/${addressId}`);
     return response.data;
   },
@@ -83,21 +97,32 @@ const customerService = {
   },
 
   addCreditCard: async (cardData) => {
+    const ultimos4 = cardData.numero?.slice(-4) || '****';
+    logger.logInfo('CLIENTE', 'Adicionando cartão', { 
+      bandeira: cardData.bandeira,
+      final: ultimos4 
+    });
     const response = await api.post('/clientes/cartoes', cardData);
+    logger.logInfo('CLIENTE', 'Cartão adicionado', { 
+      cartaoId: response.data.data?.id 
+    });
     return response.data.data;
   },
 
   updateCreditCard: async (cardId, cardData) => {
+    logger.logInfo('CLIENTE', 'Atualizando cartão', { cartaoId: cardId });
     const response = await api.put(`/clientes/cartoes/${cardId}`, cardData);
     return response.data.data;
   },
 
   setPreferredCard: async (cardId) => {
+    logger.logInfo('CLIENTE', 'Definindo cartão preferencial', { cartaoId: cardId });
     const response = await api.patch(`/clientes/cartoes/${cardId}/preferencial`);
     return response.data.data;
   },
 
   deleteCreditCard: async (cardId) => {
+    logger.logInfo('CLIENTE', 'Removendo cartão', { cartaoId: cardId });
     const response = await api.delete(`/clientes/cartoes/${cardId}`);
     return response.data;
   },
@@ -117,7 +142,12 @@ const customerService = {
   },
 
   requestExchange: async (orderId, itens) => {
+    logger.logInfo('CLIENTE', 'Solicitando troca', { 
+      pedidoId: orderId,
+      quantidadeItens: itens?.length 
+    });
     const response = await api.post(`/pedidos/${orderId}/trocas`, { itens });
+    logger.logInfo('CLIENTE', 'Troca solicitada com sucesso', { pedidoId: orderId });
     return response.data;
   },
 

@@ -16,6 +16,7 @@ import java.util.Optional;
 
 @Repository
 public interface PedidoRepository extends JpaRepository<Pedido, Long> {
+    boolean existsByClienteId(Long clienteId);
     Page<Pedido> findByClienteId(Long clienteId, Pageable pageable);
     List<Pedido> findTop20ByClienteIdOrderByDataPedidoDesc(Long clienteId);
     Optional<Pedido> findByIdAndClienteId(Long id, Long clienteId);

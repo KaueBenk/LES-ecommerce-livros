@@ -1,6 +1,7 @@
 package com.kauebenk.lesecommercelivros.controller;
 
 import com.kauebenk.lesecommercelivros.dto.ApiResponse;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.ai.chat.client.ChatClient;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.time.LocalDateTime;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/chat")
 public class ChatController {

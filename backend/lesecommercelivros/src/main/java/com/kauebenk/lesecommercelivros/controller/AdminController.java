@@ -8,6 +8,7 @@ import com.kauebenk.lesecommercelivros.entity.GrupoPrecificacao;
 import com.kauebenk.lesecommercelivros.entity.Livro;
 import com.kauebenk.lesecommercelivros.service.AdminService;
 import com.kauebenk.lesecommercelivros.service.AdminWorkflowService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -16,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/admin")
 public class AdminController {
@@ -33,23 +35,27 @@ public class AdminController {
 
     @PostMapping("/livros")
     public ResponseEntity<ApiResponse<Livro>> createLivro(@RequestBody Map<String, Object> request) {
+        log.info("[ADMIN-CTRL] POST /api/v1/admin/livros - Criando novo livro");
         return ResponseEntity.status(201).body(ApiResponse.created(adminService.createLivro(request), "Livro criado"));
     }
 
     @PutMapping("/livros/{id}")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> updateLivro(@PathVariable Long id, @RequestBody Map<String, Object> request) {
+        log.info("[ADMIN-CTRL] PUT /api/v1/admin/livros/{} - Atualizando livro", id);
         adminService.updateLivro(id, request);
         return ResponseEntity.ok(ApiResponse.success(Map.of("success", true), "Livro atualizado"));
     }
     
     @PatchMapping("/livros/{id}/inativar")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> inativarLivro(@PathVariable Long id, @RequestBody Map<String, Object> req) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/livros/{}/inativar - Inativando livro", id);
         adminService.inativarLivro(id, req);
         return ResponseEntity.ok(ApiResponse.success(Map.of("success", true), "Livro inativado"));
     }
 
     @PatchMapping("/livros/{id}/ativar")
     public ResponseEntity<ApiResponse<Map<String, Boolean>>> ativarLivro(@PathVariable Long id, @RequestBody Map<String, Object> req) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/livros/{}/ativar - Ativando livro", id);
         adminService.ativarLivro(id, req);
         return ResponseEntity.ok(ApiResponse.success(Map.of("success", true), "Livro ativado"));
     }
@@ -82,6 +88,7 @@ public class AdminController {
 
     @PostMapping("/estoque/entradas")
     public ResponseEntity<ApiResponse<EntradaEstoque>> createEntradaEstoque(@RequestBody Map<String, Object> request) {
+        log.info("[ADMIN-CTRL] POST /api/v1/admin/estoque/entradas - Registrando entrada de estoque");
         return ResponseEntity
                 .status(201)
                 .body(ApiResponse.created(adminService.createStockEntry(request), "Entrada registrada"));
@@ -97,11 +104,13 @@ public class AdminController {
 
     @PatchMapping("/pedidos/{id}/despachar")
     public ResponseEntity<ApiResponse<Map<String, Object>>> despacharPedido(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/pedidos/{}/despachar - Despachando pedido", id);
         return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.despacharPedido(id), "Pedido despachado"));
     }
 
     @PatchMapping("/pedidos/{id}/entregar")
     public ResponseEntity<ApiResponse<Map<String, Object>>> entregarPedido(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/pedidos/{}/entregar - Entregando pedido", id);
         return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.entregarPedido(id), "Pedido entregue"));
     }
 
@@ -126,6 +135,7 @@ public class AdminController {
 
     @PatchMapping("/clientes/{id}/inativar")
     public ResponseEntity<ApiResponse<Map<String, Object>>> inativarCliente(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/clientes/{}/inativar - Inativando cliente", id);
         return ResponseEntity.ok(ApiResponse.success(
                 adminWorkflowService.inativarCliente(id),
                 "Cliente inativado"
@@ -134,9 +144,19 @@ public class AdminController {
 
     @PatchMapping("/clientes/{id}/ativar")
     public ResponseEntity<ApiResponse<Map<String, Object>>> ativarCliente(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/clientes/{}/ativar - Ativando cliente", id);
         return ResponseEntity.ok(ApiResponse.success(
                 adminWorkflowService.ativarCliente(id),
                 "Cliente ativado"
+        ));
+    }
+
+    @DeleteMapping("/clientes/{id}")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> excluirCliente(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] DELETE /api/v1/admin/clientes/{} - Excluindo cliente", id);
+        return ResponseEntity.ok(ApiResponse.success(
+                adminWorkflowService.excluirCliente(id),
+                "Cliente excluído"
         ));
     }
 
@@ -155,6 +175,7 @@ public class AdminController {
 
     @PatchMapping("/avaliacoes/{id}/aprovar")
     public ResponseEntity<ApiResponse<Map<String, Object>>> aprovarAvaliacao(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/avaliacoes/{}/aprovar - Aprovando avaliação", id);
         return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.aprovarAvaliacao(id), "Avaliação aprovada"));
     }
 
@@ -165,6 +186,7 @@ public class AdminController {
 
     @PatchMapping("/avaliacoes/{id}/rejeitar")
     public ResponseEntity<ApiResponse<Map<String, Object>>> rejeitarAvaliacao(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/avaliacoes/{}/rejeitar - Rejeitando avaliação", id);
         return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.rejeitarAvaliacao(id), "Avaliação rejeitada"));
     }
 
@@ -183,6 +205,7 @@ public class AdminController {
 
     @PatchMapping("/trocas/{id}/autorizar")
     public ResponseEntity<ApiResponse<Map<String, Object>>> autorizarTroca(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/trocas/{}/autorizar - Autorizando troca", id);
         return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.autorizarTroca(id), "Troca autorizada"));
     }
 
@@ -191,6 +214,7 @@ public class AdminController {
             @PathVariable Long id,
             @RequestBody Map<String, Object> payload
     ) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/trocas/{}/confirmar-recebimento - Confirmando recebimento de troca", id);
         return ResponseEntity.ok(
                 ApiResponse.success(adminWorkflowService.confirmarRecebimentoTroca(id, payload), "Troca finalizada, cupom gerado")
         );

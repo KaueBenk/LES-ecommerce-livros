@@ -41,6 +41,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
+import lombok.extern.slf4j.Slf4j;
+
+@Slf4j
 @Service
 public class AdminService {
 
@@ -100,6 +103,7 @@ public class AdminService {
 
         livroRepository.findByIsbn(livro.getIsbn())
                 .ifPresent(existing -> {
+                    log.warn("[ADMIN-INVENTARIO] Tentativa de criar livro com ISBN duplicado - ISBN: {}", livro.getIsbn());
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ISBN já cadastrado.");
                 });
 
@@ -109,13 +113,24 @@ public class AdminService {
 
         Livro saved = livroRepository.save(livro);
         transacaoLogService.registrar("LIVRO", saved.getId(), OperacaoLog.INSERT, null, toLivroSnapshot(saved));
+        
+        log.info("[ADMIN-INVENTARIO] Produto criado - ProdutoID: {} - Titulo: {} - ISBN: {} - Autor: {} - Editora: {}", 
+                saved.getId(), 
+                saved.getTitulo(), 
+                saved.getIsbn(),
+                saved.getAutor() != null ? saved.getAutor().getNome() : "N/A",
+                saved.getEditora() != null ? saved.getEditora().getNome() : "N/A");
+        
         return saved;
     }
 
     @Transactional
     public void updateLivro(Long id, Map<String, Object> request) {
         Livro livro = livroRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado."));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-INVENTARIO] Tentativa de atualizar livro inexistente - ProdutoID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado.");
+                });
         Map<String, Object> snapshotAnterior = toLivroSnapshot(livro);
 
         String isbnRequest = asString(request.get("isbn"));
@@ -123,6 +138,7 @@ public class AdminService {
             String normalized = normalizeIsbn(isbnRequest);
             livroRepository.findByIsbn(normalized).ifPresent(existing -> {
                 if (!existing.getId().equals(id)) {
+                    log.warn("[ADMIN-INVENTARIO] Tentativa de atualizar livro com ISBN duplicado - ProdutoID: {} - ISBN: {}", id, normalized);
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ISBN já cadastrado.");
                 }
             });
@@ -131,12 +147,17 @@ public class AdminService {
         applyLivroPayload(livro, request, true);
         Livro saved = livroRepository.save(livro);
         transacaoLogService.registrar("LIVRO", saved.getId(), OperacaoLog.UPDATE, snapshotAnterior, toLivroSnapshot(saved));
+        
+        log.info("[ADMIN-INVENTARIO] Produto atualizado - ProdutoID: {} - Titulo: {}", saved.getId(), saved.getTitulo());
     }
 
     @Transactional
     public void inativarLivro(Long id, Map<String, Object> req) {
         Livro livro = livroRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado."));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-INVENTARIO] Tentativa de inativar livro inexistente - ProdutoID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado.");
+                });
         Map<String, Object> snapshotAnterior = toLivroSnapshot(livro);
 
         String motivo = firstNonBlank(
@@ -144,16 +165,21 @@ public class AdminService {
                 asString(req.get("motivoInativacao"))
         );
         if (motivo == null) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de inativar livro sem motivo - ProdutoID: {}", id);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Motivo de inativação é obrigatório.");
         }
 
         Long categoriaId = extractId(req, "categoriaInativacaoId", "categoriaInativacao");
         if (categoriaId == null) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de inativar livro sem categoria - ProdutoID: {}", id);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria de inativação é obrigatória.");
         }
 
         CategoriaInativacao categoria = categoriaInativacaoRepository.findById(categoriaId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria de inativação inválida."));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-INVENTARIO] Categoria de inativação inválida - ProdutoID: {} - CategoriaID: {}", id, categoriaId);
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria de inativação inválida.");
+                });
 
         livro.setAtivo(false);
         livro.setMotivoInativacao(motivo);
@@ -161,12 +187,21 @@ public class AdminService {
 
         Livro saved = livroRepository.save(livro);
         transacaoLogService.registrar("LIVRO", saved.getId(), OperacaoLog.UPDATE, snapshotAnterior, toLivroSnapshot(saved));
+        
+        log.info("[ADMIN-INVENTARIO] Produto inativado - ProdutoID: {} - Titulo: {} - Motivo: {} - Categoria: {}", 
+                saved.getId(), 
+                saved.getTitulo(), 
+                motivo, 
+                categoria.getDescricao());
     }
 
     @Transactional
     public void ativarLivro(Long id, Map<String, Object> req) {
         Livro livro = livroRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado."));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-INVENTARIO] Tentativa de ativar livro inexistente - ProdutoID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado.");
+                });
         Map<String, Object> snapshotAnterior = toLivroSnapshot(livro);
 
         String motivo = firstNonBlank(
@@ -174,16 +209,21 @@ public class AdminService {
                 asString(req.get("motivoAtivacao"))
         );
         if (motivo == null) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de ativar livro sem motivo - ProdutoID: {}", id);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Motivo de ativação é obrigatório.");
         }
 
         Long categoriaId = extractId(req, "categoriaAtivacaoId", "categoriaAtivacao");
         if (categoriaId == null) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de ativar livro sem categoria - ProdutoID: {}", id);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria de ativação é obrigatória.");
         }
 
         CategoriaAtivacao categoria = categoriaAtivacaoRepository.findById(categoriaId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria de ativação inválida."));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-INVENTARIO] Categoria de ativação inválida - ProdutoID: {} - CategoriaID: {}", id, categoriaId);
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Categoria de ativação inválida.");
+                });
 
         livro.setAtivo(true);
         livro.setMotivoAtivacao(motivo);
@@ -191,6 +231,12 @@ public class AdminService {
 
         Livro saved = livroRepository.save(livro);
         transacaoLogService.registrar("LIVRO", saved.getId(), OperacaoLog.UPDATE, snapshotAnterior, toLivroSnapshot(saved));
+        
+        log.info("[ADMIN-INVENTARIO] Produto ativado - ProdutoID: {} - Titulo: {} - Motivo: {} - Categoria: {}", 
+                saved.getId(), 
+                saved.getTitulo(), 
+                motivo, 
+                categoria.getDescricao());
     }
 
     public List<GrupoPrecificacao> getPricingGroups() {
@@ -216,18 +262,37 @@ public class AdminService {
         BigDecimal valorCusto = asBigDecimal(request.get("valorCusto"));
         LocalDate dataEntrada = asLocalDate(request.get("dataEntrada"));
 
-        if (livroId == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Livro é obrigatório.");
-        if (fornecedorId == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fornecedor é obrigatório.");
-        if (quantidade == null || quantidade <= 0) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade inválida.");
+        if (livroId == null) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de criar entrada de estoque sem livro");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Livro é obrigatório.");
+        }
+        if (fornecedorId == null) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de criar entrada de estoque sem fornecedor - ProdutoID: {}", livroId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Fornecedor é obrigatório.");
+        }
+        if (quantidade == null || quantidade <= 0) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de criar entrada de estoque com quantidade inválida - ProdutoID: {} - Quantidade: {}", livroId, quantidade);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Quantidade inválida.");
+        }
         if (valorCusto == null || valorCusto.compareTo(BigDecimal.ZERO) <= 0) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de criar entrada de estoque com valor de custo inválido - ProdutoID: {} - ValorCusto: {}", livroId, valorCusto);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Valor de custo inválido.");
         }
-        if (dataEntrada == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data de entrada é obrigatória.");
+        if (dataEntrada == null) {
+            log.warn("[ADMIN-INVENTARIO] Tentativa de criar entrada de estoque sem data - ProdutoID: {}", livroId);
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data de entrada é obrigatória.");
+        }
 
         Livro livro = livroRepository.findById(livroId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado."));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-INVENTARIO] Tentativa de criar entrada de estoque para livro inexistente - ProdutoID: {}", livroId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado.");
+                });
         Fornecedor fornecedor = fornecedorRepository.findById(fornecedorId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Fornecedor não encontrado."));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-INVENTARIO] Fornecedor não encontrado - ProdutoID: {} - FornecedorID: {}", livroId, fornecedorId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Fornecedor não encontrado.");
+                });
 
         EntradaEstoque entrada = new EntradaEstoque();
         entrada.setLivro(livro);
@@ -254,12 +319,21 @@ public class AdminService {
         estoque.setQuantidadeBloqueada(bloqueado);
         estoque.setQuantidadeDisponivel(Math.max(0, totalAtualizado - bloqueado));
         estoqueRepository.save(estoque);
+        
+        log.info("[ADMIN-INVENTARIO] Estoque atualizado - ProdutoID: {} - Titulo: {} - Anterior: {} - Entrada: {} - Novo: {} - Disponível: {}", 
+                livroId, 
+                livro.getTitulo(), 
+                totalAnterior, 
+                quantidade, 
+                totalAtualizado,
+                estoque.getQuantidadeDisponivel());
 
         if (livro.getGrupoPrecificacao() != null && livro.getGrupoPrecificacao().getMargemLucro() != null) {
             BigDecimal margem = livro.getGrupoPrecificacao().getMargemLucro();
             BigDecimal novoValorVenda = valorCusto.add(valorCusto.multiply(margem));
             if (livro.getValorVenda() == null || novoValorVenda.compareTo(livro.getValorVenda()) > 0) {
                 Map<String, Object> snapshotAnterior = toLivroSnapshot(livro);
+                BigDecimal valorVendaAnterior = livro.getValorVenda();
                 livro.setValorVenda(novoValorVenda);
                 Livro updated = livroRepository.save(livro);
                 transacaoLogService.registrar(
@@ -269,6 +343,11 @@ public class AdminService {
                         snapshotAnterior,
                         toLivroSnapshot(updated)
                 );
+                log.info("[ADMIN-INVENTARIO] Preço atualizado automaticamente - ProdutoID: {} - PreçoAnterior: {} - NovoPreço: {} - Margem: {}", 
+                        livroId, 
+                        valorVendaAnterior, 
+                        novoValorVenda, 
+                        margem);
             }
         }
 
@@ -281,10 +360,15 @@ public class AdminService {
         BigDecimal valorMinimo = parametroSistemaService.getBigDecimal(PARAM_INATIVACAO_VENDA_MINIMA, BigDecimal.ZERO);
         CategoriaInativacao categoriaAutomatica = categoriaInativacaoRepository
                 .findFirstByDescricaoIgnoreCase(CATEGORIA_INATIVACAO_AUTOMATICA)
-                .orElseThrow(() -> new ResponseStatusException(
-                        HttpStatus.INTERNAL_SERVER_ERROR,
-                        "Categoria de inativação automática não configurada."
-                ));
+                .orElseThrow(() -> {
+                    log.error("[ADMIN-INVENTARIO] Categoria de inativação automática não configurada no sistema");
+                    return new ResponseStatusException(
+                            HttpStatus.INTERNAL_SERVER_ERROR,
+                            "Categoria de inativação automática não configurada."
+                    );
+                });
+
+        log.info("[ADMIN-INVENTARIO] Iniciando inativação automática de livros - ValorMínimoVendas: {}", valorMinimo);
 
         List<StatusPedido> statusAprovados = List.of(
                 StatusPedido.APROVADA,
@@ -330,6 +414,12 @@ public class AdminService {
                     toLivroSnapshot(atualizado)
             );
 
+            log.info("[ADMIN-INVENTARIO] Produto inativado automaticamente - ProdutoID: {} - Titulo: {} - EstoqueDisponível: {} - VendasAprovadas: {}", 
+                    atualizado.getId(), 
+                    atualizado.getTitulo(), 
+                    disponivel, 
+                    vendas);
+
             inativados++;
             Map<String, Object> item = new HashMap<>();
             item.put("livroId", atualizado.getId());
@@ -337,6 +427,8 @@ public class AdminService {
             item.put("vendasAprovadas", vendas);
             livrosInativados.add(item);
         }
+
+        log.info("[ADMIN-INVENTARIO] Inativação automática concluída - Analisados: {} - Inativados: {}", analisados, inativados);
 
         Map<String, Object> response = new HashMap<>();
         response.put("analisados", analisados);
@@ -349,77 +441,120 @@ public class AdminService {
     private void applyLivroPayload(Livro livro, Map<String, Object> request, boolean partial) {
         String titulo = asString(request.get("titulo"));
         if (titulo != null) livro.setTitulo(titulo.trim());
-        if (!partial && isBlank(livro.getTitulo())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Título é obrigatório.");
+        if (!partial && isBlank(livro.getTitulo())) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Título é obrigatório");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Título é obrigatório.");
+        }
 
         Long autorId = extractId(request, "autorId", "autor");
         if (autorId != null) {
             Autor autor = autorRepository.findById(autorId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Autor inválido."));
+                    .orElseThrow(() -> {
+                        log.warn("[ADMIN-INVENTARIO] Validação falhou - Autor inválido - AutorID: {}", autorId);
+                        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Autor inválido.");
+                    });
             livro.setAutor(autor);
         }
-        if (!partial && livro.getAutor() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Autor é obrigatório.");
+        if (!partial && livro.getAutor() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Autor é obrigatório");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Autor é obrigatório.");
+        }
 
         Long editoraId = extractId(request, "editoraId", "editora");
         if (editoraId != null) {
             Editora editora = editoraRepository.findById(editoraId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Editora inválida."));
+                    .orElseThrow(() -> {
+                        log.warn("[ADMIN-INVENTARIO] Validação falhou - Editora inválida - EditoraID: {}", editoraId);
+                        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Editora inválida.");
+                    });
             livro.setEditora(editora);
         }
-        if (!partial && livro.getEditora() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Editora é obrigatória.");
+        if (!partial && livro.getEditora() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Editora é obrigatória");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Editora é obrigatória.");
+        }
 
         Integer ano = asInteger(request.get("ano"));
         if (ano != null) livro.setAno(ano);
-        if (!partial && livro.getAno() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ano é obrigatório.");
+        if (!partial && livro.getAno() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Ano é obrigatório");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ano é obrigatório.");
+        }
 
         String edicao = asString(request.get("edicao"));
         if (edicao != null) livro.setEdicao(edicao.trim());
-        if (!partial && isBlank(livro.getEdicao())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Edição é obrigatória.");
+        if (!partial && isBlank(livro.getEdicao())) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Edição é obrigatória");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Edição é obrigatória.");
+        }
 
         String isbn = asString(request.get("isbn"));
         if (isbn != null) livro.setIsbn(normalizeIsbn(isbn));
-        if (!partial && isBlank(livro.getIsbn())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ISBN é obrigatório.");
+        if (!partial && isBlank(livro.getIsbn())) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - ISBN é obrigatório");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "ISBN é obrigatório.");
+        }
 
         Integer numeroPaginas = asInteger(request.get("numeroPaginas"));
         if (numeroPaginas != null) livro.setNumeroPaginas(numeroPaginas);
         if (!partial && livro.getNumeroPaginas() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Número de páginas é obrigatório");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Número de páginas é obrigatório.");
         }
 
         String sinopse = asString(request.get("sinopse"));
         if (sinopse != null) livro.setSinopse(sinopse.trim());
-        if (!partial && isBlank(livro.getSinopse())) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sinopse é obrigatória.");
+        if (!partial && isBlank(livro.getSinopse())) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Sinopse é obrigatória");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Sinopse é obrigatória.");
+        }
 
         Double altura = asDouble(request.get("altura"));
         if (altura != null) livro.setAltura(altura);
-        if (!partial && livro.getAltura() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Altura é obrigatória.");
+        if (!partial && livro.getAltura() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Altura é obrigatória");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Altura é obrigatória.");
+        }
 
         Double largura = asDouble(request.get("largura"));
         if (largura != null) livro.setLargura(largura);
-        if (!partial && livro.getLargura() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Largura é obrigatória.");
+        if (!partial && livro.getLargura() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Largura é obrigatória");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Largura é obrigatória.");
+        }
 
         Double profundidade = asDouble(request.get("profundidade"));
         if (profundidade != null) livro.setProfundidade(profundidade);
         if (!partial && livro.getProfundidade() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Profundidade é obrigatória");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Profundidade é obrigatória.");
         }
 
         Double peso = asDouble(request.get("peso"));
         if (peso != null) livro.setPeso(peso);
-        if (!partial && livro.getPeso() == null) throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Peso é obrigatório.");
+        if (!partial && livro.getPeso() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Peso é obrigatório");
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Peso é obrigatório.");
+        }
 
         String codigoBarras = asString(request.get("codigoBarras"));
         if (codigoBarras != null) livro.setCodigoBarras(codigoBarras.trim());
         if (!partial && isBlank(livro.getCodigoBarras())) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Código de barras é obrigatório");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código de barras é obrigatório.");
         }
 
         Long grupoPrecificacaoId = extractId(request, "grupoPrecificacaoId", "grupoPrecificacao");
         if (grupoPrecificacaoId != null) {
             GrupoPrecificacao grupo = grupoPrecificacaoRepository.findById(grupoPrecificacaoId)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Grupo de precificação inválido."));
+                    .orElseThrow(() -> {
+                        log.warn("[ADMIN-INVENTARIO] Validação falhou - Grupo de precificação inválido - GrupoID: {}", grupoPrecificacaoId);
+                        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Grupo de precificação inválido.");
+                    });
             livro.setGrupoPrecificacao(grupo);
         }
         if (!partial && livro.getGrupoPrecificacao() == null) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Grupo de precificação é obrigatório");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Grupo de precificação é obrigatório.");
         }
 
@@ -427,6 +562,7 @@ public class AdminService {
         if (!categoriaIds.isEmpty()) {
             List<Categoria> categorias = categoriaRepository.findAllById(categoriaIds);
             if (categorias.size() != categoriaIds.size()) {
+                log.warn("[ADMIN-INVENTARIO] Validação falhou - Uma ou mais categorias são inválidas - CategoriaIDs: {}", categoriaIds);
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Uma ou mais categorias são inválidas.");
             }
             livro.setCategorias(new HashSet<>(categorias));
@@ -434,6 +570,7 @@ public class AdminService {
             livro.setCategorias(new HashSet<>());
         }
         if (!partial && (livro.getCategorias() == null || livro.getCategorias().isEmpty())) {
+            log.warn("[ADMIN-INVENTARIO] Validação falhou - Ao menos uma categoria é obrigatória");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Ao menos uma categoria é obrigatória.");
         }
 

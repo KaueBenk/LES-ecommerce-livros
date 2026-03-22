@@ -4,6 +4,7 @@ import com.kauebenk.lesecommercelivros.dto.ApiResponse;
 import com.kauebenk.lesecommercelivros.dto.PaginatedResponse;
 import com.kauebenk.lesecommercelivros.entity.Livro;
 import com.kauebenk.lesecommercelivros.service.LivroService;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
@@ -11,6 +12,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.Map;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/livros")
 public class LivroController {
@@ -53,6 +55,7 @@ public class LivroController {
             @PathVariable Long id,
             @RequestBody Map<String, Object> payload
     ) {
+        log.info("[LIVRO-CTRL] POST /api/v1/livros/{}/avaliacoes - Criando nova avaliação", id);
         return ResponseEntity
                 .status(201)
                 .body(ApiResponse.created(livroService.criarAvaliacao(id, payload), "Avaliação enviada para moderação"));

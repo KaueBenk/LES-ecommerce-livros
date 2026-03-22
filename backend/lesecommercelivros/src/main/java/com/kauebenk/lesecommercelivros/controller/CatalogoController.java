@@ -7,6 +7,7 @@ import com.kauebenk.lesecommercelivros.entity.Editora;
 import com.kauebenk.lesecommercelivros.repository.AutorRepository;
 import com.kauebenk.lesecommercelivros.repository.CategoriaRepository;
 import com.kauebenk.lesecommercelivros.repository.EditoraRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.GetMapping;
@@ -15,6 +16,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
+@Slf4j
 @RestController
 @RequestMapping("/api/v1/catalogo")
 public class CatalogoController {

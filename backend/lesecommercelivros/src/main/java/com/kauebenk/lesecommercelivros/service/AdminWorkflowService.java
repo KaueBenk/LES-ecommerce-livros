@@ -15,11 +15,15 @@ import com.kauebenk.lesecommercelivros.entity.enums.OperacaoLog;
 import com.kauebenk.lesecommercelivros.entity.enums.StatusPedido;
 import com.kauebenk.lesecommercelivros.entity.enums.StatusTroca;
 import com.kauebenk.lesecommercelivros.repository.AvaliacaoRepository;
+import com.kauebenk.lesecommercelivros.repository.CarrinhoCompraRepository;
 import com.kauebenk.lesecommercelivros.repository.ClienteRepository;
 import com.kauebenk.lesecommercelivros.repository.CupomTrocaRepository;
 import com.kauebenk.lesecommercelivros.repository.EstoqueRepository;
+import com.kauebenk.lesecommercelivros.repository.ItemCarrinhoRepository;
+import com.kauebenk.lesecommercelivros.repository.NotificacaoRepository;
 import com.kauebenk.lesecommercelivros.repository.PedidoRepository;
 import com.kauebenk.lesecommercelivros.repository.SolicitacaoTrocaRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
@@ -43,6 +47,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Slf4j
 @Service
 @Transactional
 public class AdminWorkflowService {
@@ -66,6 +71,15 @@ public class AdminWorkflowService {
     private CupomTrocaRepository cupomTrocaRepository;
 
     @Autowired
+    private CarrinhoCompraRepository carrinhoCompraRepository;
+
+    @Autowired
+    private ItemCarrinhoRepository itemCarrinhoRepository;
+
+    @Autowired
+    private NotificacaoRepository notificacaoRepository;
+
+    @Autowired
     private NotificacaoService notificacaoService;
 
     @Autowired
@@ -83,9 +97,14 @@ public class AdminWorkflowService {
 
     public Map<String, Object> despacharPedido(Long pedidoId) {
         Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Pedido não encontrado - PedidoID: {}", pedidoId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado");
+                });
         StatusPedido statusAnterior = pedido.getStatus();
         if (pedido.getStatus() != StatusPedido.APROVADA) {
+            log.warn("[ADMIN-WORKFLOW] Validação falhou ao despachar - PedidoID: {} - Status atual: {} - Esperado: APROVADA", 
+                    pedidoId, pedido.getStatus());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Apenas pedidos APROVADA podem ser despachados"
@@ -93,6 +112,9 @@ public class AdminWorkflowService {
         }
         pedido.setStatus(StatusPedido.EM_TRANSITO);
         pedidoRepository.save(pedido);
+
+        String clienteEmail = pedido.getCliente() != null ? pedido.getCliente().getEmail() : "desconhecido";
+        log.info("[ADMIN-WORKFLOW] Pedido despachado - PedidoID: {} - Cliente: {}", pedidoId, clienteEmail);
 
         if (pedido.getCliente() != null) {
             notificacaoService.criar(
@@ -117,9 +139,14 @@ public class AdminWorkflowService {
 
     public Map<String, Object> entregarPedido(Long pedidoId) {
         Pedido pedido = pedidoRepository.findById(pedidoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Pedido não encontrado - PedidoID: {}", pedidoId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado");
+                });
         StatusPedido statusAnterior = pedido.getStatus();
         if (pedido.getStatus() != StatusPedido.EM_TRANSITO) {
+            log.warn("[ADMIN-WORKFLOW] Validação falhou ao entregar - PedidoID: {} - Status atual: {} - Esperado: EM_TRANSITO", 
+                    pedidoId, pedido.getStatus());
             throw new ResponseStatusException(
                     HttpStatus.BAD_REQUEST,
                     "Apenas pedidos EM_TRANSITO podem ser marcados como entregues"
@@ -127,6 +154,9 @@ public class AdminWorkflowService {
         }
         pedido.setStatus(StatusPedido.ENTREGUE);
         pedidoRepository.save(pedido);
+
+        String clienteEmail = pedido.getCliente() != null ? pedido.getCliente().getEmail() : "desconhecido";
+        log.info("[ADMIN-WORKFLOW] Pedido entregue - PedidoID: {} - Cliente: {}", pedidoId, clienteEmail);
 
         if (pedido.getCliente() != null) {
             notificacaoService.criar(
@@ -172,16 +202,26 @@ public class AdminWorkflowService {
     @Transactional(readOnly = true)
     public Map<String, Object> getCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Cliente não encontrado - ClienteID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado");
+                });
         return toClienteDetalheResponse(cliente);
     }
 
     public Map<String, Object> inativarCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Cliente não encontrado para inativar - ClienteID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado");
+                });
         Map<String, Object> snapshotAnterior = toClienteStatusSnapshot(cliente);
         cliente.setAtivo(false);
         Cliente saved = clienteRepository.save(cliente);
+        
+        log.info("[ADMIN-WORKFLOW] Cliente inativado - ClienteID: {} - Email: {}", 
+                saved.getId(), saved.getEmail());
+        
         transacaoLogService.registrar(
                 "CLIENTE",
                 saved.getId(),
@@ -194,10 +234,17 @@ public class AdminWorkflowService {
 
     public Map<String, Object> ativarCliente(Long id) {
         Cliente cliente = clienteRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Cliente não encontrado para ativar - ClienteID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado");
+                });
         Map<String, Object> snapshotAnterior = toClienteStatusSnapshot(cliente);
         cliente.setAtivo(true);
         Cliente saved = clienteRepository.save(cliente);
+        
+        log.info("[ADMIN-WORKFLOW] Cliente ativado - ClienteID: {} - Email: {}", 
+                saved.getId(), saved.getEmail());
+        
         transacaoLogService.registrar(
                 "CLIENTE",
                 saved.getId(),
@@ -206,6 +253,41 @@ public class AdminWorkflowService {
                 toClienteStatusSnapshot(saved)
         );
         return Map.of("id", saved.getId(), "ativo", saved.getAtivo());
+    }
+
+    public Map<String, Object> excluirCliente(Long id) {
+        log.info("[ADMIN-WORKFLOW] Iniciando exclusão de cliente - ClienteID: {}", id);
+        
+        Cliente cliente = clienteRepository.findById(id)
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Cliente não encontrado para exclusão - ClienteID: {}", id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cliente não encontrado");
+                });
+
+        validateClienteSemDependenciasParaExclusao(id);
+
+        String clienteEmail = cliente.getEmail();
+        String clienteNome = cliente.getNome();
+        Map<String, Object> snapshotAnterior = toClienteDeleteSnapshot(cliente);
+        
+        log.info("[ADMIN-WORKFLOW] Removendo dados relacionados ao cliente - ClienteID: {} - Email: {}", id, clienteEmail);
+        itemCarrinhoRepository.deleteAllByClienteIdQuery(id);
+        carrinhoCompraRepository.deleteAllByClienteId(id);
+        
+        log.info("[ADMIN-WORKFLOW] Executando exclusão do cliente - ClienteID: {} - Nome: {} - Email: {}", 
+                id, clienteNome, clienteEmail);
+        clienteRepository.delete(cliente);
+        
+        log.info("[ADMIN-WORKFLOW] Cliente excluído com sucesso - ClienteID: {} - Email: {}", id, clienteEmail);
+        
+        transacaoLogService.registrar(
+                "CLIENTE",
+                id,
+                OperacaoLog.UPDATE,
+                snapshotAnterior,
+                null
+        );
+        return Map.of("id", id, "excluido", true);
     }
 
     @Transactional(readOnly = true)
@@ -219,9 +301,17 @@ public class AdminWorkflowService {
 
     public Map<String, Object> aprovarAvaliacao(Long avaliacaoId) {
         Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Avaliação não encontrada - AvaliacaoID: {}", avaliacaoId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada");
+                });
         avaliacao.setAprovada(true);
         avaliacaoRepository.save(avaliacao);
+
+        String clienteEmail = avaliacao.getCliente() != null ? avaliacao.getCliente().getEmail() : "desconhecido";
+        String livroTitulo = avaliacao.getLivro() != null ? avaliacao.getLivro().getTitulo() : "desconhecido";
+        log.info("[ADMIN-WORKFLOW] Avaliação aprovada - AvaliacaoID: {} - Cliente: {} - Livro: {}", 
+                avaliacaoId, clienteEmail, livroTitulo);
 
         if (avaliacao.getCliente() != null && avaliacao.getLivro() != null) {
             notificacaoService.criar(
@@ -238,9 +328,17 @@ public class AdminWorkflowService {
 
     public Map<String, Object> rejeitarAvaliacao(Long avaliacaoId) {
         Avaliacao avaliacao = avaliacaoRepository.findById(avaliacaoId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Avaliação não encontrada - AvaliacaoID: {}", avaliacaoId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Avaliação não encontrada");
+                });
         avaliacao.setAprovada(false);
         avaliacaoRepository.save(avaliacao);
+
+        String clienteEmail = avaliacao.getCliente() != null ? avaliacao.getCliente().getEmail() : "desconhecido";
+        String livroTitulo = avaliacao.getLivro() != null ? avaliacao.getLivro().getTitulo() : "desconhecido";
+        log.info("[ADMIN-WORKFLOW] Avaliação rejeitada - AvaliacaoID: {} - Cliente: {} - Livro: {}", 
+                avaliacaoId, clienteEmail, livroTitulo);
 
         if (avaliacao.getCliente() != null && avaliacao.getLivro() != null) {
             notificacaoService.criar(
@@ -267,13 +365,23 @@ public class AdminWorkflowService {
 
     public Map<String, Object> autorizarTroca(Long trocaId) {
         SolicitacaoTroca troca = solicitacaoTrocaRepository.findById(trocaId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Troca não encontrada"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Troca não encontrada - TrocaID: {}", trocaId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Troca não encontrada");
+                });
         StatusTroca statusAnteriorTroca = troca.getStatus();
         if (troca.getStatus() != StatusTroca.EM_TROCA) {
+            log.warn("[ADMIN-WORKFLOW] Validação falhou - TrocaID: {} - Status atual: {} - Esperado: EM_TROCA", 
+                    trocaId, troca.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Troca deve estar EM_TROCA");
         }
         troca.setStatus(StatusTroca.TROCA_AUTORIZADA);
         solicitacaoTrocaRepository.save(troca);
+
+        String clienteEmail = troca.getPedido() != null && troca.getPedido().getCliente() != null 
+                ? troca.getPedido().getCliente().getEmail() : "desconhecido";
+        log.info("[ADMIN-WORKFLOW] Troca autorizada - TrocaID: {} - Cliente: {} - PedidoID: {}", 
+                trocaId, clienteEmail, troca.getPedido() != null ? troca.getPedido().getId() : null);
 
         transacaoLogService.registrar(
                 "SOLICITACAO_TROCA",
@@ -311,9 +419,14 @@ public class AdminWorkflowService {
 
     public Map<String, Object> confirmarRecebimentoTroca(Long trocaId, Map<String, Object> payload) {
         SolicitacaoTroca troca = solicitacaoTrocaRepository.findById(trocaId)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Troca não encontrada"));
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Troca não encontrada - TrocaID: {}", trocaId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Troca não encontrada");
+                });
         StatusTroca statusAnteriorTroca = troca.getStatus();
         if (troca.getStatus() != StatusTroca.TROCA_AUTORIZADA) {
+            log.warn("[ADMIN-WORKFLOW] Validação falhou - TrocaID: {} - Status atual: {} - Esperado: TROCA_AUTORIZADA", 
+                    trocaId, troca.getStatus());
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Troca deve estar TROCA_AUTORIZADA");
         }
 
@@ -367,6 +480,10 @@ public class AdminWorkflowService {
         );
 
         Pedido pedido = troca.getPedido();
+        String clienteEmail = pedido != null && pedido.getCliente() != null 
+                ? pedido.getCliente().getEmail() : "desconhecido";
+        String cupomCodigo = null;
+        
         if (pedido != null) {
             StatusPedido statusAnteriorPedido = pedido.getStatus();
             pedido.setStatus(StatusPedido.TROCADO);
@@ -386,6 +503,11 @@ public class AdminWorkflowService {
                 cupomTroca.setUtilizado(false);
                 cupomTroca.setDataGeracao(LocalDateTime.now());
                 cupomTrocaRepository.save(cupomTroca);
+                cupomCodigo = "CUPOM-" + cupomTroca.getId();
+                
+                log.info("[ADMIN-WORKFLOW] Troca finalizada - TrocaID: {} - Cliente: {} - Cupom gerado: {} - Valor: {}", 
+                        trocaId, clienteEmail, cupomCodigo, valorCupom);
+                
                 transacaoLogService.registrar(
                         "CUPOM_TROCA",
                         cupomTroca.getId(),
@@ -409,6 +531,11 @@ public class AdminWorkflowService {
             }
         }
 
+        if (cupomCodigo == null) {
+            log.info("[ADMIN-WORKFLOW] Troca finalizada sem cupom - TrocaID: {} - Cliente: {}", 
+                    trocaId, clienteEmail);
+        }
+
         return Map.of("status", StatusTroca.TROCADO.name());
     }
 
@@ -417,6 +544,8 @@ public class AdminWorkflowService {
         LocalDate inicio = parseDate(dataInicio, "dataInicio");
         LocalDate fim = parseDate(dataFim, "dataFim");
         if (fim.isBefore(inicio)) {
+            log.warn("[ADMIN-WORKFLOW] Validação de data falhou em análise de vendas - DataInicio: {} - DataFim: {}", 
+                    inicio, fim);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data fim deve ser maior ou igual à data início");
         }
 
@@ -478,6 +607,8 @@ public class AdminWorkflowService {
         LocalDate inicio = parseDate(dataInicio, "dataInicio");
         LocalDate fim = parseDate(dataFim, "dataFim");
         if (fim.isBefore(inicio)) {
+            log.warn("[ADMIN-WORKFLOW] Validação de data falhou em análise por região - DataInicio: {} - DataFim: {}", 
+                    inicio, fim);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data fim deve ser maior ou igual à data início");
         }
 
@@ -606,6 +737,41 @@ public class AdminWorkflowService {
         return snapshot;
     }
 
+    private Map<String, Object> toClienteDeleteSnapshot(Cliente cliente) {
+        Map<String, Object> snapshot = toClienteStatusSnapshot(cliente);
+        snapshot.put("cpf", cliente.getCpf());
+        snapshot.put("ranking", cliente.getRanking());
+        return snapshot;
+    }
+
+    private void validateClienteSemDependenciasParaExclusao(Long clienteId) {
+        List<String> dependencias = new ArrayList<>();
+        if (pedidoRepository.existsByClienteId(clienteId)) {
+            dependencias.add("pedidos");
+        }
+        if (avaliacaoRepository.existsByClienteId(clienteId)) {
+            dependencias.add("avaliações");
+        }
+        if (carrinhoCompraRepository.existsItemsByClienteId(clienteId)) {
+            dependencias.add("carrinho");
+        }
+        if (!cupomTrocaRepository.findByClienteId(clienteId).isEmpty()) {
+            dependencias.add("cupons de troca");
+        }
+        if (notificacaoRepository.existsByClienteId(clienteId)) {
+            dependencias.add("notificações");
+        }
+        if (!dependencias.isEmpty()) {
+            String deps = String.join(", ", dependencias);
+            log.warn("[ADMIN-WORKFLOW] Tentativa de excluir cliente com dependências - ClienteID: {} - Dependências: {}", 
+                    clienteId, deps);
+            throw new ResponseStatusException(
+                    HttpStatus.CONFLICT,
+                    "Não é possível excluir cliente com vínculos: " + deps
+            );
+        }
+    }
+
     private Map<String, Object> toEnderecoResponse(Endereco endereco) {
         Map<String, Object> map = new HashMap<>();
         map.put("id", endereco.getId());
@@ -721,6 +887,7 @@ public class AdminWorkflowService {
             }
             return StatusPedido.valueOf(normalized);
         } catch (IllegalArgumentException ex) {
+            log.warn("[ADMIN-WORKFLOW] Status de pedido inválido: {}", rawStatus);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status de pedido inválido");
         }
     }
@@ -730,6 +897,7 @@ public class AdminWorkflowService {
         try {
             return StatusTroca.valueOf(rawStatus.trim().toUpperCase(Locale.ROOT));
         } catch (IllegalArgumentException ex) {
+            log.warn("[ADMIN-WORKFLOW] Status de troca inválido: {}", rawStatus);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Status de troca inválido");
         }
     }
@@ -738,6 +906,7 @@ public class AdminWorkflowService {
         try {
             return LocalDate.parse(raw);
         } catch (Exception ex) {
+            log.warn("[ADMIN-WORKFLOW] Data inválida - Campo: {} - Valor: {}", field, raw);
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, field + " inválida");
         }
     }

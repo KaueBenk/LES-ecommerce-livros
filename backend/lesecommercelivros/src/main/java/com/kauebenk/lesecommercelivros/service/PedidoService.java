@@ -11,6 +11,7 @@ import com.kauebenk.lesecommercelivros.repository.ClienteRepository;
 import com.kauebenk.lesecommercelivros.repository.ItemPedidoRepository;
 import com.kauebenk.lesecommercelivros.repository.PedidoRepository;
 import com.kauebenk.lesecommercelivros.repository.SolicitacaoTrocaRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 public class PedidoService {
@@ -100,10 +102,18 @@ public class PedidoService {
         troca.setItensDevolvidos(itensTroca);
         troca.setStatus(StatusTroca.EM_TROCA);
         troca.setDataSolicitacao(LocalDateTime.now());
+        
+        log.info("[TROCA] Iniciando criação de solicitação de troca - PedidoID: {} - Cliente: {} - TotalItens: {}", 
+                pedido.getId(), cliente.getEmail(), itensTroca.size());
         troca = solicitacaoTrocaRepository.save(troca);
+        log.info("[TROCA] Solicitação de troca criada com sucesso - TrocaID: {} - PedidoID: {}", 
+                troca.getId(), pedido.getId());
 
+        log.info("[PEDIDO] Atualizando status do pedido para EM_TROCA - PedidoID: {}", pedido.getId());
         pedido.setStatus(StatusPedido.EM_TROCA);
         pedidoRepository.save(pedido);
+        log.info("[PEDIDO] Status do pedido atualizado - PedidoID: {} - NovoStatus: {}", 
+                pedido.getId(), StatusPedido.EM_TROCA);
 
         notificacaoService.criar(
                 cliente,

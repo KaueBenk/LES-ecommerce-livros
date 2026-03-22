@@ -8,6 +8,7 @@ import com.kauebenk.lesecommercelivros.repository.AvaliacaoRepository;
 import com.kauebenk.lesecommercelivros.repository.ClienteRepository;
 import com.kauebenk.lesecommercelivros.repository.LivroRepository;
 import com.kauebenk.lesecommercelivros.repository.PedidoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -23,6 +24,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 public class LivroService {
@@ -111,7 +113,12 @@ public class LivroService {
         avaliacao.setTexto(texto);
         avaliacao.setAprovada(false);
         avaliacao.setDataAvaliacao(LocalDateTime.now());
+        
+        log.info("[AVALIACAO] Iniciando criação de avaliação - LivroID: {} - Cliente: {} - Estrelas: {}", 
+                livro.getId(), cliente.getEmail(), estrelas);
         avaliacao = avaliacaoRepository.save(avaliacao);
+        log.info("[AVALIACAO] Avaliação criada com sucesso - AvaliacaoID: {} - LivroID: {} - Cliente: {}", 
+                avaliacao.getId(), livro.getId(), cliente.getEmail());
 
         notificacaoService.criar(
                 cliente,

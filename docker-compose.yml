@@ -31,6 +31,9 @@ services:
       - SPRING_DATASOURCE_PASSWORD=les_password
       - SPRING_JPA_HIBERNATE_DDL_AUTO=update
       - SPRING_SQL_INIT_CONTINUE_ON_ERROR=true
+      # Garante logs visíveis no console do Docker
+      - LOGGING_LEVEL_COM_KAUEBENK_LESECOMMERCELIVROS=INFO
+      - SPRING_OUTPUT_ANSI_ENABLED=ALWAYS
     depends_on:
       - db
     networks:

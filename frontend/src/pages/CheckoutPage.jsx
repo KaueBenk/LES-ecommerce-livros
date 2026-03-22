@@ -10,6 +10,7 @@ import { getErrorMessage } from '../utils/helpers';
 import { ROUTES } from '../utils/constants';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AddressForm from '../components/account/AddressForm';
+import logger from '@utils/logger';
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
 

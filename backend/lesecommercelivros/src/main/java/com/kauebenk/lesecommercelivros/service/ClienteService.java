@@ -15,6 +15,7 @@ import com.kauebenk.lesecommercelivros.repository.ClienteRepository;
 import com.kauebenk.lesecommercelivros.repository.CupomTrocaRepository;
 import com.kauebenk.lesecommercelivros.repository.EnderecoRepository;
 import com.kauebenk.lesecommercelivros.repository.PedidoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -30,6 +31,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 
+@Slf4j
 @Service
 @Transactional
 public class ClienteService {
@@ -69,6 +71,7 @@ public class ClienteService {
         }
 
         clienteRepository.save(current);
+        log.info("[CLIENTE] Perfil atualizado - ClienteID: {} - Email: {}", current.getId(), current.getEmail());
     }
 
     @Transactional(readOnly = true)
@@ -81,13 +84,19 @@ public class ClienteService {
         Cliente current = getAuthenticatedCliente();
         endereco.setId(null);
         endereco.setCliente(current);
-        return enderecoRepository.save(endereco);
+        Endereco saved = enderecoRepository.save(endereco);
+        log.info("[CLIENTE] Endereço adicionado - ClienteID: {} - EnderecoID: {} - CEP: {}", 
+                current.getId(), saved.getId(), saved.getCep());
+        return saved;
     }
 
     public Endereco updateEndereco(Long id, Endereco endereco) {
         Cliente current = getAuthenticatedCliente();
         Endereco existing = enderecoRepository.findByIdAndClienteId(id, current.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CLIENTE] Endereço não encontrado - ClienteID: {} - EnderecoID: {}", current.getId(), id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado");
+                });
 
         if (endereco.getApelido() != null) existing.setApelido(endereco.getApelido());
         if (endereco.getTipoResidencia() != null) existing.setTipoResidencia(endereco.getTipoResidencia());
@@ -102,14 +111,25 @@ public class ClienteService {
         if (endereco.getObservacoes() != null) existing.setObservacoes(endereco.getObservacoes());
         if (endereco.getTipoEndereco() != null) existing.setTipoEndereco(endereco.getTipoEndereco());
 
-        return enderecoRepository.save(existing);
+        Endereco updated = enderecoRepository.save(existing);
+        log.info("[CLIENTE] Endereço atualizado - ClienteID: {} - EnderecoID: {} - CEP: {}", 
+                current.getId(), updated.getId(), updated.getCep());
+        return updated;
     }
 
     public void deleteEndereco(Long id) {
         Cliente current = getAuthenticatedCliente();
+        log.info("[CLIENTE] Iniciando remoção de endereço - ClienteID: {} - EnderecoID: {}", current.getId(), id);
+        
         Endereco existing = enderecoRepository.findByIdAndClienteId(id, current.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CLIENTE] Endereço não encontrado para remoção - ClienteID: {} - EnderecoID: {}", current.getId(), id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Endereço não encontrado");
+                });
+        
         enderecoRepository.delete(existing);
+        log.info("[CLIENTE] Endereço removido com sucesso - ClienteID: {} - EnderecoID: {} - CEP: {}", 
+                current.getId(), id, existing.getCep());
     }
 
     @Transactional(readOnly = true)
@@ -135,13 +155,21 @@ public class ClienteService {
             card.setPreferencial(false);
         }
 
-        return cartaoRepository.save(card);
+        CartaoCredito saved = cartaoRepository.save(card);
+        String ultimos4 = saved.getNumero() != null && saved.getNumero().length() >= 4
+                ? saved.getNumero().substring(saved.getNumero().length() - 4)
+                : "****";
+        log.info("[CLIENTE] Cartão adicionado - ClienteID: {} - Final: ****{}", current.getId(), ultimos4);
+        return saved;
     }
 
     public CartaoCredito updateCartao(Long id, Map<String, Object> payload) {
         Cliente current = getAuthenticatedCliente();
         CartaoCredito existing = cartaoRepository.findByIdAndClienteId(id, current.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cartão não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CLIENTE] Cartão não encontrado - ClienteID: {} - CartaoID: {}", current.getId(), id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cartão não encontrado");
+                });
 
         applyCardPayload(existing, payload, true);
 
@@ -151,24 +179,44 @@ public class ClienteService {
             existing.setPreferencial(true);
         }
 
-        return cartaoRepository.save(existing);
+        CartaoCredito updated = cartaoRepository.save(existing);
+        String ultimos4 = updated.getNumero() != null && updated.getNumero().length() >= 4
+                ? updated.getNumero().substring(updated.getNumero().length() - 4)
+                : "****";
+        log.info("[CLIENTE] Cartão atualizado - ClienteID: {} - CartaoID: {} - Final: ****{}", 
+                current.getId(), updated.getId(), ultimos4);
+        return updated;
     }
 
     public void setCartaoPreferencial(Long id) {
         Cliente current = getAuthenticatedCliente();
         CartaoCredito preferred = cartaoRepository.findByIdAndClienteId(id, current.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cartão não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CLIENTE] Cartão não encontrado para definir como preferencial - ClienteID: {} - CartaoID: {}", 
+                            current.getId(), id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cartão não encontrado");
+                });
 
         List<CartaoCredito> cards = cartaoRepository.findByClienteId(current.getId());
         cards.forEach(c -> c.setPreferencial(Objects.equals(c.getId(), preferred.getId())));
         cartaoRepository.saveAll(cards);
+        log.info("[CLIENTE] Cartão definido como preferencial - ClienteID: {} - CartaoID: {}", current.getId(), id);
     }
 
     public void deleteCartao(Long id) {
         Cliente current = getAuthenticatedCliente();
+        log.info("[CLIENTE] Iniciando remoção de cartão - ClienteID: {} - CartaoID: {}", current.getId(), id);
+        
         CartaoCredito existing = cartaoRepository.findByIdAndClienteId(id, current.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Cartão não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CLIENTE] Cartão não encontrado para remoção - ClienteID: {} - CartaoID: {}", current.getId(), id);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Cartão não encontrado");
+                });
+        
+        String ultimosDigitos = existing.getNumero().substring(Math.max(0, existing.getNumero().length() - 4));
         cartaoRepository.delete(existing);
+        log.info("[CLIENTE] Cartão removido com sucesso - ClienteID: {} - CartaoID: {} - Final: ****{}", 
+                current.getId(), id, ultimosDigitos);
     }
 
     @Transactional(readOnly = true)
@@ -191,10 +239,14 @@ public class ClienteService {
     private Cliente getAuthenticatedCliente() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         if (authentication == null || !authentication.isAuthenticated() || "anonymousUser".equals(authentication.getName())) {
+            log.warn("[CLIENTE] Tentativa de acesso sem autenticação");
             throw new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Usuário não autenticado");
         }
         return clienteRepository.findFirstByEmailIgnoreCaseOrderByIdAsc(authentication.getName())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cliente não encontrado"));
+                .orElseThrow(() -> {
+                    log.warn("[CLIENTE] Cliente não encontrado no banco - Email: {}", authentication.getName());
+                    return new ResponseStatusException(HttpStatus.UNAUTHORIZED, "Cliente não encontrado");
+                });
     }
 
     private void applyCardPayload(CartaoCredito target, Map<String, Object> payload, boolean partial) {
@@ -206,6 +258,7 @@ public class ClienteService {
 
         if (!partial || numero != null) {
             if (numero == null || numero.trim().isEmpty()) {
+                log.warn("[CLIENTE] Validação falhada - Número do cartão vazio ou nulo");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Número do cartão é obrigatório");
             }
             target.setNumero(numero.replaceAll("\\s+", ""));
@@ -213,6 +266,7 @@ public class ClienteService {
 
         if (!partial || nomeImpresso != null) {
             if (nomeImpresso == null || nomeImpresso.trim().isEmpty()) {
+                log.warn("[CLIENTE] Validação falhada - Nome impresso vazio ou nulo");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Nome impresso é obrigatório");
             }
             target.setNomeImpresso(nomeImpresso.trim());
@@ -220,6 +274,7 @@ public class ClienteService {
 
         if (!partial || codigoSeguranca != null) {
             if (codigoSeguranca == null || codigoSeguranca.trim().isEmpty()) {
+                log.warn("[CLIENTE] Validação falhada - Código de segurança vazio ou nulo");
                 throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Código de segurança é obrigatório");
             }
             target.setCodigoSeguranca(codigoSeguranca.trim());
@@ -236,12 +291,16 @@ public class ClienteService {
 
     private Bandeira resolveBandeira(Object raw) {
         if (raw == null) {
+            log.warn("[CLIENTE] Validação falhada - Bandeira é nula");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira é obrigatória");
         }
 
         if (raw instanceof Number number) {
             return bandeiraRepository.findById(number.longValue())
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida"));
+                    .orElseThrow(() -> {
+                        log.warn("[CLIENTE] Validação falhada - Bandeira inválida (ID: {})", number.longValue());
+                        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida");
+                    });
         }
 
         if (raw instanceof Map<?, ?> map) {
@@ -249,27 +308,36 @@ public class ClienteService {
             if (nestedId != null) {
                 Long id = asLong(nestedId);
                 if (id == null) {
+                    log.warn("[CLIENTE] Validação falhada - Bandeira inválida (ID não numérico)");
                     throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida");
                 }
                 return bandeiraRepository.findById(id)
-                        .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida"));
+                        .orElseThrow(() -> {
+                            log.warn("[CLIENTE] Validação falhada - Bandeira inválida (ID: {})", id);
+                            return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida");
+                        });
             }
             Object nestedName = map.get("nome");
             if (nestedName != null) {
                 return findBandeiraByName(String.valueOf(nestedName));
             }
+            log.warn("[CLIENTE] Validação falhada - Bandeira inválida (Map sem id ou nome)");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida");
         }
 
         String value = String.valueOf(raw).trim();
         if (value.isEmpty()) {
+            log.warn("[CLIENTE] Validação falhada - Bandeira inválida (String vazia)");
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida");
         }
 
         if (value.chars().allMatch(Character::isDigit)) {
             Long id = Long.valueOf(value);
             return bandeiraRepository.findById(id)
-                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida"));
+                    .orElseThrow(() -> {
+                        log.warn("[CLIENTE] Validação falhada - Bandeira inválida (ID: {})", id);
+                        return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida");
+                    });
         }
 
         return findBandeiraByName(value);
@@ -284,7 +352,10 @@ public class ClienteService {
 
         String finalName = normalized;
         return bandeiraRepository.findFirstByNomeIgnoreCase(finalName)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida"));
+                .orElseThrow(() -> {
+                    log.warn("[CLIENTE] Validação falhada - Bandeira inválida (Nome: {})", finalName);
+                    return new ResponseStatusException(HttpStatus.BAD_REQUEST, "Bandeira inválida");
+                });
     }
 
     private Map<String, Object> toOrderResponse(Pedido pedido) {

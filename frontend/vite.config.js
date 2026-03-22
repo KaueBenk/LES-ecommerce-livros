@@ -6,8 +6,6 @@ import { fileURLToPath } from 'url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const isDemoMode = process.env.VITE_DEMO_MODE === 'true';
-
 // https://vite.dev/config/
 export default defineConfig({
   plugins: [react()],
@@ -26,7 +24,7 @@ export default defineConfig({
   server: {
     port: 5173,
     host: true,
-    proxy: isDemoMode ? {} : {
+    proxy: {
       '/api': {
         target: process.env.VITE_API_URL || 'http://localhost:8080',
         changeOrigin: true,

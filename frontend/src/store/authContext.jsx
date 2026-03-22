@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useState, useEffect } from 'react';
 import PropTypes from 'prop-types';
 import authService from '../services/authService';
+import logger from '@utils/logger';
 
 const AuthContext = createContext(null);
 
@@ -28,6 +29,8 @@ export const AuthProvider = ({ children }) => {
 
   const login = async (email, senha) => {
     setLoading(true);
+    logger.logAuth('LOGIN_ATTEMPT', { email });
+    
     try {
       const response = await authService.login(email, senha);
       setToken(response.token);
@@ -35,8 +38,19 @@ export const AuthProvider = ({ children }) => {
       localStorage.setItem('auth_token', response.token);
       localStorage.setItem('user_profile', JSON.stringify(response.user));
       setIsAuthenticated(true);
+      
+      logger.logAuth('LOGIN_SUCCESS', { 
+        email: response.user.email, 
+        nome: response.user.nome,
+        tipo: response.user.tipo 
+      });
+      
       return response;
     } catch (error) {
+      logger.logAuth('LOGIN_FAILED', { 
+        email, 
+        erro: error.response?.data?.message || error.message 
+      });
       throw error;
     } finally {
       setLoading(false);
@@ -44,6 +58,9 @@ export const AuthProvider = ({ children }) => {
   };
 
   const logout = () => {
+    const userEmail = user?.email || 'unknown';
+    logger.logAuth('LOGOUT', { email: userEmail });
+    
     setUser(null);
     setToken(null);
     localStorage.removeItem('auth_token');
@@ -52,6 +69,11 @@ export const AuthProvider = ({ children }) => {
   };
 
   const updateUser = (updatedUser) => {
+    logger.logAuth('USER_UPDATE', { 
+      email: updatedUser.email,
+      camposAtualizados: Object.keys(updatedUser)
+    });
+    
     setUser(updatedUser);
     localStorage.setItem('user_profile', JSON.stringify(updatedUser));
   };
