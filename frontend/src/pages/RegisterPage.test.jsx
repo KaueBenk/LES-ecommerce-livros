@@ -60,7 +60,7 @@ const validAddress = {
   cidade: 'São Paulo',
   estado: 'SP',
   pais: 'Brasil',
-  tipoEndereco: 'ENTREGA_E_FINANCEIRO',
+  tipoEndereco: 'AMBOS',
 };
 
 // Existing data to test uniqueness

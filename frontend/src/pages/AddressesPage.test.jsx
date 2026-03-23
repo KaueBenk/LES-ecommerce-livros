@@ -74,7 +74,7 @@ const mockAddresses = [
     cidade: 'Rio Claro',
     estado: 'SP',
     pais: 'Brasil',
-    tipoEndereco: 'ENTREGA_E_FINANCEIRO',
+    tipoEndereco: 'AMBOS',
   },
 ];
 
@@ -774,12 +774,12 @@ describe('AddressesPage - US-012: VALIDAR RF0026: Cadastro de endereços de entr
     expect(screen.queryByTestId('delete-confirm-button')).not.toBeInTheDocument();
   });
 
-  it('RF0034: should allow deletion of ENTREGA_E_FINANCEIRO address when other typed addresses exist', async () => {
+  it('RF0034: should allow deletion of AMBOS address when other typed addresses exist', async () => {
     // Have separate delivery and billing addresses, plus one combined
     const addresses = [
       { ...mockAddresses[0], id: 1, tipoEndereco: 'ENTREGA' },
       { ...mockAddresses[1], id: 2, tipoEndereco: 'FINANCEIRO' },
-      { ...mockAddresses[2], id: 3, tipoEndereco: 'ENTREGA_E_FINANCEIRO' },
+      { ...mockAddresses[2], id: 3, tipoEndereco: 'AMBOS' },
     ];
 
     customerService.getAddresses.mockResolvedValue(addresses);

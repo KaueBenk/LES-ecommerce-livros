@@ -63,7 +63,7 @@ const Stepper = ({ currentStep }) => (
 // ─── Address card (radio selection) ──────────────────────────────────────────
 
 const AddressCard = ({ address, selected, onSelect }) => {
-  const isDelivery = ['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(address.tipoEndereco);
+  const isDelivery = ['ENTREGA', 'AMBOS'].includes(address.tipoEndereco);
   return (
     <div
       className={`card mb-3 cursor-pointer ${selected ? 'border-primary shadow-sm' : ''}`}
@@ -235,7 +235,7 @@ const AddAddressModal = ({ onClose, onAdded }) => {
 
 const StepAddress = ({ addresses, selectedAddress, onSelect, shippingFee, shippingLoading, onAddAddress }) => {
   const deliveryAddresses = addresses.filter((a) =>
-    ['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(a.tipoEndereco)
+    ['ENTREGA', 'AMBOS'].includes(a.tipoEndereco)
   );
 
   return (
@@ -262,7 +262,7 @@ const StepAddress = ({ addresses, selectedAddress, onSelect, shippingFee, shippi
             />
           ))}
 
-          {addresses.filter((a) => !['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(a.tipoEndereco)).map((addr) => (
+          {addresses.filter((a) => !['ENTREGA', 'AMBOS'].includes(a.tipoEndereco)).map((addr) => (
             <AddressCard
               key={addr.id}
               address={addr}
@@ -1101,7 +1101,7 @@ const CheckoutPage = () => {
   // ── Shipping calculation when address is selected ──
   const handleSelectAddress = useCallback(
     async (address) => {
-      const isDelivery = ['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(address.tipoEndereco);
+      const isDelivery = ['ENTREGA', 'AMBOS'].includes(address.tipoEndereco);
       if (!isDelivery) return; // non-delivery addresses cannot be selected
 
       setCheckoutData((prev) => ({ ...prev, selectedAddress: address, shippingFee: null }));
@@ -1127,7 +1127,7 @@ const CheckoutPage = () => {
     setAddresses((prev) => [...prev, newAddr]);
     setShowAddModal(false);
     // Auto-select if it's a delivery address
-    if (['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(newAddr.tipoEndereco)) {
+    if (['ENTREGA', 'AMBOS'].includes(newAddr.tipoEndereco)) {
       handleSelectAddress(newAddr);
     }
   };
