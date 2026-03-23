@@ -79,7 +79,7 @@ const customerService = {
   },
 
   updateAddress: async (addressId, addressData) => {
-    logger.logInfo('CLIENTE', 'Atualizando endereço', { enderecoId });
+    logger.logInfo('CLIENTE', 'Atualizando endereço', { enderecoId: addressId });
     const response = await api.put(`/clientes/enderecos/${addressId}`, addressData);
     return response.data.data;
   },
