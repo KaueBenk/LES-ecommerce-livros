@@ -54,34 +54,63 @@ public class LivroService {
             String isbn,
             Boolean ativo
     ) {
-        Page<Livro> page = livroRepository.search(
-                normalizeString(titulo),
-                autorId,
-                categoriaId,
-                ano,
-                normalizeString(isbn),
-                ativo,
-                pageable
-        );
-        return new PaginatedResponse<>(page);
+        try {
+            log.info("[LIVRO] Buscando livros - Titulo: {}, AutorID: {}, CategoriaID: {}, Ativo: {}", 
+                    titulo, autorId, categoriaId, ativo);
+            Page<Livro> page = livroRepository.search(
+                    normalizeString(titulo),
+                    autorId,
+                    categoriaId,
+                    ano,
+                    normalizeString(isbn),
+                    ativo,
+                    pageable
+            );
+            log.debug("[LIVRO] Livros encontrados: {}", page.getTotalElements());
+            return new PaginatedResponse<>(page);
+        } catch (Exception e) {
+            log.error("[LIVRO] Erro ao buscar livros", e);
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)
     public Livro getLivroById(Long id) {
-        return livroRepository.findById(id)
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado"));
+        try {
+            log.info("[LIVRO] Buscando livro por ID - LivroID: {}", id);
+            return livroRepository.findById(id)
+                    .orElseThrow(() -> {
+                        log.warn("[LIVRO] Livro não encontrado - LivroID: {}", id);
+                        return new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado");
+                    });
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("[LIVRO] Erro ao buscar livro - LivroID: {}", id, e);
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)
     public PaginatedResponse<Map<String, Object>> getAvaliacoesLivro(Long livroId, Boolean aprovada, Pageable pageable) {
-        if (!livroRepository.existsById(livroId)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado");
+        try {
+            if (!livroRepository.existsById(livroId)) {
+                log.warn("[LIVRO] Livro não encontrado para busca de avaliações - LivroID: {}", livroId);
+                throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Livro não encontrado");
+            }
+            log.info("[LIVRO] Buscando avaliações - LivroID: {}, Aprovada: {}", livroId, aprovada);
+            Page<Avaliacao> page = aprovada == null
+                    ? avaliacaoRepository.findByLivroId(livroId, pageable)
+                    : avaliacaoRepository.findByLivroIdAndAprovada(livroId, aprovada, pageable);
+            Page<Map<String, Object>> mapped = page.map(this::toAvaliacaoResponse);
+            log.debug("[LIVRO] Avaliações encontradas: {}", mapped.getTotalElements());
+            return new PaginatedResponse<>(mapped);
+        } catch (ResponseStatusException e) {
+            throw e;
+        } catch (Exception e) {
+            log.error("[LIVRO] Erro ao buscar avaliações - LivroID: {}", livroId, e);
+            throw e;
         }
-        Page<Avaliacao> page = aprovada == null
-                ? avaliacaoRepository.findByLivroId(livroId, pageable)
-                : avaliacaoRepository.findByLivroIdAndAprovada(livroId, aprovada, pageable);
-        Page<Map<String, Object>> mapped = page.map(this::toAvaliacaoResponse);
-        return new PaginatedResponse<>(mapped);
     }
 
     public Map<String, Object> criarAvaliacao(Long livroId, Map<String, Object> payload) {

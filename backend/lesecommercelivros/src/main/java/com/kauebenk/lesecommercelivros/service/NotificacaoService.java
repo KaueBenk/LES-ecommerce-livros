@@ -5,6 +5,7 @@ import com.kauebenk.lesecommercelivros.entity.Cliente;
 import com.kauebenk.lesecommercelivros.entity.Notificacao;
 import com.kauebenk.lesecommercelivros.repository.ClienteRepository;
 import com.kauebenk.lesecommercelivros.repository.NotificacaoRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -19,6 +20,7 @@ import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Map;
 
+@Slf4j
 @Service
 @Transactional
 public class NotificacaoService {
@@ -31,38 +33,68 @@ public class NotificacaoService {
 
     @Transactional(readOnly = true)
     public PaginatedResponse<Map<String, Object>> listar(Pageable pageable, Boolean lida) {
-        Cliente cliente = getAuthenticatedCliente();
-        Page<Notificacao> page = lida == null
-                ? notificacaoRepository.findByClienteIdOrderByDataCriacaoDesc(cliente.getId(), pageable)
-                : notificacaoRepository.findByClienteIdAndLidaOrderByDataCriacaoDesc(cliente.getId(), lida, pageable);
-        Page<Map<String, Object>> mapped = page.map(this::toResponse);
-        return new PaginatedResponse<>(mapped);
+        try {
+            Cliente cliente = getAuthenticatedCliente();
+            log.info("[NOTIF] Listando notificações - Cliente: {}, Lida: {}", cliente.getId(), lida);
+            Page<Notificacao> page = lida == null
+                    ? notificacaoRepository.findByClienteIdOrderByDataCriacaoDesc(cliente.getId(), pageable)
+                    : notificacaoRepository.findByClienteIdAndLidaOrderByDataCriacaoDesc(cliente.getId(), lida, pageable);
+            Page<Map<String, Object>> mapped = page.map(this::toResponse);
+            log.debug("[NOTIF] Notificações encontradas: {}", mapped.getTotalElements());
+            return new PaginatedResponse<>(mapped);
+        } catch (Exception e) {
+            log.error("[NOTIF] Erro ao listar notificações", e);
+            throw e;
+        }
     }
 
     @Transactional(readOnly = true)
     public long contarNaoLidas() {
-        Cliente cliente = getAuthenticatedCliente();
-        return notificacaoRepository.countByClienteIdAndLidaFalse(cliente.getId());
+        try {
+            Cliente cliente = getAuthenticatedCliente();
+            long count = notificacaoRepository.countByClienteIdAndLidaFalse(cliente.getId());
+            log.debug("[NOTIF] Notificações não lidas - Cliente: {}, Quantidade: {}", cliente.getId(), count);
+            return count;
+        } catch (Exception e) {
+            log.error("[NOTIF] Erro ao contar notificações não lidas", e);
+            throw e;
+        }
     }
 
     public void marcarComoLida(Long id) {
-        Cliente cliente = getAuthenticatedCliente();
-        Notificacao notificacao = notificacaoRepository.findByIdAndClienteId(id, cliente.getId())
-                .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notificação não encontrada"));
-        notificacao.setLida(true);
-        notificacaoRepository.save(notificacao);
+        try {
+            Cliente cliente = getAuthenticatedCliente();
+            Notificacao notificacao = notificacaoRepository.findByIdAndClienteId(id, cliente.getId())
+                    .orElseThrow(() -> new ResponseStatusException(HttpStatus.NOT_FOUND, "Notificação não encontrada"));
+            notificacao.setLida(true);
+            notificacaoRepository.save(notificacao);
+            log.info("[NOTIF] Notificação marcada como lida - ID: {}, Cliente: {}", id, cliente.getId());
+        } catch (ResponseStatusException e) {
+            log.warn("[NOTIF] Notificação não encontrada - ID: {}", id);
+            throw e;
+        } catch (Exception e) {
+            log.error("[NOTIF] Erro ao marcar notificação como lida - ID: {}", id, e);
+            throw e;
+        }
     }
 
     public Notificacao criar(Cliente cliente, String titulo, String mensagem, String referencia, String tipo) {
-        Notificacao notificacao = new Notificacao();
-        notificacao.setCliente(cliente);
-        notificacao.setTitulo(titulo);
-        notificacao.setMensagem(mensagem);
-        notificacao.setReferencia(referencia);
-        notificacao.setTipo(tipo);
-        notificacao.setLida(false);
-        notificacao.setDataCriacao(LocalDateTime.now());
-        return notificacaoRepository.save(notificacao);
+        try {
+            Notificacao notificacao = new Notificacao();
+            notificacao.setCliente(cliente);
+            notificacao.setTitulo(titulo);
+            notificacao.setMensagem(mensagem);
+            notificacao.setReferencia(referencia);
+            notificacao.setTipo(tipo);
+            notificacao.setLida(false);
+            notificacao.setDataCriacao(LocalDateTime.now());
+            Notificacao saved = notificacaoRepository.save(notificacao);
+            log.info("[NOTIF] Notificação criada - ID: {}, Cliente: {}, Tipo: {}", saved.getId(), cliente.getId(), tipo);
+            return saved;
+        } catch (Exception e) {
+            log.error("[NOTIF] Erro ao criar notificação - Tipo: {}, Cliente: {}", tipo, cliente.getId(), e);
+            throw e;
+        }
     }
 
     private Map<String, Object> toResponse(Notificacao notificacao) {

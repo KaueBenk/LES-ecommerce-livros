@@ -22,19 +22,31 @@ public class AnalyticsController {
             @RequestParam String dataInicio,
             @RequestParam String dataFim,
             @RequestParam(required = false, defaultValue = "CATEGORIA") String agrupamento) {
-        return ResponseEntity.ok(ApiResponse.success(
-                adminWorkflowService.getAnaliseVendas(dataInicio, dataFim, agrupamento),
-                "OK"
-        ));
+        try {
+            log.info("[ANALYTICS-CTRL] GET /api/v1/admin/analise/vendas - DataInicio: {}, DataFim: {}, Agrupamento: {}", 
+                    dataInicio, dataFim, agrupamento);
+            Map<String, Object> result = adminWorkflowService.getAnaliseVendas(dataInicio, dataFim, agrupamento);
+            log.info("[ANALYTICS-CTRL] Análise de vendas obtida com sucesso");
+            return ResponseEntity.ok(ApiResponse.success(result, "OK"));
+        } catch (Exception e) {
+            log.error("[ANALYTICS-CTRL] Erro ao obter análise de vendas", e);
+            throw e;
+        }
     }
 
     @GetMapping("/vendas-regiao")
     public ResponseEntity<ApiResponse<Map<String, Object>>> getAnaliseVendasRegiao(
             @RequestParam String dataInicio,
             @RequestParam String dataFim) {
-        return ResponseEntity.ok(ApiResponse.success(
-                adminWorkflowService.getAnaliseVendasRegiao(dataInicio, dataFim),
-                "OK"
-        ));
+        try {
+            log.info("[ANALYTICS-CTRL] GET /api/v1/admin/analise/vendas-regiao - DataInicio: {}, DataFim: {}", 
+                    dataInicio, dataFim);
+            Map<String, Object> result = adminWorkflowService.getAnaliseVendasRegiao(dataInicio, dataFim);
+            log.info("[ANALYTICS-CTRL] Análise de vendas por região obtida com sucesso");
+            return ResponseEntity.ok(ApiResponse.success(result, "OK"));
+        } catch (Exception e) {
+            log.error("[ANALYTICS-CTRL] Erro ao obter análise de vendas por região", e);
+            throw e;
+        }
     }
 }

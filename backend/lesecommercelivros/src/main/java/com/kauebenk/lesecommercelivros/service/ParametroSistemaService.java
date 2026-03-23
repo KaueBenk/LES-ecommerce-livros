@@ -1,11 +1,13 @@
 package com.kauebenk.lesecommercelivros.service;
 
 import com.kauebenk.lesecommercelivros.repository.ParametroSistemaRepository;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
 
+@Slf4j
 @Service
 public class ParametroSistemaService {
 
@@ -13,15 +15,29 @@ public class ParametroSistemaService {
     private ParametroSistemaRepository parametroSistemaRepository;
 
     public long getLong(String chave, long valorPadrao) {
-        return parametroSistemaRepository.findByChave(chave)
-                .map(parametro -> parseLong(chave, parametro.getValor()))
-                .orElse(valorPadrao);
+        try {
+            long result = parametroSistemaRepository.findByChave(chave)
+                    .map(parametro -> parseLong(chave, parametro.getValor()))
+                    .orElse(valorPadrao);
+            log.debug("[PARAM-SYS] getLong - Chave: {}, Valor: {}", chave, result);
+            return result;
+        } catch (Exception e) {
+            log.error("[PARAM-SYS] Erro ao obter parâmetro getLong - Chave: {}", chave, e);
+            throw e;
+        }
     }
 
     public BigDecimal getBigDecimal(String chave, BigDecimal valorPadrao) {
-        return parametroSistemaRepository.findByChave(chave)
-                .map(parametro -> parseBigDecimal(chave, parametro.getValor()))
-                .orElse(valorPadrao);
+        try {
+            BigDecimal result = parametroSistemaRepository.findByChave(chave)
+                    .map(parametro -> parseBigDecimal(chave, parametro.getValor()))
+                    .orElse(valorPadrao);
+            log.debug("[PARAM-SYS] getBigDecimal - Chave: {}, Valor: {}", chave, result);
+            return result;
+        } catch (Exception e) {
+            log.error("[PARAM-SYS] Erro ao obter parâmetro getBigDecimal - Chave: {}", chave, e);
+            throw e;
+        }
     }
 
     private long parseLong(String chave, String raw) {

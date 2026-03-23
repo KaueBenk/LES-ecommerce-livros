@@ -32,16 +32,40 @@ public class CatalogoController {
 
     @GetMapping("/autores")
     public ResponseEntity<ApiResponse<List<Autor>>> getAutores() {
-        return ResponseEntity.ok(ApiResponse.success(autorRepository.findAll(), "OK"));
+        try {
+            log.info("[CATALOG-CTRL] GET /api/v1/catalogo/autores");
+            List<Autor> autores = autorRepository.findAll();
+            log.debug("[CATALOG-CTRL] Autores encontrados: {}", autores.size());
+            return ResponseEntity.ok(ApiResponse.success(autores, "OK"));
+        } catch (Exception e) {
+            log.error("[CATALOG-CTRL] Erro ao obter autores", e);
+            throw e;
+        }
     }
 
     @GetMapping("/editoras")
     public ResponseEntity<ApiResponse<List<Editora>>> getEditoras() {
-        return ResponseEntity.ok(ApiResponse.success(editoraRepository.findAll(), "OK"));
+        try {
+            log.info("[CATALOG-CTRL] GET /api/v1/catalogo/editoras");
+            List<Editora> editoras = editoraRepository.findAll();
+            log.debug("[CATALOG-CTRL] Editoras encontradas: {}", editoras.size());
+            return ResponseEntity.ok(ApiResponse.success(editoras, "OK"));
+        } catch (Exception e) {
+            log.error("[CATALOG-CTRL] Erro ao obter editoras", e);
+            throw e;
+        }
     }
 
     @GetMapping("/categorias")
     public ResponseEntity<ApiResponse<List<Categoria>>> getCategorias() {
-        return ResponseEntity.ok(ApiResponse.success(categoriaRepository.findAll(), "OK"));
+        try {
+            log.info("[CATALOG-CTRL] GET /api/v1/catalogo/categorias");
+            List<Categoria> categorias = categoriaRepository.findAll();
+            log.debug("[CATALOG-CTRL] Categorias encontradas: {}", categorias.size());
+            return ResponseEntity.ok(ApiResponse.success(categorias, "OK"));
+        } catch (Exception e) {
+            log.error("[CATALOG-CTRL] Erro ao obter categorias", e);
+            throw e;
+        }
     }
 }
