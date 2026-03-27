@@ -42,6 +42,10 @@ export default defineConfig({
     responseTimeout: 10000,
     pageLoadTimeout: 30000,
 
+    // Browser launch args for headless mode
+    chromeWebSecurity: false,
+    firefoxWebSecurity: false,
+
     setupNodeEvents(on, config) {
       // Register tasks for node-level operations
       on('task', {
