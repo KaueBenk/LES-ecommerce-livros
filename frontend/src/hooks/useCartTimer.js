@@ -1,4 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import logger from '@utils/logger';
 
 /**
  * useCartTimer
@@ -80,12 +81,17 @@ const useCartTimer = (items = [], cartExpiresAt = null, { onWarn, onExpired } = 
       // Fire warning notification once
       if (isWarning && !isExpired && !warnedRef.current.has(item.id)) {
         warnedRef.current.add(item.id);
+        logger.logWarn('CART-TIMER', 'Item próximo da expiração', { 
+          itemId: item.id,
+          tempoRestante: `${Math.floor(secsLeft / 60)}min`
+        });
         if (onWarn) onWarn(item);
       }
 
       // Fire expired notification once
       if (isExpired && !expiredRef.current.has(item.id)) {
         expiredRef.current.add(item.id);
+        logger.logWarn('CART-TIMER', 'Item expirado', { itemId: item.id });
         if (onExpired) onExpired(item);
       }
     });

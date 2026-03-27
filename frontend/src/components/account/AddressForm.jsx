@@ -20,7 +20,7 @@ const EMPTY_ADDRESS = {
   cidade: '',
   estado: '',
   pais: 'Brasil',
-  tipoEndereco: 'ENTREGA_E_FINANCEIRO',
+  tipoEndereco: 'AMBOS',
 };
 
 /**
@@ -49,7 +49,7 @@ const AddressForm = ({ address, onSave, onClose, saving, serverError }) => {
         cidade: address.cidade || '',
         estado: address.estado || '',
         pais: address.pais || 'Brasil',
-        tipoEndereco: address.tipoEndereco || 'ENTREGA_E_FINANCEIRO',
+        tipoEndereco: address.tipoEndereco || 'AMBOS',
       });
     } else {
       setForm(EMPTY_ADDRESS);

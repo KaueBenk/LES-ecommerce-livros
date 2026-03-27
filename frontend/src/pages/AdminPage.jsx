@@ -168,6 +168,7 @@ const AdminBooksSection = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [runningAutoInactivation, setRunningAutoInactivation] = useState(false);
 
   // ── Categories for modal ──────────────────────────────────────────────────
   const [categories, setCategories] = useState([]);
@@ -250,6 +251,21 @@ const AdminBooksSection = () => {
 
   const handleModalClose = () => setModalBook(null);
 
+  const handleRunAutomaticInactivation = async () => {
+    setRunningAutoInactivation(true);
+    try {
+      const result = await adminService.runAutomaticBookInactivation();
+      success(
+        `Inativação automática concluída: ${result?.inativados ?? 0} livro(s) inativado(s).`
+      );
+      await fetchBooks();
+    } catch (err) {
+      notifyError(getErrorMessage(err) || 'Erro ao executar inativação automática de livros.');
+    } finally {
+      setRunningAutoInactivation(false);
+    }
+  };
+
   return (
     <div data-testid="admin-books-section">
       {/* Toolbar */}
@@ -272,6 +288,15 @@ const AdminBooksSection = () => {
         >
           + Novo Livro
         </Link>
+        <button
+          type="button"
+          className="btn btn-outline-dark btn-sm"
+          onClick={handleRunAutomaticInactivation}
+          disabled={runningAutoInactivation}
+          data-testid="auto-inactivate-books-btn"
+        >
+          {runningAutoInactivation ? 'Processando…' : 'Inativação Automática'}
+        </button>
       </div>
 
       {/* Inline Filters */}
@@ -399,7 +424,9 @@ const AdminBooksSection = () => {
 
                       {/* Preço */}
                       <td className="text-end small" data-testid={`book-price-${book.id}`}>
-                        {book.precoVenda != null ? formatCurrency(book.precoVenda) : '—'}
+                        {(book.precoVenda ?? book.valorVenda) != null
+                          ? formatCurrency(book.precoVenda ?? book.valorVenda)
+                          : '—'}
                       </td>
 
                       {/* Estoque */}

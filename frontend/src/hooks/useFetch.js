@@ -1,4 +1,5 @@
 import { useState, useEffect, useCallback } from 'react';
+import logger from '@utils/logger';
 
 /**
  * useFetch — Generic hook for data fetching with loading/error state.
@@ -14,10 +15,18 @@ const useFetch = (fetchFn, deps = []) => {
   const execute = useCallback(async () => {
     setLoading(true);
     setError(null);
+    const startTime = Date.now();
+    
     try {
       const result = await fetchFn();
       setData(result);
+      const duration = Date.now() - startTime;
+      logger.logInfo('FETCH', 'Dados carregados', { duration: `${duration}ms` });
     } catch (err) {
+      const duration = Date.now() - startTime;
+      logger.logGenericError('FETCH', 'Erro ao carregar dados', err, { 
+        duration: `${duration}ms` 
+      });
       setError(err);
     } finally {
       setLoading(false);

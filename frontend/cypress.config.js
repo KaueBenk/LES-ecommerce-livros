@@ -1,9 +1,12 @@
 import { defineConfig } from 'cypress';
 
+const baseUrl = process.env.CYPRESS_BASE_URL || 'http://localhost:5173';
+const apiBaseUrl = process.env.CYPRESS_API_BASE_URL || 'http://localhost:8080/api/v1';
+
 export default defineConfig({
   e2e: {
     // Base URL for all cy.visit() calls
-    baseUrl: 'http://localhost:5173',
+    baseUrl,
 
     // Spec pattern — covers both the legacy __tests__ folder and the new cypress/e2e folder
     specPattern: [
@@ -39,6 +42,10 @@ export default defineConfig({
     responseTimeout: 10000,
     pageLoadTimeout: 30000,
 
+    // Browser launch args for headless mode
+    chromeWebSecurity: false,
+    firefoxWebSecurity: false,
+
     setupNodeEvents(on, config) {
       // Register tasks for node-level operations
       on('task', {
@@ -58,7 +65,7 @@ export default defineConfig({
 
   // Shared env variables available via Cypress.env()
   env: {
-    apiBaseUrl: 'http://localhost:8080/api/v1',
+    apiBaseUrl,
   },
 
   // Component testing (reserved for future use)

@@ -9,6 +9,16 @@ const EMPTY_CARD = {
   codigoSeguranca: '',
 };
 
+const normalizeBrandToCode = (bandeira) => {
+  if (!bandeira) return 'VISA';
+  const raw = (typeof bandeira === 'object' ? bandeira?.nome : bandeira).toUpperCase();
+  if (raw === 'VISA') return 'VISA';
+  if (raw === 'MASTERCARD') return 'MASTERCARD';
+  if (raw === 'ELO') return 'ELO';
+  if (raw === 'AMEX' || raw === 'AMERICAN EXPRESS') return 'AMEX';
+  return 'VISA';
+};
+
 /**
  * Formats a card number string with spaces every 4 digits.
  */
@@ -36,7 +46,7 @@ const CreditCardForm = ({ card, onSave, onClose, saving, serverError }) => {
       setForm({
         numero: card.numero || '',
         nomeImpresso: card.nomeImpresso || '',
-        bandeira: card.bandeira || 'VISA',
+        bandeira: normalizeBrandToCode(card.bandeira),
         codigoSeguranca: card.codigoSeguranca || '',
       });
     } else {

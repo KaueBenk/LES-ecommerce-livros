@@ -7,7 +7,6 @@ import { ADDRESS_TYPES } from '../../utils/constants';
 const TYPE_BADGE = {
   ENTREGA: 'bg-primary',
   FINANCEIRO: 'bg-success',
-  ENTREGA_E_FINANCEIRO: 'bg-info text-dark',
   AMBOS: 'bg-info text-dark',
   COBRANCA: 'bg-success',
 };
@@ -106,13 +105,10 @@ const wouldViolateMinimum = (addresses, targetId) => {
   const hasDelivery = remaining.some(
     (a) =>
       a.tipoEndereco === 'ENTREGA' ||
-      a.tipoEndereco === 'ENTREGA_E_FINANCEIRO' ||
       a.tipoEndereco === 'AMBOS'
   );
   const hasBilling = remaining.some(
     (a) =>
-      a.tipoEndereco === 'FINANCEIRO' ||
-      a.tipoEndereco === 'ENTREGA_E_FINANCEIRO' ||
       a.tipoEndereco === 'AMBOS' ||
       a.tipoEndereco === 'COBRANCA'
   );

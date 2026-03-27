@@ -10,6 +10,7 @@ import { getErrorMessage } from '../utils/helpers';
 import { ROUTES } from '../utils/constants';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AddressForm from '../components/account/AddressForm';
+import logger from '@utils/logger';
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
 
@@ -62,7 +63,7 @@ const Stepper = ({ currentStep }) => (
 // ─── Address card (radio selection) ──────────────────────────────────────────
 
 const AddressCard = ({ address, selected, onSelect }) => {
-  const isDelivery = ['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(address.tipoEndereco);
+  const isDelivery = ['ENTREGA', 'AMBOS'].includes(address.tipoEndereco);
   return (
     <div
       className={`card mb-3 cursor-pointer ${selected ? 'border-primary shadow-sm' : ''}`}
@@ -234,7 +235,7 @@ const AddAddressModal = ({ onClose, onAdded }) => {
 
 const StepAddress = ({ addresses, selectedAddress, onSelect, shippingFee, shippingLoading, onAddAddress }) => {
   const deliveryAddresses = addresses.filter((a) =>
-    ['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(a.tipoEndereco)
+    ['ENTREGA', 'AMBOS'].includes(a.tipoEndereco)
   );
 
   return (
@@ -261,7 +262,7 @@ const StepAddress = ({ addresses, selectedAddress, onSelect, shippingFee, shippi
             />
           ))}
 
-          {addresses.filter((a) => !['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(a.tipoEndereco)).map((addr) => (
+          {addresses.filter((a) => !['ENTREGA', 'AMBOS'].includes(a.tipoEndereco)).map((addr) => (
             <AddressCard
               key={addr.id}
               address={addr}
@@ -290,7 +291,7 @@ const StepAddress = ({ addresses, selectedAddress, onSelect, shippingFee, shippi
                 <span className="spinner-border spinner-border-sm ms-1" role="status" aria-hidden="true" />
               ) : (
                 <span className="text-success fw-semibold" data-testid="shipping-fee-value">
-                  {formatCurrency(shippingFee ?? 10)}
+                  {shippingFee != null ? formatCurrency(shippingFee) : '—'}
                 </span>
               )}
             </span>
@@ -347,6 +348,7 @@ const StepCoupons = ({ tradeCoupons, couponsLoading, checkoutData, onCouponChang
         const result = await checkoutService.validateCoupons({
           cupomsTroca: tradeCouponIds,
           cupomPromocional: promoCode || undefined,
+          enderecoId: checkoutData.selectedAddress?.id,
         });
         setValidationResult(result);
         onCouponChange({
@@ -376,7 +378,7 @@ const StepCoupons = ({ tradeCoupons, couponsLoading, checkoutData, onCouponChang
         setValidating(false);
       }
     },
-    [onCouponChange]
+    [onCouponChange, checkoutData.selectedAddress]
   );
 
   // ── Trade coupon toggle ──────────────────────────────────────────────────
@@ -668,7 +670,7 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
     if (!selectedIds.includes(cardId)) return null;
     const v = parseFloat((cardValues[cardId] || '0').replace(',', '.'));
     if (isNaN(v) || v <= 0) return 'Informe um valor.';
-    if (v < 10) return 'Valor mínimo: R$ 10,00.';
+    if (target >= 10 && v < 10) return 'Valor mínimo: R$ 10,00.';
     return null;
   };
 
@@ -729,7 +731,7 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
                         className="mb-0 flex-grow-1 d-flex align-items-center"
                         style={{ cursor: 'pointer' }}
                       >
-                        <BrandBadge nome={card.bandeira?.nome} />
+                        <BrandBadge nome={card.bandeiraNome || card.bandeira?.nome || card.bandeira} />
                         <span className="fw-semibold me-2" data-testid={`payment-card-digits-${card.id}`}>
                           •••• {card.ultimosDigitos}
                         </span>
@@ -757,7 +759,7 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
                             className={`form-control ${
                               cardError ? 'is-invalid' : total > 0 ? 'is-valid' : ''
                             }`}
-                            min="10"
+                            min={target >= 10 ? '10' : '0.01'}
                             step="0.01"
                             value={cardValues[card.id] ?? ''}
                             onChange={(e) => handleValueChange(card.id, e.target.value)}
@@ -948,7 +950,7 @@ const StepConfirmation = ({
                   <span>
                     {card ? (
                       <>
-                        <BrandBadge nome={card.bandeira?.nome} />
+                        <BrandBadge nome={card.bandeiraNome || card.bandeira?.nome || card.bandeira} />
                         <span className="fw-semibold">•••• {card.ultimosDigitos}</span>
                         <span className="text-muted small ms-2">{card.nomeImpresso}</span>
                       </>
@@ -1099,7 +1101,7 @@ const CheckoutPage = () => {
   // ── Shipping calculation when address is selected ──
   const handleSelectAddress = useCallback(
     async (address) => {
-      const isDelivery = ['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(address.tipoEndereco);
+      const isDelivery = ['ENTREGA', 'AMBOS'].includes(address.tipoEndereco);
       if (!isDelivery) return; // non-delivery addresses cannot be selected
 
       setCheckoutData((prev) => ({ ...prev, selectedAddress: address, shippingFee: null }));
@@ -1108,16 +1110,16 @@ const CheckoutPage = () => {
         const result = await checkoutService.calculateShipping(address.id);
         setCheckoutData((prev) => ({
           ...prev,
-          shippingFee: result?.valorFrete ?? 10,
+          shippingFee: result?.valorFrete ?? null,
         }));
-      } catch {
-        // Fall back to fixed R$10 on error
-        setCheckoutData((prev) => ({ ...prev, shippingFee: 10 }));
+      } catch (err) {
+        setCheckoutData((prev) => ({ ...prev, shippingFee: null }));
+        notifyError(getErrorMessage(err) || 'Não foi possível calcular o frete para o endereço selecionado.');
       } finally {
         setShippingLoading(false);
       }
     },
-    []
+    [notifyError]
   );
 
   // ── Address added from modal ──
@@ -1125,7 +1127,7 @@ const CheckoutPage = () => {
     setAddresses((prev) => [...prev, newAddr]);
     setShowAddModal(false);
     // Auto-select if it's a delivery address
-    if (['ENTREGA', 'ENTREGA_E_FINANCEIRO', 'AMBOS'].includes(newAddr.tipoEndereco)) {
+    if (['ENTREGA', 'AMBOS'].includes(newAddr.tipoEndereco)) {
       handleSelectAddress(newAddr);
     }
   };
@@ -1218,7 +1220,7 @@ const CheckoutPage = () => {
 
   // ── Navigation ──
   const canProceed = () => {
-    if (currentStep === 1) return !!checkoutData.selectedAddress && !!checkoutData.shippingFee;
+    if (currentStep === 1) return !!checkoutData.selectedAddress && checkoutData.shippingFee != null;
     if (currentStep === 3) return !!checkoutData.paymentValid;
     return true;
   };
