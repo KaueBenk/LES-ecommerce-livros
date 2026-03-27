@@ -63,7 +63,7 @@
 |  |  |  |
 | Grupo: Análise |  |  |
 | RF0055 | Analisar histórico de vendas | O sistema deve possibilitar que o usuário consulte o histórico de vendas comparando produtos ou categorias de produtos a partir de uma busca por período, considerando uma data de início e uma de fim. |
-| RF00064 | Analisar histórico de vidas por região | O sistema deve possibilitar que o usuário consulte a quantidade de vendas realizadas por estado do Brasil, considerando uma data de início e uma de fim. |
+| RF00064 | Analisar histórico de vendas por região | O sistema deve possibilitar que o usuário consulte a quantidade de vendas realizadas por estado do Brasil, considerando uma data de início e uma de fim. |
 |  |  |  |
 | Grupo: Avaliações |  |  |
 | RF00063  | Cadastro de avaliações | O sistema deve permitir que clientes com compras finalizadas publiquem avaliações (estrelas e texto) para livros. |
