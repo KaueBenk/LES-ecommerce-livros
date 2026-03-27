@@ -217,7 +217,9 @@ const ClientDetailModal = ({ clientId, onClose }) => {
                                   {card.nomeTitular ?? '—'}
                                 </div>
                                 <div className="text-muted">
-                                  Validade: {card.mesValidade?.toString().padStart(2, '0')}/{card.anoValidade}
+                                  {card.mesValidade && card.anoValidade
+                                    ? `Validade: ${card.mesValidade.toString().padStart(2, '0')}/${card.anoValidade}`
+                                    : 'Validade não informada'}
                                 </div>
                               </div>
                             </div>
@@ -296,7 +298,7 @@ const ClientDetailModal = ({ clientId, onClose }) => {
  */
 const ClientSearchAdmin = () => {
   usePageTitle('Admin — Clientes');
-  const { error: notifyError } = useNotification();
+  const { error: notifyError, success: notifySuccess } = useNotification();
 
   // ── Filters ────────────────────────────────────────────────────────────────
   const [pendingFilters, setPendingFilters] = useState({ nome: '', cpf: '', email: '', ativo: '' });
@@ -308,6 +310,7 @@ const ClientSearchAdmin = () => {
   const [page, setPage] = useState(0);
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
+  const [processingClientId, setProcessingClientId] = useState(null);
 
   // ── Detail modal ───────────────────────────────────────────────────────────
   const [selectedClientId, setSelectedClientId] = useState(null);
@@ -355,6 +358,54 @@ const ClientSearchAdmin = () => {
 
   const hasActiveFilters =
     filters.nome || filters.cpf || filters.email || filters.ativo !== '';
+
+  const handleToggleClientStatus = async (client, event) => {
+    event.stopPropagation();
+    if (!client?.id) return;
+
+    setProcessingClientId(client.id);
+    try {
+      if (client.ativo === false) {
+        await adminService.activateCustomer(client.id);
+        notifySuccess(`Cliente "${client.nome}" ativado com sucesso.`);
+      } else {
+        await adminService.inactivateCustomer(client.id);
+        notifySuccess(`Cliente "${client.nome}" inativado com sucesso.`);
+      }
+      await fetchClients();
+      if (selectedClientId === client.id) {
+        setSelectedClientId(null);
+      }
+    } catch (err) {
+      notifyError(getErrorMessage(err) || 'Erro ao alterar status do cliente.');
+    } finally {
+      setProcessingClientId(null);
+    }
+  };
+
+  const handleDeleteClient = async (client, event) => {
+    event.stopPropagation();
+    if (!client?.id) return;
+
+    const confirmed = window.confirm(
+      `Tem certeza que deseja excluir o cliente "${client.nome}"? Esta ação não pode ser desfeita.`,
+    );
+    if (!confirmed) return;
+
+    setProcessingClientId(client.id);
+    try {
+      await adminService.deleteCustomer(client.id);
+      notifySuccess(`Cliente "${client.nome}" excluído com sucesso.`);
+      if (selectedClientId === client.id) {
+        setSelectedClientId(null);
+      }
+      await fetchClients();
+    } catch (err) {
+      notifyError(getErrorMessage(err) || 'Erro ao excluir cliente.');
+    } finally {
+      setProcessingClientId(null);
+    }
+  };
 
   return (
     <div data-testid="admin-clients-section">
@@ -485,11 +536,13 @@ const ClientSearchAdmin = () => {
                   <th className="text-center">Ranking</th>
                   <th className="text-center">Status</th>
                   <th>Data Cadastro</th>
+                  <th className="text-end">Ações</th>
                 </tr>
               </thead>
               <tbody>
                 {clients.map((client) => {
                   const isActive = client.ativo !== false;
+                  const isProcessing = processingClientId === client.id;
                   return (
                     <tr
                       key={client.id}
@@ -519,6 +572,28 @@ const ClientSearchAdmin = () => {
                       </td>
                       <td className="small text-muted" data-testid={`client-date-${client.id}`}>
                         {client.dataCadastro ? formatDate(client.dataCadastro) : '—'}
+                      </td>
+                      <td className="text-end">
+                        <div className="d-inline-flex gap-1">
+                          <button
+                            type="button"
+                            className={`btn btn-sm ${isActive ? 'btn-outline-warning' : 'btn-outline-success'}`}
+                            onClick={(event) => handleToggleClientStatus(client, event)}
+                            disabled={isProcessing}
+                            data-testid={`toggle-client-${client.id}`}
+                          >
+                            {isProcessing ? 'Processando…' : isActive ? 'Inativar' : 'Ativar'}
+                          </button>
+                          <button
+                            type="button"
+                            className="btn btn-sm btn-outline-danger"
+                            onClick={(event) => handleDeleteClient(client, event)}
+                            disabled={isProcessing}
+                            data-testid={`delete-client-${client.id}`}
+                          >
+                            Excluir
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   );

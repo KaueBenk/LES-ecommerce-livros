@@ -28,7 +28,7 @@ const newAddress = () => ({
   cidade: '',
   estado: '',
   pais: 'Brasil',
-  tipoEndereco: 'ENTREGA_E_FINANCEIRO',
+  tipoEndereco: 'AMBOS',
 });
 
 // ── Password strength helpers ────────────────────────────────────────────────

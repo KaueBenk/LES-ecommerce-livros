@@ -290,11 +290,13 @@ const Step2 = ({ form, errors, onChange }) => (
 const Step3 = ({ form, errors, onChange, categories, pricingGroups, loadingRefs, bookId }) => {
   // Pricing group selection
   const selectedGroup = pricingGroups.find((g) => String(g.id) === String(form.grupoPrecificacaoId));
-  const hasMargem = selectedGroup?.margem != null && form.valorCusto;
+  const margemRaw = selectedGroup?.margem ?? selectedGroup?.margemLucro;
+  const margemPercent = margemRaw != null ? (Number(margemRaw) <= 1 ? Number(margemRaw) * 100 : Number(margemRaw)) : null;
+  const hasMargem = margemPercent != null && form.valorCusto;
 
   // Computed price range from cost and margin
   const cost = hasMargem ? parseFloat(form.valorCusto) : null;
-  const margem = hasMargem ? selectedGroup.margem : null;
+  const margem = hasMargem ? margemPercent : null;
   const targetPrice = hasMargem ? cost * (1 + margem / 100) : null;
   const minPrice = hasMargem ? targetPrice * (1 - margem / 100) : null;
   const maxPrice = hasMargem ? targetPrice * (1 + margem / 100) : null;
@@ -337,13 +339,16 @@ const Step3 = ({ form, errors, onChange, categories, pricingGroups, loadingRefs,
             onChange={(e) => onChange('grupoPrecificacaoId', e.target.value)}
             data-testid="field-grupoPrecificacaoId"
           >
-            <option value="">Selecione um grupo</option>
-            {pricingGroups.map((g) => (
-              <option key={g.id} value={g.id}>
-                {g.nome}{g.margem != null ? ` (margem ${g.margem}%)` : ''}
-              </option>
-            ))}
-          </select>
+              <option value="">Selecione um grupo</option>
+              {pricingGroups.map((g) => (
+                <option key={g.id} value={g.id}>
+                  {g.nome}
+                  {g.margem != null || g.margemLucro != null
+                    ? ` (margem ${Number(g.margem ?? g.margemLucro) <= 1 ? Number(g.margem ?? g.margemLucro) * 100 : Number(g.margem ?? g.margemLucro)}%)`
+                    : ''}
+                </option>
+              ))}
+            </select>
         )}
       </Field>
 
@@ -701,10 +706,10 @@ const BookFormPage = () => {
             profundidade: String(book.profundidade ?? ''),
             peso: String(book.peso ?? ''),
             codigoBarras: book.codigoBarras ?? '',
-            grupoPrecificacaoId: String(book.grupoPrecificacaoId ?? ''),
+            grupoPrecificacaoId: String(book.grupoPrecificacaoId ?? book.grupoPrecificacao?.id ?? ''),
             categoriaIds: (book.categorias ?? []).map((c) => c.id ?? c),
             valorCusto: '',
-            precoVenda: String(book.precoVenda ?? ''),
+            precoVenda: String(book.precoVenda ?? book.valorVenda ?? ''),
             autorizacaoGerencial: false,
           });
         }
@@ -743,12 +748,16 @@ const BookFormPage = () => {
 
   // ── Margin check ────────────────────────────────────────────────────────
   const _selGroup = pricingGroups.find((g) => String(g.id) === String(form.grupoPrecificacaoId));
-  const _hasMargem = _selGroup?.margem != null && form.valorCusto;
-  const _targetPrice = _hasMargem
-    ? parseFloat(form.valorCusto) * (1 + _selGroup.margem / 100)
+  const _margemRaw = _selGroup?.margem ?? _selGroup?.margemLucro;
+  const _margemPercent = _margemRaw != null
+    ? (Number(_margemRaw) <= 1 ? Number(_margemRaw) * 100 : Number(_margemRaw))
     : null;
-  const _minPrice = _hasMargem ? _targetPrice * (1 - _selGroup.margem / 100) : null;
-  const _maxPrice = _hasMargem ? _targetPrice * (1 + _selGroup.margem / 100) : null;
+  const _hasMargem = _margemPercent != null && form.valorCusto;
+  const _targetPrice = _hasMargem
+    ? parseFloat(form.valorCusto) * (1 + _margemPercent / 100)
+    : null;
+  const _minPrice = _hasMargem ? _targetPrice * (1 - _margemPercent / 100) : null;
+  const _maxPrice = _hasMargem ? _targetPrice * (1 + _margemPercent / 100) : null;
   const _salePrice = form.precoVenda !== '' ? parseFloat(form.precoVenda) : null;
   const _hasSalePrice = _salePrice !== null && !isNaN(_salePrice) && _salePrice > 0;
   const isOutsideMargin = _hasMargem && _hasSalePrice

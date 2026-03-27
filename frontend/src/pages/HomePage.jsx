@@ -145,9 +145,9 @@ const HomePage = () => {
   const handleAddToCart = async (book) => {
     setAddingId(book.id);
     try {
-      addItem(book, 1);
+      await addItem(book, 1);
       success(`"${book.titulo}" adicionado ao carrinho!`);
-    } catch (err) {
+    } catch {
       notifyError('Não foi possível adicionar ao carrinho.');
     } finally {
       setAddingId(null);
@@ -253,4 +253,3 @@ const HomePage = () => {
 };
 
 export default HomePage;
-

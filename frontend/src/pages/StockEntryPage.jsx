@@ -201,6 +201,16 @@ const HistoryTable = ({ livroId }) => {
               </thead>
               <tbody>
                 {entries.map((entry) => (
+                  (() => {
+                    const supplierName =
+                      typeof entry.fornecedor === 'object' && entry.fornecedor !== null
+                        ? entry.fornecedor.nome ??
+                          entry.fornecedor.name ??
+                          entry.fornecedor.cnpj ??
+                          (entry.fornecedor.id ? `Fornecedor #${entry.fornecedor.id}` : null)
+                        : entry.fornecedor;
+
+                    return (
                   <tr key={entry.id} data-testid={`history-row-${entry.id}`}>
                     <td data-testid={`history-date-${entry.id}`}>
                       {entry.dataEntrada
@@ -223,9 +233,11 @@ const HistoryTable = ({ livroId }) => {
                       className="text-muted small"
                       data-testid={`history-supplier-${entry.id}`}
                     >
-                      {entry.fornecedor ?? entry.fornecedorId ?? '—'}
+                      {supplierName ?? entry.fornecedorId ?? '—'}
                     </td>
                   </tr>
+                    );
+                  })()
                 ))}
               </tbody>
             </table>

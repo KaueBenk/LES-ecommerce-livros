@@ -192,6 +192,7 @@ const CartPage = () => {
   );
 
   const itens = cart?.itens ?? [];
+  const itensRemovidos = cart?.itensRemovidos ?? [];
 
   // Per-item countdown timers
   const { timers, hasAnyExpired, hasAnyWarning } = useCartTimer(
@@ -324,6 +325,19 @@ const CartPage = () => {
         </div>
       )}
 
+      {itensRemovidos.length > 0 && (
+        <div className="alert alert-warning mb-3" data-testid="cart-removed-items-banner">
+          <div className="fw-semibold mb-1">Itens removidos por expiração de reserva:</div>
+          <ul className="mb-0 ps-3">
+            {itensRemovidos.map((item) => (
+              <li key={`${item.itemId}-${item.livroId}`}>
+                {item.titulo} (Qtd: {item.quantidade})
+              </li>
+            ))}
+          </ul>
+        </div>
+      )}
+
       {/* Warning banner */}
       {!hasAnyExpired && hasAnyWarning && (
         <div className="alert alert-warning d-flex align-items-center gap-2 mb-3" data-testid="cart-warning-banner">
@@ -421,7 +435,7 @@ const CartPage = () => {
 
           <p className="text-muted small" data-testid="cart-timer-note">
             * Os itens ficam reservados por{' '}
-            {localStorage.getItem('cart_item_ttl_minutes') ?? 30} min.
+            {cart?.tempoReservaMinutos ?? localStorage.getItem('cart_item_ttl_minutes') ?? 30} min.
             O carrinho é sincronizado automaticamente a cada 30 segundos.
           </p>
         </div>
@@ -453,16 +467,24 @@ const CartPage = () => {
                 type="button"
                 className="btn btn-primary w-100"
                 onClick={() => navigate(ROUTES.CHECKOUT)}
-                disabled={hasAnyExpired}
-                title={hasAnyExpired ? 'Remova os itens expirados antes de finalizar' : ''}
+                disabled={hasAnyExpired || cart?.compraHabilitada === false}
+                title={
+                  hasAnyExpired
+                    ? 'Remova os itens expirados antes de finalizar'
+                    : cart?.compraHabilitada === false
+                    ? 'Revise os itens removidos e adicione-os novamente antes de finalizar'
+                    : ''
+                }
                 data-testid="checkout-btn"
               >
                 Finalizar Compra
               </button>
 
-              {hasAnyExpired && (
+              {(hasAnyExpired || cart?.compraHabilitada === false) && (
                 <p className="text-danger small mt-2 mb-0" data-testid="checkout-blocked-msg">
-                  Remova os itens expirados para continuar.
+                  {hasAnyExpired
+                    ? 'Remova os itens expirados para continuar.'
+                    : 'Há itens removidos do carrinho. Adicione-os novamente para continuar.'}
                 </p>
               )}
 

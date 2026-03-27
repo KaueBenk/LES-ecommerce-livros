@@ -37,8 +37,8 @@ export const PHONE_TYPES = [
 // Address types
 export const ADDRESS_TYPES = [
   { value: 'ENTREGA', label: 'Entrega' },
-  { value: 'FINANCEIRO', label: 'Financeiro' },
-  { value: 'ENTREGA_E_FINANCEIRO', label: 'Entrega e Financeiro' },
+  { value: 'COBRANCA', label: 'Cobrança' },
+  { value: 'AMBOS', label: 'Ambos' },
 ];
 
 // Residential types
