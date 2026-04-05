@@ -643,7 +643,18 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
         return { cartaoId: id, valor: isNaN(v) ? 0 : v };
       })
       .filter((s) => s.valor > 0);
-    onPaymentChange({ paymentSplits: splits, paymentValid: isExact && selectedIds.length > 0 });
+
+    const hasCardErrors = selectedIds.some((id) => {
+      const v = parseFloat((cardValues[id] || '0').replace(',', '.'));
+      if (isNaN(v) || v <= 0) return true;
+      if (target >= 10 && v < 10) return true;
+      return false;
+    });
+
+    onPaymentChange({
+      paymentSplits: splits,
+      paymentValid: isExact && selectedIds.length > 0 && !hasCardErrors,
+    });
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [cardValues, selectedIds]);
 
@@ -683,6 +694,12 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
           {formatCurrency(target)}
         </strong>
       </p>
+
+      {/* Test helper: business rule D8 — even-ending cards are rejected */}
+      <div className="alert alert-info small mb-3" data-testid="test-hint-even-cards">
+        Observação para testes: cartões cujo último dígito é <strong>par</strong> são recusados pelo
+        processador (regra de demonstração). Utilize um final <strong>ímpar</strong> para aprovação.
+      </div>
 
       {cardsLoading ? (
         <div className="text-center py-3">

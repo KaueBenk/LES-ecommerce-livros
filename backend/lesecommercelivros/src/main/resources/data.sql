@@ -589,6 +589,24 @@ WHERE
       AND numero = '1234567890123457'
   );
 
+INSERT INTO cartao_credito (numero, nome_impresso, bandeira_id, codigo_seguranca, preferencial, cliente_id)
+SELECT
+  '1234567890123459',
+  'JOAO SILVA',
+  (SELECT id FROM bandeira WHERE nome = 'Visa' ORDER BY id LIMIT 1),
+  '456',
+  false,
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM bandeira WHERE nome = 'Visa' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM cartao_credito
+    WHERE cliente_id = (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1)
+      AND numero = '1234567890123459'
+  );
+
 -- Pedido sample
 INSERT INTO pedido (cliente_id, endereco_entrega, status, valor_frete, valor_total, data_pedido)
 SELECT
@@ -640,4 +658,62 @@ WHERE
     WHERE pedido_id = (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1)
       AND tipo = 'CARTAO_CREDITO'
       AND valor = 189.80
+  );
+
+-- Cupom de troca de exemplo para fluxo de checkout (RF0036 / RN0035 / RN0036)
+INSERT INTO cupom_troca (cliente_id, valor, utilizado, data_geracao, pedido_origem_id)
+SELECT
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1),
+  15.00,
+  false,
+  '2026-03-05 09:00:00',
+  (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM cupom_troca
+    WHERE cliente_id = (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1)
+      AND valor = 15.00
+      AND utilizado = false
+      AND pedido_origem_id = (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO cupom_troca (cliente_id, valor, utilizado, data_geracao, pedido_origem_id)
+SELECT
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1),
+  12.00,
+  false,
+  '2026-03-06 09:00:00',
+  (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM cupom_troca
+    WHERE cliente_id = (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1)
+      AND valor = 12.00
+      AND utilizado = false
+      AND pedido_origem_id = (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO cupom_troca (cliente_id, valor, utilizado, data_geracao, pedido_origem_id)
+SELECT
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1),
+  8.00,
+  false,
+  '2026-03-07 09:00:00',
+  (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM cupom_troca
+    WHERE cliente_id = (SELECT id FROM cliente WHERE lower(email) = lower('joao@example.com') ORDER BY id LIMIT 1)
+      AND valor = 8.00
+      AND utilizado = false
+      AND pedido_origem_id = (SELECT id FROM pedido WHERE data_pedido = '2026-03-01 10:45:00' ORDER BY id LIMIT 1)
   );
