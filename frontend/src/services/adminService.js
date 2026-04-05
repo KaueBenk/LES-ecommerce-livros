@@ -24,23 +24,23 @@ const adminService = {
   },
 
   updateBook: async (bookId, bookData) => {
-    logger.logAdmin('ATUALIZAR_LIVRO', { livroId, titulo: bookData.titulo });
+    logger.logAdmin('ATUALIZAR_LIVRO', { livroId: bookId, titulo: bookData.titulo });
     const response = await api.put(`/admin/livros/${bookId}`, bookData);
-    logger.logAdmin('LIVRO_ATUALIZADO', { livroId });
+    logger.logAdmin('LIVRO_ATUALIZADO', { livroId: bookId });
     return response.data;
   },
 
   activateBook: async (bookId, payload) => {
-    logger.logAdmin('ATIVAR_LIVRO', { livroId });
+    logger.logAdmin('ATIVAR_LIVRO', { livroId: bookId });
     const response = await api.patch(`/admin/livros/${bookId}/ativar`, payload);
-    logger.logAdmin('LIVRO_ATIVADO', { livroId });
+    logger.logAdmin('LIVRO_ATIVADO', { livroId: bookId });
     return response.data;
   },
 
   deactivateBook: async (bookId, payload) => {
-    logger.logAdmin('INATIVAR_LIVRO', { livroId });
+    logger.logAdmin('INATIVAR_LIVRO', { livroId: bookId });
     const response = await api.patch(`/admin/livros/${bookId}/inativar`, payload);
-    logger.logAdmin('LIVRO_INATIVADO', { livroId });
+    logger.logAdmin('LIVRO_INATIVADO', { livroId: bookId });
     return response.data;
   },
 
