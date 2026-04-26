@@ -145,6 +145,19 @@ cd frontend
 npx cypress run --spec cypress/e2e/sales-checkout-consultation-4entrega.cy.js
 ```
 
+Para a apresentacao focada no cenario solicitado pelo professor (registro de pedido com sucesso + entrega prevista fixa em 06/10/2025), use o spec dedicado:
+
+```bash
+cd frontend
+npm run test:e2e:pedido-sucesso
+```
+
+Esse spec dedicado valida explicitamente:
+- pedido finalizado com status HTTP 201,
+- tela de confirmacao com numero do pedido,
+- campo de entrega prevista com `06/10/2025`,
+- pedido listado no historico (`/account/orders`).
+
 O teste valida:
 - frete e endereco,
 - aplicacao de cupom troca + promocional,
