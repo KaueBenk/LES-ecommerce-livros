@@ -15,6 +15,17 @@ const EXPECTED_DELIVERY_DATE = '06/10/2025';
 const FIXED_DELIVERY_DATE_ISO = '2025-10-06';
 const STEP_DELAY_MS = Number(Cypress.env('STEP_DELAY_MS') || 1800);
 
+const DRS_COVERED_REQUIREMENTS = [
+  'RF0025', // Consulta de transações
+  'RF0033', // Realizar compra
+  'RF0034', // Calcular frete
+  'RF0035', // Selecionar endereço de entrega
+  'RF0036', // Selecionar forma de pagamento
+  'RF0037', // Finalizar compra
+  'RN0037', // Validar forma de pagamento na finalização
+  'RN0038', // Alterar status conforme aprovação do pagamento
+];
+
 const parseCurrency = (raw) => {
   const normalized = (raw || '')
     .replace(/\s/g, '')
@@ -41,6 +52,7 @@ const clearCartIfNeeded = () => {
 
 const pauseForDemo = () => cy.wait(STEP_DELAY_MS);
 const pauseForTransition = () => cy.wait(STEP_DELAY_MS * 2);
+const markRequirement = (id, description) => cy.log(`[DRS] ${id} - ${description}`);
 
 const toOrderPattern = (orderNumber) => {
   const numeric = Number(String(orderNumber || '').replace(/\D/g, ''));
@@ -149,7 +161,15 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
   });
 
   it('registra pedido com sucesso e exibe entrega prevista em 06/10/2025', () => {
+    cy.log(`[DRS] Cobertura deste teste: ${DRS_COVERED_REQUIREMENTS.join(', ')}`);
+
+    markRequirement('RF0025', 'Exibir pedidos existentes antes da nova compra');
     prepareCheckoutToPaymentStep();
+
+    markRequirement('RF0033', 'Realizar compra a partir do carrinho');
+    markRequirement('RF0034', 'Calcular frete');
+    markRequirement('RF0035', 'Selecionar endereço de entrega');
+    markRequirement('RF0036', 'Selecionar forma de pagamento');
     selectOddCardAndFillFullAmount();
     pauseForTransition();
 
@@ -166,8 +186,18 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
       });
     }).as('finalizeOrderSuccess');
 
+    markRequirement('RF0037', 'Finalizar compra');
+    markRequirement('RN0037', 'Validar forma de pagamento na finalização');
     cy.get('[data-testid="confirm-purchase-btn"]').click();
-    cy.wait('@finalizeOrderSuccess').its('response.statusCode').should('eq', 201);
+    cy.wait('@finalizeOrderSuccess').then((interception) => {
+      expect(interception?.response?.statusCode).to.eq(201);
+
+      const reqBody = interception?.request?.body || {};
+      expect(reqBody.enderecoEntregaId, 'endereço selecionado no payload').to.exist;
+      expect(Array.isArray(reqBody.formasPagamento), 'formas de pagamento enviadas').to.eq(true);
+      expect(reqBody.formasPagamento.length, 'ao menos uma forma de pagamento').to.be.greaterThan(0);
+      expect(reqBody.formasPagamento[0]?.tipo).to.eq('CARTAO_CREDITO');
+    });
     pauseForTransition();
 
     cy.url({ timeout: 20000 }).should('include', '/order-confirmation');
@@ -192,7 +222,9 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
         .closest('[data-testid^="order-card-"]')
         .within(() => {
           cy.get('[data-testid^="order-toggle-"]').click();
-          cy.get('[data-testid="order-status-badge"]').should('be.visible');
+          cy.get('[data-testid="order-status-badge"]').invoke('text').should((text) => {
+            expect(text.trim()).to.match(/Processamento|Aprovad[ao]/i);
+          });
           cy.get('[data-testid="order-payment"]').should('be.visible');
         });
     });
@@ -219,7 +251,10 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
       cy.get('@adminOrderRow').click();
       cy.get('[data-testid="order-detail-modal"]', { timeout: 10000 }).should('be.visible');
       cy.get('[data-testid="modal-order-numero"]').should('contain.text', orderNumber);
-      cy.get('[data-testid="modal-order-status"]').should('be.visible');
+      markRequirement('RN0038', 'Status após validação do pagamento');
+      cy.get('[data-testid="modal-order-status"]').invoke('text').should((text) => {
+        expect(text.trim()).to.match(/Aprovad[ao]|Em Processamento/i);
+      });
       cy.get('[data-testid="modal-client-email"]').should('contain.text', CUSTOMER_EMAIL);
     });
     pauseForTransition();

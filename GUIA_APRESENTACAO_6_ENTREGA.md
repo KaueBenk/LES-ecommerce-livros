@@ -19,6 +19,27 @@ Este guia prepara a apresentacao da 6a entrega com foco em teste automatizado do
 - RF0036: Selecionar forma de pagamento.
 - RF0037: Finalizar compra.
 - RF0025: Consultar transacoes (historico de pedidos).
+- RN0037: Validar forma de pagamento para finalizacao da compra.
+- RN0038: Alterar status conforme aprovacao da forma de pagamento.
+
+## 2.1 Rastreabilidade DRS deste teste
+
+O spec `pedido-venda-sucesso.cy.js` registra no proprio log do Cypress os IDs do DRS cobertos no fluxo.
+
+IDs exibidos no log:
+- RF0025
+- RF0033
+- RF0034
+- RF0035
+- RF0036
+- RF0037
+- RN0037
+- RN0038
+
+Importante sobre "todos os requisitos" do DRS:
+- O DRS completo inclui modulos de livros, clientes, trocas, estoque, analytics e avaliacoes.
+- Um unico teste de checkout nao consegue cumprir todos os requisitos globais do documento.
+- Este teste garante e exibe todos os requisitos aplicaveis ao cenario da 6a entrega (registro de pedido com sucesso).
 
 ## 3. Arquivos principais da entrega
 
