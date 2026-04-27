@@ -15,17 +15,6 @@ const EXPECTED_DELIVERY_DATE = '06/10/2025';
 const FIXED_DELIVERY_DATE_ISO = '2025-10-06';
 const STEP_DELAY_MS = Number(Cypress.env('STEP_DELAY_MS') || 1800);
 
-const DRS_COVERED_REQUIREMENTS = [
-  'RF0025', // Consulta de transações
-  'RF0033', // Realizar compra
-  'RF0034', // Calcular frete
-  'RF0035', // Selecionar endereço de entrega
-  'RF0036', // Selecionar forma de pagamento
-  'RF0037', // Finalizar compra
-  'RN0037', // Validar forma de pagamento na finalização
-  'RN0038', // Alterar status conforme aprovação do pagamento
-];
-
 const parseCurrency = (raw) => {
   const normalized = (raw || '')
     .replace(/\s/g, '')
@@ -52,7 +41,6 @@ const clearCartIfNeeded = () => {
 
 const pauseForDemo = () => cy.wait(STEP_DELAY_MS);
 const pauseForTransition = () => cy.wait(STEP_DELAY_MS * 2);
-const markRequirement = (id, description) => cy.log(`[DRS] ${id} - ${description}`);
 
 const toOrderPattern = (orderNumber) => {
   const numeric = Number(String(orderNumber || '').replace(/\D/g, ''));
@@ -161,15 +149,8 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
   });
 
   it('registra pedido com sucesso e exibe entrega prevista em 06/10/2025', () => {
-    cy.log(`[DRS] Cobertura deste teste: ${DRS_COVERED_REQUIREMENTS.join(', ')}`);
-
-    markRequirement('RF0025', 'Exibir pedidos existentes antes da nova compra');
     prepareCheckoutToPaymentStep();
 
-    markRequirement('RF0033', 'Realizar compra a partir do carrinho');
-    markRequirement('RF0034', 'Calcular frete');
-    markRequirement('RF0035', 'Selecionar endereço de entrega');
-    markRequirement('RF0036', 'Selecionar forma de pagamento');
     selectOddCardAndFillFullAmount();
     pauseForTransition();
 
@@ -186,8 +167,6 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
       });
     }).as('finalizeOrderSuccess');
 
-    markRequirement('RF0037', 'Finalizar compra');
-    markRequirement('RN0037', 'Validar forma de pagamento na finalização');
     cy.get('[data-testid="confirm-purchase-btn"]').click();
     cy.wait('@finalizeOrderSuccess').then((interception) => {
       expect(interception?.response?.statusCode).to.eq(201);
@@ -251,7 +230,6 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
       cy.get('@adminOrderRow').click();
       cy.get('[data-testid="order-detail-modal"]', { timeout: 10000 }).should('be.visible');
       cy.get('[data-testid="modal-order-numero"]').should('contain.text', orderNumber);
-      markRequirement('RN0038', 'Status após validação do pagamento');
       cy.get('[data-testid="modal-order-status"]').invoke('text').should((text) => {
         expect(text.trim()).to.match(/Aprovad[ao]|Em Processamento/i);
       });
