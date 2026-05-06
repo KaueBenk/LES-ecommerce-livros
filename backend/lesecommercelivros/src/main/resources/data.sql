@@ -1,3 +1,9 @@
+-- Ajustes de schema
+ALTER TABLE solicitacao_troca DROP CONSTRAINT IF EXISTS solicitacao_troca_status_check;
+ALTER TABLE solicitacao_troca
+  ADD CONSTRAINT solicitacao_troca_status_check
+  CHECK (status IN ('EM_TROCA', 'TROCA_AUTORIZADA', 'TROCADO', 'REJEITADA'));
+
 -- Autores
 INSERT INTO autor (nome)
 SELECT 'Robert C. Martin'

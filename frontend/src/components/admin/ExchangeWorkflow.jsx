@@ -16,6 +16,7 @@ const StatusBadge = ({ status }) => {
     EM_TROCA: { cls: 'bg-warning text-dark', label: 'Pendente' },
     TROCA_AUTORIZADA: { cls: 'bg-info text-dark', label: 'Autorizada' },
     TROCADO: { cls: 'bg-success', label: 'Concluída' },
+    REJEITADA: { cls: 'bg-danger', label: 'Rejeitada' },
   };
   const { cls = 'bg-secondary', label = status } = map[status] ?? {};
   return <span className={`badge ${cls}`}>{label}</span>;
@@ -108,6 +109,7 @@ const PendingExchanges = () => {
   const [totalPages, setTotalPages] = useState(0);
   const [totalElements, setTotalElements] = useState(0);
   const [authorizingId, setAuthorizingId] = useState(null);
+  const [rejectingId, setRejectingId] = useState(null);
 
   const fetchExchanges = useCallback(async () => {
     setLoading(true);
@@ -135,6 +137,24 @@ const PendingExchanges = () => {
       notifyError(getErrorMessage(err) || 'Erro ao autorizar troca.');
     } finally {
       setAuthorizingId(null);
+    }
+  };
+
+  const handleReject = async (exchange) => {
+    const ok = window.confirm(
+      `Confirma a rejeição da troca #${exchange.id} (${exchange.numeroNota ?? exchange.pedidoId})?`
+    );
+    if (!ok) return;
+
+    setRejectingId(exchange.id);
+    try {
+      await adminService.rejectExchange(exchange.id);
+      success(`Troca #${exchange.id} (${exchange.numeroNota ?? exchange.pedidoId}) rejeitada.`);
+      fetchExchanges();
+    } catch (err) {
+      notifyError(getErrorMessage(err) || 'Erro ao rejeitar troca.');
+    } finally {
+      setRejectingId(null);
     }
   };
 
@@ -182,19 +202,34 @@ const PendingExchanges = () => {
                   <StatusBadge status={ex.status} />
                 </td>
                 <td className="text-end">
-                  <button
-                    type="button"
-                    className="btn btn-sm btn-success"
-                    onClick={() => handleAuthorize(ex)}
-                    disabled={authorizingId === ex.id}
-                    data-testid={`authorize-exchange-${ex.id}`}
-                  >
-                    {authorizingId === ex.id ? (
-                      <><span className="spinner-border spinner-border-sm me-1" role="status" />Autorizando…</>
-                    ) : (
-                      'Autorizar'
-                    )}
-                  </button>
+                  <div className="btn-group btn-group-sm">
+                    <button
+                      type="button"
+                      className="btn btn-success"
+                      onClick={() => handleAuthorize(ex)}
+                      disabled={authorizingId === ex.id || rejectingId === ex.id}
+                      data-testid={`authorize-exchange-${ex.id}`}
+                    >
+                      {authorizingId === ex.id ? (
+                        <><span className="spinner-border spinner-border-sm me-1" role="status" />Autorizando…</>
+                      ) : (
+                        'Autorizar'
+                      )}
+                    </button>
+                    <button
+                      type="button"
+                      className="btn btn-outline-danger"
+                      onClick={() => handleReject(ex)}
+                      disabled={authorizingId === ex.id || rejectingId === ex.id}
+                      data-testid={`reject-exchange-${ex.id}`}
+                    >
+                      {rejectingId === ex.id ? (
+                        <><span className="spinner-border spinner-border-sm me-1" role="status" />Rejeitando…</>
+                      ) : (
+                        'Rejeitar'
+                      )}
+                    </button>
+                  </div>
                 </td>
               </tr>
             ))}

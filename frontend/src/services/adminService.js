@@ -91,6 +91,11 @@ const adminService = {
     return response.data;
   },
 
+  confirmPayment: async (orderId) => {
+    const response = await api.patch(`/admin/pedidos/${orderId}/confirmar-pagamento`);
+    return response.data;
+  },
+
   deliverOrder: async (orderId) => {
     const response = await api.patch(`/admin/pedidos/${orderId}/entregar`);
     return response.data;
@@ -179,6 +184,13 @@ const adminService = {
     logger.logAdmin('AUTORIZAR_TROCA', { trocaId: exchangeId });
     const response = await api.patch(`/admin/trocas/${exchangeId}/autorizar`);
     logger.logAdmin('TROCA_AUTORIZADA', { trocaId: exchangeId });
+    return response.data;
+  },
+
+  rejectExchange: async (exchangeId) => {
+    logger.logAdmin('REJEITAR_TROCA', { trocaId: exchangeId });
+    const response = await api.patch(`/admin/trocas/${exchangeId}/rejeitar`);
+    logger.logAdmin('TROCA_REJEITADA', { trocaId: exchangeId });
     return response.data;
   },
 

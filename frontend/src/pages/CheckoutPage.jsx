@@ -10,6 +10,7 @@ import { getErrorMessage } from '../utils/helpers';
 import { ROUTES } from '../utils/constants';
 import LoadingSpinner from '../components/common/LoadingSpinner';
 import AddressForm from '../components/account/AddressForm';
+import CreditCardForm from '../components/account/CreditCardForm';
 import logger from '@utils/logger';
 
 // ─── Stepper ──────────────────────────────────────────────────────────────────
@@ -228,6 +229,40 @@ const AddAddressModal = ({ onClose, onAdded }) => {
         </div>
       </div>
     </>
+  );
+};
+
+// ─── Add Credit Card Modal ──────────────────────────────────────────────────
+
+const AddCardModal = ({ onClose, onAdded }) => {
+  const [saving, setSaving] = useState(false);
+  const [serverError, setServerError] = useState(null);
+  const { success, error: notifyError } = useNotification();
+
+  const handleSave = async (formData) => {
+    setSaving(true);
+    setServerError(null);
+    try {
+      await customerService.addCreditCard(formData);
+      success('Cartão adicionado com sucesso!');
+      onAdded();
+    } catch (err) {
+      const msg = getErrorMessage(err) || 'Erro ao salvar cartão.';
+      setServerError(msg);
+      notifyError(msg);
+    } finally {
+      setSaving(false);
+    }
+  };
+
+  return (
+    <CreditCardForm
+      card={null}
+      onSave={handleSave}
+      onClose={onClose}
+      saving={saving}
+      serverError={serverError}
+    />
   );
 };
 
@@ -611,7 +646,14 @@ const BrandBadge = ({ nome }) => {
  * the remaining balance (after shipping and coupons) before the step
  * can be completed.
  */
-const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance, onPaymentChange }) => {
+const StepPayment = ({
+  checkoutData,
+  creditCards,
+  cardsLoading,
+  remainingBalance,
+  onPaymentChange,
+  onAddCard,
+}) => {
   // cardValues: { [cardId]: string }  — raw input strings
   const [cardValues, setCardValues] = useState(
     () =>
@@ -632,11 +674,21 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
   }, 0);
 
   const target = remainingBalance ?? 0;
+  const allowNoPayment = target <= 0.009;
   const diff = Math.abs(total - target);
   const isExact = diff < 0.005;
 
   // Notify parent whenever selection or values change
   useEffect(() => {
+    if (allowNoPayment) {
+      if (selectedIds.length > 0 || Object.keys(cardValues).length > 0) {
+        setSelectedIds([]);
+        setCardValues({});
+      }
+      onPaymentChange({ paymentSplits: [], paymentValid: true });
+      return;
+    }
+
     const splits = selectedIds
       .map((id) => {
         const v = parseFloat((cardValues[id] || '0').replace(',', '.'));
@@ -656,7 +708,7 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
       paymentValid: isExact && selectedIds.length > 0 && !hasCardErrors,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardValues, selectedIds]);
+  }, [cardValues, selectedIds, target, allowNoPayment]);
 
   const toggleCard = (cardId) => {
     setSelectedIds((prev) => {
@@ -687,13 +739,27 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
 
   return (
     <div data-testid="step-payment-cards">
-      <h2 className="h5 fw-bold mb-1">Forma de Pagamento</h2>
-      <p className="text-muted small mb-4">
-        Valor a pagar:{' '}
-        <strong className="text-primary" data-testid="payment-remaining-balance">
-          {formatCurrency(target)}
-        </strong>
-      </p>
+      <div className="d-flex align-items-start justify-content-between gap-2 mb-3">
+        <div>
+          <h2 className="h5 fw-bold mb-1">Forma de Pagamento</h2>
+          <p className="text-muted small mb-0">
+            Valor a pagar:{' '}
+            <strong className="text-primary" data-testid="payment-remaining-balance">
+              {formatCurrency(target)}
+            </strong>
+          </p>
+        </div>
+        {onAddCard && (
+          <button
+            type="button"
+            className="btn btn-outline-primary btn-sm"
+            onClick={onAddCard}
+            data-testid="add-card-btn"
+          >
+            + Adicionar Cartão
+          </button>
+        )}
+      </div>
 
       {/* Test helper: business rule D8 — even-ending cards are rejected */}
       <div className="alert alert-info small mb-3" data-testid="test-hint-even-cards">
@@ -701,7 +767,11 @@ const StepPayment = ({ checkoutData, creditCards, cardsLoading, remainingBalance
         processador (regra de demonstração). Utilize um final <strong>ímpar</strong> para aprovação.
       </div>
 
-      {cardsLoading ? (
+      {allowNoPayment ? (
+        <div className="alert alert-success" data-testid="no-payment-needed">
+          Os cupons cobrem o valor total. Nenhum cartão é necessário para finalizar a compra.
+        </div>
+      ) : cardsLoading ? (
         <div className="text-center py-3">
           <span className="spinner-border spinner-border-sm me-2" role="status" aria-hidden="true" />
           Carregando cartões…
@@ -1092,6 +1162,7 @@ const CheckoutPage = () => {
 
   // Add address modal
   const [showAddModal, setShowAddModal] = useState(false);
+  const [showAddCardModal, setShowAddCardModal] = useState(false);
 
   // ── Fetch cart + addresses on mount ──
   useEffect(() => {
@@ -1146,6 +1217,17 @@ const CheckoutPage = () => {
     // Auto-select if it's a delivery address
     if (['ENTREGA', 'AMBOS'].includes(newAddr.tipoEndereco)) {
       handleSelectAddress(newAddr);
+    }
+  };
+
+  const handleCardAdded = async () => {
+    try {
+      const data = await customerService.getCreditCards();
+      setCreditCards(Array.isArray(data) ? data : []);
+    } catch {
+      setCreditCards([]);
+    } finally {
+      setShowAddCardModal(false);
     }
   };
 
@@ -1313,6 +1395,7 @@ const CheckoutPage = () => {
               cardsLoading={cardsLoading}
               remainingBalance={remainingBalance}
               onPaymentChange={handlePaymentChange}
+              onAddCard={() => setShowAddCardModal(true)}
             />
           )}
           {currentStep === 4 && (
@@ -1392,6 +1475,12 @@ const CheckoutPage = () => {
         <AddAddressModal
           onClose={() => setShowAddModal(false)}
           onAdded={handleAddressAdded}
+        />
+      )}
+      {showAddCardModal && (
+        <AddCardModal
+          onClose={() => setShowAddCardModal(false)}
+          onAdded={handleCardAdded}
         />
       )}
     </div>

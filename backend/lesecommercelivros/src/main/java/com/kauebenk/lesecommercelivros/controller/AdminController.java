@@ -114,6 +114,12 @@ public class AdminController {
         return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.entregarPedido(id), "Pedido entregue"));
     }
 
+    @PatchMapping("/pedidos/{id}/confirmar-pagamento")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> confirmarPagamento(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/pedidos/{}/confirmar-pagamento - Confirmando pagamento", id);
+        return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.confirmarPagamento(id), "Pagamento confirmado"));
+    }
+
     @GetMapping("/clientes")
     public ResponseEntity<ApiResponse<PaginatedResponse<Map<String, Object>>>> getClientes(
             @RequestParam(required = false) String nome,
@@ -207,6 +213,12 @@ public class AdminController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> autorizarTroca(@PathVariable Long id) {
         log.info("[ADMIN-CTRL] PATCH /api/v1/admin/trocas/{}/autorizar - Autorizando troca", id);
         return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.autorizarTroca(id), "Troca autorizada"));
+    }
+
+    @PatchMapping("/trocas/{id}/rejeitar")
+    public ResponseEntity<ApiResponse<Map<String, Object>>> rejeitarTroca(@PathVariable Long id) {
+        log.info("[ADMIN-CTRL] PATCH /api/v1/admin/trocas/{}/rejeitar - Rejeitando troca", id);
+        return ResponseEntity.ok(ApiResponse.success(adminWorkflowService.rejeitarTroca(id), "Troca rejeitada"));
     }
 
     @PatchMapping("/trocas/{id}/confirmar-recebimento")

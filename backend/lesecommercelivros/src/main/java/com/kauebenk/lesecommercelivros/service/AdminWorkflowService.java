@@ -179,6 +179,41 @@ public class AdminWorkflowService {
         return Map.of("status", pedido.getStatus().name());
     }
 
+    public Map<String, Object> confirmarPagamento(Long pedidoId) {
+        Pedido pedido = pedidoRepository.findById(pedidoId)
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Pedido não encontrado - PedidoID: {}", pedidoId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Pedido não encontrado");
+                });
+
+        if (pedido.getStatus() != StatusPedido.APROVADA) {
+            log.warn("[ADMIN-WORKFLOW] Validação falhou ao confirmar pagamento - PedidoID: {} - Status atual: {}", 
+                    pedidoId, pedido.getStatus());
+            throw new ResponseStatusException(
+                    HttpStatus.BAD_REQUEST,
+                    "Apenas pedidos APROVADA podem ter pagamento confirmado"
+            );
+        }
+
+        if (Boolean.TRUE.equals(pedido.getPagamentoConfirmado())) {
+            return Map.of("pagamentoConfirmado", true);
+        }
+
+        Map<String, Object> before = Map.of("pagamentoConfirmado", pedido.getPagamentoConfirmado());
+        pedido.setPagamentoConfirmado(true);
+        pedidoRepository.save(pedido);
+
+        transacaoLogService.registrar(
+                "PEDIDO",
+                pedido.getId(),
+                OperacaoLog.UPDATE,
+                before,
+                Map.of("pagamentoConfirmado", true)
+        );
+
+        return Map.of("pagamentoConfirmado", true);
+    }
+
     @Transactional(readOnly = true)
     public PaginatedResponse<Map<String, Object>> getClientes(
             String nome,
@@ -415,6 +450,57 @@ public class AdminWorkflowService {
         }
 
         return Map.of("status", StatusTroca.TROCA_AUTORIZADA.name());
+    }
+
+    public Map<String, Object> rejeitarTroca(Long trocaId) {
+        SolicitacaoTroca troca = solicitacaoTrocaRepository.findById(trocaId)
+                .orElseThrow(() -> {
+                    log.warn("[ADMIN-WORKFLOW] Troca não encontrada - TrocaID: {}", trocaId);
+                    return new ResponseStatusException(HttpStatus.NOT_FOUND, "Troca não encontrada");
+                });
+        StatusTroca statusAnteriorTroca = troca.getStatus();
+        if (troca.getStatus() != StatusTroca.EM_TROCA) {
+            log.warn("[ADMIN-WORKFLOW] Validação falhou ao rejeitar - TrocaID: {} - Status atual: {}", 
+                    trocaId, troca.getStatus());
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Troca deve estar EM_TROCA");
+        }
+
+        troca.setStatus(StatusTroca.REJEITADA);
+        solicitacaoTrocaRepository.save(troca);
+
+        transacaoLogService.registrar(
+                "SOLICITACAO_TROCA",
+                troca.getId(),
+                OperacaoLog.UPDATE,
+                statusSnapshot(statusAnteriorTroca),
+                statusSnapshot(troca.getStatus())
+        );
+
+        Pedido pedido = troca.getPedido();
+        if (pedido != null) {
+            StatusPedido statusAnteriorPedido = pedido.getStatus();
+            pedido.setStatus(StatusPedido.ENTREGUE);
+            pedidoRepository.save(pedido);
+            transacaoLogService.registrar(
+                    "PEDIDO",
+                    pedido.getId(),
+                    OperacaoLog.UPDATE,
+                    statusSnapshot(statusAnteriorPedido),
+                    statusSnapshot(pedido.getStatus())
+            );
+
+            if (pedido.getCliente() != null) {
+                notificacaoService.criar(
+                        pedido.getCliente(),
+                        "Troca rejeitada",
+                        "Sua solicitação de troca do pedido PED-" + pedido.getId() + " foi rejeitada.",
+                        "/account/orders",
+                        "TROCA_REJEITADA"
+                );
+            }
+        }
+
+        return Map.of("status", StatusTroca.REJEITADA.name());
     }
 
     public Map<String, Object> confirmarRecebimentoTroca(Long trocaId, Map<String, Object> payload) {
@@ -676,6 +762,7 @@ public class AdminWorkflowService {
         map.put("numero", "PED-" + String.format("%03d", pedido.getId()));
         map.put("dataPedido", pedido.getDataPedido());
         map.put("status", pedido.getStatus() != null ? pedido.getStatus().name() : null);
+        map.put("pagamentoConfirmado", pedido.getPagamentoConfirmado());
         map.put("cliente", cliente);
         map.put("valorTotal", pedido.getValorTotal());
         map.put("valorFrete", pedido.getValorFrete());

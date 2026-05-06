@@ -22,6 +22,7 @@ public class Pedido {
     private String enderecoEntrega;
     @Enumerated(EnumType.STRING)
     private StatusPedido status;
+    private Boolean pagamentoConfirmado;
     private BigDecimal valorFrete;
     private BigDecimal valorTotal;
     @OneToMany(mappedBy = "pedido", cascade = CascadeType.ALL)

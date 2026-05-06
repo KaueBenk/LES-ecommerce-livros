@@ -322,6 +322,7 @@ public class CheckoutService {
         pedido.setCliente(cliente);
         pedido.setEnderecoEntrega(formatEndereco(endereco));
         pedido.setStatus(StatusPedido.EM_PROCESSAMENTO);
+        pedido.setPagamentoConfirmado(false);
         pedido.setValorFrete(valorFrete);
         pedido.setValorTotal(valorTotal);
         pedido.setDataPedido(LocalDateTime.now());

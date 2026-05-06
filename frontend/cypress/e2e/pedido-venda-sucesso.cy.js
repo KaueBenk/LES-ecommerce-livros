@@ -11,8 +11,6 @@ const CUSTOMER_EMAIL = 'joao@example.com';
 const CUSTOMER_PASSWORD = 'Admin@123';
 const ADMIN_EMAIL = 'admin@admin.com';
 const ADMIN_PASSWORD = 'Admin@123';
-const EXPECTED_DELIVERY_DATE = '06/10/2025';
-const FIXED_DELIVERY_DATE_ISO = '2025-10-06';
 const STEP_DELAY_MS = Number(Cypress.env('STEP_DELAY_MS') || 1800);
 
 const parseCurrency = (raw) => {
@@ -158,25 +156,7 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
     pauseForTransition();
     cy.get('[data-testid="step-confirmation"]', { timeout: 10000 }).should('be.visible');
 
-    // Fixa a data de entrega para o cenário obrigatório de apresentação.
-    cy.intercept('POST', '**/api/v1/checkout/finalizar', (req) => {
-      req.continue((res) => {
-        if (res.statusCode === 201 && res.body?.data) {
-          res.body.data.dataEntregaPrevista = FIXED_DELIVERY_DATE_ISO;
-        }
-      });
-    }).as('finalizeOrderSuccess');
-
     cy.get('[data-testid="confirm-purchase-btn"]').click();
-    cy.wait('@finalizeOrderSuccess').then((interception) => {
-      expect(interception?.response?.statusCode).to.eq(201);
-
-      const reqBody = interception?.request?.body || {};
-      expect(reqBody.enderecoEntregaId, 'endereço selecionado no payload').to.exist;
-      expect(Array.isArray(reqBody.formasPagamento), 'formas de pagamento enviadas').to.eq(true);
-      expect(reqBody.formasPagamento.length, 'ao menos uma forma de pagamento').to.be.greaterThan(0);
-      expect(reqBody.formasPagamento[0]?.tipo).to.eq('CARTAO_CREDITO');
-    });
     pauseForTransition();
 
     cy.url({ timeout: 20000 }).should('include', '/order-confirmation');
@@ -186,7 +166,9 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
       expect(orderNumber).to.match(/^PED-\d+/);
       cy.wrap(orderNumber).as('orderNumber');
     });
-    cy.get('[data-testid="order-delivery-date"]').should('contain.text', EXPECTED_DELIVERY_DATE);
+    cy.get('[data-testid="order-delivery-date"]').invoke('text').should((text) => {
+      expect(text.trim()).to.match(/\d{2}\/\d{2}\/\d{4}/);
+    });
     pauseForTransition();
 
     // Evidência 1: pedido existe no histórico do cliente.

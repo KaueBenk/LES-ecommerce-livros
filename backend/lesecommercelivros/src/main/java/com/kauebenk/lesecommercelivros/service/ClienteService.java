@@ -370,6 +370,7 @@ public class ClienteService {
         out.put("valor", pedido.getValorTotal());
         out.put("dataPedido", pedido.getDataPedido());
         out.put("data", pedido.getDataPedido());
+        out.put("pagamentoConfirmado", pedido.getPagamentoConfirmado());
         out.put("enderecoEntrega", parseEndereco(pedido.getEnderecoEntrega()));
 
         List<Map<String, Object>> itens = pedido.getItens() == null ? List.of() : pedido.getItens().stream()

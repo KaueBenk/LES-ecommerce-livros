@@ -34,6 +34,11 @@ const logoutViaUi = () => {
   cy.url({ timeout: 10000 }).should('include', '/login');
 };
 
+const confirmActionModal = () => {
+  cy.get('[data-testid="confirm-modal-ok"]').click();
+  cy.get('[data-testid="confirm-action-modal"]', { timeout: 15000 }).should('not.exist');
+};
+
 const clearCartIfNeeded = () => {
   cy.visit('/cart');
   cy.get('[data-testid="cart-page"]', { timeout: 15000 }).should('exist');
@@ -114,10 +119,18 @@ const dispatchAndDeliverOrderAsAdmin = () => {
     cy.get('[data-testid="filter-submit"]').click();
 
     cy.contains('[data-testid^="order-row-"]', orderNumber, { timeout: 20000 }).within(() => {
+      cy.get('[data-testid^="confirm-payment-btn-"]').click();
+    });
+
+    confirmActionModal();
+
+    cy.get('[data-testid="filter-submit"]').click();
+
+    cy.contains('[data-testid^="order-row-"]', orderNumber, { timeout: 20000 }).within(() => {
       cy.get('[data-testid^="dispatch-btn-"]').click();
     });
 
-    cy.get('[data-testid="confirm-modal-ok"]').click();
+    confirmActionModal();
 
     cy.get('[data-testid="filter-status"]').select('EM_TRANSITO');
     cy.get('[data-testid="filter-submit"]').click();
@@ -126,7 +139,25 @@ const dispatchAndDeliverOrderAsAdmin = () => {
       cy.get('[data-testid^="deliver-btn-"]').click();
     });
 
-    cy.get('[data-testid="confirm-modal-ok"]').click();
+    confirmActionModal();
+  });
+};
+
+const getTradeCouponCount = () => {
+  return cy.window().then((win) => {
+    const token = win.localStorage.getItem('auth_token');
+    expect(token, 'token de autenticação no localStorage').to.be.a('string').and.not.be.empty;
+
+    return cy
+      .request({
+        method: 'GET',
+        url: `${Cypress.env('apiBaseUrl')}/clientes/cupons-troca`,
+        headers: { Authorization: `Bearer ${token}` },
+      })
+      .then((response) => {
+        const coupons = Array.isArray(response.body?.data) ? response.body.data : [];
+        return coupons.length;
+      });
   });
 };
 
@@ -208,6 +239,143 @@ describe('Trocas (cliente + admin) com backend real', () => {
             expect(text.trim()).to.match(/Troca|Trocado|TROCADO/i);
           });
         });
+    });
+  });
+
+  it('admin rejeita troca e pedido permanece ENTREGUE', () => {
+    const rejectMarker = `REJEICAO-E2E-${Date.now()}`;
+
+    loginCustomer();
+    completeCheckoutWithOddCard();
+    logoutViaUi();
+
+    loginAdmin();
+    dispatchAndDeliverOrderAsAdmin();
+    logoutViaUi();
+
+    loginCustomer();
+    cy.get('@createdOrderNumber').then((orderNumber) => {
+      const orderPattern = toOrderPattern(orderNumber);
+      cy.visit('/account/orders');
+      cy.get('[data-testid="order-history-page"]', { timeout: 15000 }).should('be.visible');
+
+      cy.contains('[data-testid="order-numero"]', orderPattern, { timeout: 20000 })
+        .closest('[data-testid^="order-card-"]')
+        .within(() => {
+          cy.get('[data-testid^="order-toggle-"]').click();
+          cy.get('[data-testid^="exchange-btn-"]').click();
+        });
+
+      cy.get('[data-testid="exchange-modal"]', { timeout: 10000 }).should('be.visible');
+      cy.get('[data-testid^="exchange-chk-"]').first().check({ force: true });
+      cy.get('[data-testid="exchange-justificativa"]').type(
+        `${rejectMarker} Solicitação de troca para validação de rejeição.`,
+      );
+      cy.get('[data-testid="exchange-submit-btn"]').click();
+      cy.get('[data-testid="exchange-modal"]', { timeout: 10000 }).should('not.exist');
+    });
+
+    logoutViaUi();
+
+    loginAdmin();
+    cy.on('window:confirm', () => true);
+    cy.visit('/admin/trocas');
+    cy.get('[data-testid="admin-exchanges-section"]', { timeout: 15000 }).should('be.visible');
+
+    cy.contains('[data-testid^="pending-exchange-row-"]', rejectMarker, { timeout: 20000 })
+      .should('be.visible')
+      .invoke('attr', 'data-testid')
+      .then((rowTestId) => {
+        const exchangeId = String(rowTestId).replace('pending-exchange-row-', '');
+        cy.get(`[data-testid="reject-exchange-${exchangeId}"]`).click();
+      });
+
+    logoutViaUi();
+
+    loginCustomer();
+    cy.get('@createdOrderNumber').then((orderNumber) => {
+      const orderPattern = toOrderPattern(orderNumber);
+      cy.visit('/account/orders');
+      cy.contains('[data-testid="order-numero"]', orderPattern, { timeout: 20000 })
+        .closest('[data-testid^="order-card-"]')
+        .within(() => {
+          cy.get('[data-testid^="order-toggle-"]').click();
+          cy.get('[data-testid="order-status-badge"]').invoke('text').should((text) => {
+            expect(text.trim()).to.match(/Entregue/i);
+          });
+        });
+    });
+  });
+
+  it('troca total gera cupom e fica disponível para o cliente', () => {
+    const fullExchangeMarker = `TROCA-TOTAL-E2E-${Date.now()}`;
+
+    loginCustomer();
+    completeCheckoutWithOddCard();
+    logoutViaUi();
+
+    loginAdmin();
+    dispatchAndDeliverOrderAsAdmin();
+    logoutViaUi();
+
+    loginCustomer();
+    getTradeCouponCount().then((count) => cy.wrap(count).as('couponCountBefore'));
+
+    cy.get('@createdOrderNumber').then((orderNumber) => {
+      const orderPattern = toOrderPattern(orderNumber);
+      cy.visit('/account/orders');
+      cy.contains('[data-testid="order-numero"]', orderPattern, { timeout: 20000 })
+        .closest('[data-testid^="order-card-"]')
+        .within(() => {
+          cy.get('[data-testid^="order-toggle-"]').click();
+          cy.get('[data-testid^="exchange-btn-"]').click();
+        });
+
+      cy.get('[data-testid="exchange-modal"]', { timeout: 10000 }).should('be.visible');
+
+      cy.get('[data-testid^="exchange-chk-"]').each(($el) => {
+        cy.wrap($el).check({ force: true });
+      });
+
+      cy.get('[data-testid^="exchange-qty-"]').each(($el) => {
+        const max = $el.attr('max') || '1';
+        cy.wrap($el).clear().type(String(max));
+      });
+
+      cy.get('[data-testid="exchange-justificativa"]').type(
+        `${fullExchangeMarker} Solicitação de troca total para validação de cupom.`,
+      );
+      cy.get('[data-testid="exchange-submit-btn"]').click();
+      cy.get('[data-testid="exchange-modal"]', { timeout: 10000 }).should('not.exist');
+    });
+
+    logoutViaUi();
+
+    loginAdmin();
+    cy.visit('/admin/trocas');
+    cy.get('[data-testid="admin-exchanges-section"]', { timeout: 15000 }).should('be.visible');
+
+    cy.contains('[data-testid^="pending-exchange-row-"]', fullExchangeMarker, { timeout: 20000 })
+      .should('be.visible')
+      .invoke('attr', 'data-testid')
+      .then((rowTestId) => {
+        const exchangeId = String(rowTestId).replace('pending-exchange-row-', '');
+        cy.get(`[data-testid="authorize-exchange-${exchangeId}"]`).click();
+
+        cy.get('[data-testid="tab-authorized"]').click();
+        cy.get(`[data-testid="authorized-exchange-row-${exchangeId}"]`, { timeout: 20000 })
+          .within(() => {
+            cy.get(`[data-testid="confirm-receipt-${exchangeId}"]`).click();
+          });
+      });
+
+    logoutViaUi();
+
+    loginCustomer();
+    getTradeCouponCount().then((countAfter) => {
+      cy.get('@couponCountBefore').then((countBefore) => {
+        expect(countAfter).to.be.greaterThan(countBefore);
+      });
     });
   });
 });

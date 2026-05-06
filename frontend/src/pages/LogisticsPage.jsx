@@ -277,7 +277,7 @@ const LogisticsPage = () => {
 
   // ── Modals ─────────────────────────────────────────────────────────────────
   const [detailOrder, setDetailOrder] = useState(null);
-  const [pendingAction, setPendingAction] = useState(null); // { order, type: 'despachar'|'entregar' }
+  const [pendingAction, setPendingAction] = useState(null); // { order, type: 'confirmar-pagamento'|'despachar'|'entregar' }
   const [actionLoading, setActionLoading] = useState(false);
 
   // ── Fetch orders ───────────────────────────────────────────────────────────
@@ -321,6 +321,11 @@ const LogisticsPage = () => {
     setPendingAction({ order, type: 'despachar' });
   };
 
+  const handleConfirmPaymentClick = (e, order) => {
+    e.stopPropagation();
+    setPendingAction({ order, type: 'confirmar-pagamento' });
+  };
+
   const handleDeliverClick = (e, order) => {
     e.stopPropagation();
     setPendingAction({ order, type: 'entregar' });
@@ -331,7 +336,10 @@ const LogisticsPage = () => {
     const { order, type } = pendingAction;
     setActionLoading(true);
     try {
-      if (type === 'despachar') {
+      if (type === 'confirmar-pagamento') {
+        await adminService.confirmPayment(order.id);
+        success(`Pagamento do pedido ${order.numero ?? `#${order.id}`} confirmado!`);
+      } else if (type === 'despachar') {
         await adminService.dispatchOrder(order.id);
         success(`Pedido ${order.numero ?? `#${order.id}`} despachado com sucesso!`);
       } else {
@@ -348,7 +356,14 @@ const LogisticsPage = () => {
   };
 
   const actionConfig = pendingAction
-    ? pendingAction.type === 'despachar'
+    ? pendingAction.type === 'confirmar-pagamento'
+      ? {
+          title: 'Confirmar Pagamento',
+          message: `Confirma o pagamento do pedido ${pendingAction.order.numero ?? `#${pendingAction.order.id}`}?`,
+          confirmLabel: 'Confirmar Pagamento',
+          confirmClass: 'btn-primary',
+        }
+      : pendingAction.type === 'despachar'
       ? {
           title: 'Despachar Pedido',
           message: `Confirma o despacho do pedido ${pendingAction.order.numero ?? `#${pendingAction.order.id}`}? O status será alterado para EM TRÂNSITO.`,
@@ -538,7 +553,18 @@ const LogisticsPage = () => {
                     {/* Ações */}
                     <td className="text-end" onClick={(e) => e.stopPropagation()}>
                       <div className="btn-group btn-group-sm">
-                        {order.status === 'APROVADA' && (
+                        {order.status === 'APROVADA' && !order.pagamentoConfirmado && (
+                          <button
+                            type="button"
+                            className="btn btn-outline-primary"
+                            onClick={(e) => handleConfirmPaymentClick(e, order)}
+                            data-testid={`confirm-payment-btn-${order.id}`}
+                            title="Confirmar pagamento"
+                          >
+                            💳 Confirmar Pagamento
+                          </button>
+                        )}
+                        {order.status === 'APROVADA' && order.pagamentoConfirmado && (
                           <button
                             type="button"
                             className="btn btn-warning"
