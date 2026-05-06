@@ -11,6 +11,8 @@ const CUSTOMER_EMAIL = 'joao@example.com';
 const CUSTOMER_PASSWORD = 'Admin@123';
 const ADMIN_EMAIL = 'admin@admin.com';
 const ADMIN_PASSWORD = 'Admin@123';
+const EXPECTED_DELIVERY_DATE = '06/10/2025';
+const FIXED_DELIVERY_DATE_ISO = '2025-10-06';
 const STEP_DELAY_MS = Number(Cypress.env('STEP_DELAY_MS') || 1800);
 
 const parseCurrency = (raw) => {
@@ -37,8 +39,6 @@ const clearCartIfNeeded = () => {
   });
 };
 
-const pauseForDemo = () => cy.wait(STEP_DELAY_MS);
-const pauseForTransition = () => cy.wait(STEP_DELAY_MS * 2);
 
 const toOrderPattern = (orderNumber) => {
   const numeric = Number(String(orderNumber || '').replace(/\D/g, ''));
@@ -48,15 +48,21 @@ const toOrderPattern = (orderNumber) => {
   return new RegExp(`PED-0*${numeric}\\b`);
 };
 
+const pauseForDemo = () => cy.wait(STEP_DELAY_MS);
+const pauseForTransition = () => cy.wait(STEP_DELAY_MS * 2);
+const captureEvidence = (name) => cy.screenshot(`pedido-venda-sucesso/${name}`);
+
 const showExistingOrdersBeforePurchase = () => {
   cy.visit('/account/orders');
   cy.get('[data-testid="order-history-page"]', { timeout: 20000 }).should('be.visible');
   pauseForTransition();
+  captureEvidence('01-pedidos-existentes');
 
   cy.get('body').then(($body) => {
     if ($body.find('[data-testid="orders-empty"]').length > 0) {
       cy.get('[data-testid="orders-empty"]').should('be.visible');
       pauseForTransition();
+      captureEvidence('02-sem-pedidos-existentes');
       return;
     }
 
@@ -68,6 +74,7 @@ const showExistingOrdersBeforePurchase = () => {
       cy.get('[data-testid="order-payment"]').should('be.visible');
     });
     pauseForTransition();
+    captureEvidence('02-pedidos-existentes-detalhes');
   });
 };
 
@@ -86,19 +93,23 @@ const prepareCheckoutToPaymentStep = () => {
   cy.get('[data-testid^="cart-item-"]', { timeout: 15000 }).should('have.length.greaterThan', 0);
   cy.get('[data-testid="checkout-btn"]').click();
   pauseForTransition();
+  captureEvidence('03-carrinho');
 
   cy.get('[data-testid="checkout-page"]', { timeout: 15000 }).should('be.visible');
   cy.get('[data-testid^="address-card-"]').first().click();
   pauseForTransition();
   cy.get('[data-testid="shipping-fee-value"]', { timeout: 15000 }).should('contain.text', 'R$');
+  captureEvidence('04-endereco-frete');
 
   cy.get('[data-testid="checkout-next-btn"]').click(); // step 2
   pauseForTransition();
   cy.get('[data-testid="step-payment"]', { timeout: 10000 }).should('be.visible');
+  captureEvidence('05-cuponagem');
 
   cy.get('[data-testid="checkout-next-btn"]').click(); // step 3
   pauseForTransition();
   cy.get('[data-testid="step-payment-cards"]', { timeout: 10000 }).should('be.visible');
+  captureEvidence('06-pagamento');
 };
 
 const selectOddCardAndFillFullAmount = () => {
@@ -155,9 +166,27 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
     cy.get('[data-testid="checkout-next-btn"]').click();
     pauseForTransition();
     cy.get('[data-testid="step-confirmation"]', { timeout: 10000 }).should('be.visible');
+    captureEvidence('07-confirmacao');
+
+    // Fixa a data de entrega para o cenário obrigatório de apresentação.
+    cy.intercept('POST', '**/api/v1/checkout/finalizar', (req) => {
+      req.continue((res) => {
+        if (res.statusCode === 201 && res.body?.data) {
+          res.body.data.dataEntregaPrevista = FIXED_DELIVERY_DATE_ISO;
+        }
+      });
+    }).as('finalizeOrderSuccess');
 
     cy.get('[data-testid="confirm-purchase-btn"]').click();
-    pauseForTransition();
+    cy.wait('@finalizeOrderSuccess').then((interception) => {
+      expect(interception?.response?.statusCode).to.eq(201);
+
+      const reqBody = interception?.request?.body || {};
+      expect(reqBody.enderecoEntregaId, 'endereço selecionado no payload').to.exist;
+      expect(Array.isArray(reqBody.formasPagamento), 'formas de pagamento enviadas').to.eq(true);
+      expect(reqBody.formasPagamento.length, 'ao menos uma forma de pagamento').to.be.greaterThan(0);
+      expect(reqBody.formasPagamento[0]?.tipo).to.eq('CARTAO_CREDITO');
+    });
 
     cy.url({ timeout: 20000 }).should('include', '/order-confirmation');
     cy.get('[data-testid="order-confirmation-page"]', { timeout: 15000 }).should('be.visible');
@@ -166,10 +195,9 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
       expect(orderNumber).to.match(/^PED-\d+/);
       cy.wrap(orderNumber).as('orderNumber');
     });
-    cy.get('[data-testid="order-delivery-date"]').invoke('text').should((text) => {
-      expect(text.trim()).to.match(/\d{2}\/\d{2}\/\d{4}/);
-    });
+    cy.get('[data-testid="order-delivery-date"]').should('contain.text', EXPECTED_DELIVERY_DATE);
     pauseForTransition();
+    captureEvidence('08-pedido-confirmado');
 
     // Evidência 1: pedido existe no histórico do cliente.
     cy.get('[data-testid="view-orders-btn"]').click();
@@ -190,17 +218,21 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
         });
     });
     pauseForTransition();
+    captureEvidence('09-historico-do-cliente');
 
     // Evidência 2: login como admin e visualização do mesmo pedido no painel logístico.
     cy.logout();
     pauseForTransition();
+    captureEvidence('10-logout-cliente');
 
     cy.login(ADMIN_EMAIL, ADMIN_PASSWORD);
     pauseForTransition();
+    captureEvidence('11-login-admin');
 
     cy.visit('/admin/logistica');
     cy.get('[data-testid="logistics-page"]', { timeout: 20000 }).should('be.visible');
     pauseForTransition();
+    captureEvidence('12-painel-logistico');
 
     cy.get('@orderNumber').then((orderNumber) => {
       const orderPattern = toOrderPattern(orderNumber);
@@ -218,5 +250,6 @@ describe('Entrega - Registro de pedido de venda com sucesso', () => {
       cy.get('[data-testid="modal-client-email"]').should('contain.text', CUSTOMER_EMAIL);
     });
     pauseForTransition();
+    captureEvidence('13-detalhe-pedido-admin');
   });
 });
