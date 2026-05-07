@@ -81,6 +81,7 @@ Cypress.Commands.add('addToCart', (bookId, qty = 1) => {
       .first()
       .should('be.visible')
       .click();
+    cy.contains('adicionado ao carrinho', { timeout: 10000 }).should('be.visible');
   };
 
   if (!bookId) {
@@ -89,8 +90,11 @@ Cypress.Commands.add('addToCart', (bookId, qty = 1) => {
   }
 
   cy.visit(`/product/${bookId}`);
-  cy.get('body', { timeout: 15000 }).then(($body) => {
+  cy.get('[data-testid="product-page"]', { timeout: 20000 }).should('be.visible');
+  
+  cy.get('body').then(($body) => {
     if ($body.find('[data-testid="add-to-cart-btn"]').length === 0) {
+      cy.log('Add to cart button not found on product page, falling back to catalog');
       addFromCatalog();
       return;
     }
@@ -100,6 +104,7 @@ Cypress.Commands.add('addToCart', (bookId, qty = 1) => {
     }
 
     cy.get('[data-testid="add-to-cart-btn"]').should('be.visible').click();
+    cy.contains('adicionado ao carrinho', { timeout: 15000 }).should('be.visible');
   });
 });
 

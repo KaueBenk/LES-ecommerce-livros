@@ -151,7 +151,7 @@ const customerService = {
     return response.data;
   },
 
-  getCuponsTraoca: async () => {
+  getCuponsTroca: async () => {
     const response = await api.get('/clientes/cupons-troca');
     return response.data.data;
   },

@@ -1211,12 +1211,22 @@ const CheckoutPage = () => {
   );
 
   // ── Address added from modal ──
-  const handleAddressAdded = (newAddr) => {
-    setAddresses((prev) => [...prev, newAddr]);
+  const handleAddressAdded = async (result) => {
     setShowAddModal(false);
-    // Auto-select if it's a delivery address
-    if (['ENTREGA', 'AMBOS'].includes(newAddr.tipoEndereco)) {
-      handleSelectAddress(newAddr);
+    try {
+      const data = await customerService.getAddresses();
+      const updatedList = data ?? [];
+      setAddresses(updatedList);
+      
+      // Auto-select the newly added address
+      if (result?.id) {
+        const newlyAdded = updatedList.find(a => String(a.id) === String(result.id));
+        if (newlyAdded && ['ENTREGA', 'AMBOS'].includes(newlyAdded.tipoEndereco)) {
+          handleSelectAddress(newlyAdded);
+        }
+      }
+    } catch (err) {
+      notifyError('Erro ao atualizar lista de endereços.');
     }
   };
 
@@ -1237,7 +1247,7 @@ const CheckoutPage = () => {
     let cancelled = false;
     setCouponsLoading(true);
     customerService
-      .getCuponsTraoca()
+      .getCuponsTroca()
       .then((data) => {
         if (!cancelled) setTradeCoupons(Array.isArray(data) ? data : []);
       })

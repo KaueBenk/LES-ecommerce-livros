@@ -57,6 +57,34 @@ export const NotificationProvider = ({ children }) => {
       value={{ notifications, addNotification, removeNotification, success, error, warn, info }}
     >
       {children}
+
+      {/* Toast Container */}
+      <div
+        className="toast-container position-fixed top-0 end-0 p-3"
+        style={{ zIndex: 2000 }}
+        data-testid="notification-container"
+      >
+        {notifications.map((n) => (
+          <div
+            key={n.id}
+            className={`toast show align-items-center text-white bg-${n.type} border-0 mb-2`}
+            role="alert"
+            aria-live="assertive"
+            aria-atomic="true"
+            data-testid={`notification-${n.type}`}
+          >
+            <div className="d-flex">
+              <div className="toast-body">{n.message}</div>
+              <button
+                type="button"
+                className="btn-close btn-close-white me-2 m-auto"
+                onClick={() => removeNotification(n.id)}
+                aria-label="Close"
+              />
+            </div>
+          </div>
+        ))}
+      </div>
     </NotificationContext.Provider>
   );
 };

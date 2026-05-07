@@ -933,7 +933,11 @@ public class AdminWorkflowService {
         Map<String, Object> map = new HashMap<>();
         map.put("id", troca.getId());
         map.put("pedidoId", troca.getPedido() != null ? troca.getPedido().getId() : null);
-        map.put("numeroNota", troca.getPedido() != null ? "PED-" + troca.getPedido().getId() : null);
+        if (troca.getPedido() != null) {
+            map.put("numeroNota", "PED-" + String.format("%03d", troca.getPedido().getId()));
+        } else {
+            map.put("numeroNota", null);
+        }
         map.put("status", troca.getStatus() != null ? troca.getStatus().name() : null);
         map.put("dataSolicitacao", troca.getDataSolicitacao());
         map.put("itens", itens);

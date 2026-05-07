@@ -284,7 +284,7 @@ const LogisticsPage = () => {
   const fetchOrders = useCallback(async () => {
     setLoading(true);
     try {
-      const params = { page, size: PAGE_SIZE };
+      const params = { page, size: PAGE_SIZE, sort: 'id,desc' };
       if (appliedStatus) params.status = appliedStatus;
       const data = await adminService.getOrders(params);
       setOrders(data?.content ?? (Array.isArray(data) ? data : []));

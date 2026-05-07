@@ -362,8 +362,9 @@ public class ClienteService {
         Map<String, Object> out = new HashMap<>();
         out.put("id", pedido.getId());
         out.put("pedidoId", pedido.getId());
-        out.put("numero", "PED-" + pedido.getId());
-        out.put("numeroNota", "PED-" + pedido.getId());
+        String numeroPadded = "PED-" + String.format("%03d", pedido.getId());
+        out.put("numero", numeroPadded);
+        out.put("numeroNota", numeroPadded);
         out.put("status", pedido.getStatus() != null ? pedido.getStatus().name() : null);
         out.put("valorFrete", pedido.getValorFrete());
         out.put("valorTotal", pedido.getValorTotal());
