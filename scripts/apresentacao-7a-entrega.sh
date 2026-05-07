@@ -28,26 +28,43 @@ FRONTEND_PID=$!
 
 cd "$ROOT_DIR"
 
-echo "==> Aguarde o frontend subir em $BASE_URL"
-read -r -p "Pressione Enter para iniciar os testes..."
+echo "==> Aguardando frontend em $BASE_URL..."
+until curl -s "$BASE_URL" > /dev/null; do
+  sleep 2
+done
+echo "==> Frontend pronto!"
+
+read -r -p "Pressione Enter para iniciar a sequencia de 10 testes obrigatorios..."
 
 SPECS=(
-  "cypress/e2e/checkout-new-card-address.cy.js"
-  "cypress/e2e/sales-checkout-consultation-4entrega.cy.js"
-  "cypress/e2e/checkout.cy.js"
-  "cypress/e2e/exchanges-reviews.cy.js"
-  "cypress/e2e/cart-timer.cy.js"
+  "cypress/e2e/entrega7/01-cliente-realiza-compra.cy.js"
+  "cypress/e2e/entrega7/02-cliente-pagamento-combinado.cy.js"
+  "cypress/e2e/entrega7/03-cliente-novo-cartao-endereco.cy.js"
+  "cypress/e2e/entrega7/04-usuario-solicita-troca.cy.js"
+  "cypress/e2e/entrega7/05-admin-confirma-pagamento.cy.js"
+  "cypress/e2e/entrega7/06-admin-aceita-nega-troca.cy.js"
+  "cypress/e2e/entrega7/07-admin-em-transporte.cy.js"
+  "cypress/e2e/entrega7/08-admin-confirma-recebimento.cy.js"
+  "cypress/e2e/entrega7/09-sistema-gera-cupom.cy.js"
+  "cypress/e2e/entrega7/10-admin-confirma-entregue.cy.js"
 )
 
 for spec in "${SPECS[@]}"; do
-  echo "==> Rodando $spec"
+  FILENAME=$(basename "$spec")
+  SCENARIO_NAME="${FILENAME%.cy.js}"
+  
+  echo "----------------------------------------------------------------------"
+  echo "==> EXECUTANDO CENARIO: $SCENARIO_NAME"
+  echo "----------------------------------------------------------------------"
+  
   cd "$FRONTEND_DIR"
   CYPRESS_BASE_URL="$BASE_URL" \
   CYPRESS_API_BASE_URL="$CYPRESS_API_BASE_URL" \
   npx cypress run --headed --browser "$BROWSER" --spec "$spec"
 
   cd "$ROOT_DIR"
-  read -r -p "Pressione Enter para o proximo teste..."
+  echo ""
+  read -r -p "Pressione Enter para o proximo cenario ($spec)..."
 done
 
 echo "==> Concluido."

@@ -132,6 +132,30 @@ Cypress.Commands.add('logout', () => {
   });
 });
 
+// ── cy.clearCart ─────────────────────────────────────────────────────────────
+
+Cypress.Commands.add('clearCart', () => {
+  cy.visit('/cart');
+  cy.get('body').then(($body) => {
+    if ($body.find('[data-testid="cart-empty"]').length > 0) return;
+    if ($body.find('[data-testid="clear-cart-btn"]').length > 0) {
+      cy.window().then((win) => {
+        cy.stub(win, 'confirm').returns(true);
+      });
+      cy.get('[data-testid="clear-cart-btn"]').click();
+      cy.get('[data-testid="cart-empty"]', { timeout: 15000 }).should('be.visible');
+    }
+  });
+});
+
+// ── cy.confirmActionModal ──────────────────────────────────────────────────────
+
+Cypress.Commands.add('confirmActionModal', () => {
+  cy.get('[data-testid="confirm-action-modal"]', { timeout: 10000 }).should('be.visible');
+  cy.get('[data-testid="confirm-modal-ok"]').click();
+  cy.get('[data-testid="confirm-action-modal"]', { timeout: 15000 }).should('not.exist');
+});
+
 // ── cy.setViewport helpers ───────────────────────────────────────────────────
 
 Cypress.Commands.add('mobile', () => {
