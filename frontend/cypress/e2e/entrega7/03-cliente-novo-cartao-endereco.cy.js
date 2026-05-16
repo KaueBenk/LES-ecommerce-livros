@@ -36,13 +36,14 @@ describe('Cenário 03: Cliente registra novo cartão e novo endereço no ato da 
     cy.get('[data-testid="checkout-next-btn"]').click(); // pula cupons
 
     // Novo Cartão
-    const cardNum = `400000000000${Math.floor(1000 + Math.random() * 8999)}1`; // Garantir final ímpar
+    const cardNum = `40000000000${Math.floor(100 + Math.random() * 899)}1`; // Garantir final ímpar e 16 dígitos
     cy.get('[data-testid="add-card-btn"]').click();
     cy.get('[data-testid="credit-card-numero"]').type(cardNum);
     cy.get('[data-testid="credit-card-nome"]').type('JOAO TESTE NOVO');
     cy.get('[data-testid="credit-card-bandeira"]').select('VISA');
     cy.get('[data-testid="credit-card-cvv"]').type('123');
     cy.get('[data-testid="credit-card-form-submit"]').click();
+    cy.get('[data-testid="credit-card-form-modal"]', { timeout: 15000 }).should('not.exist');
 
     cy.contains('[data-testid^="payment-card-digits-"]', cardNum.slice(-4), { timeout: 10000 }).then(($el) => {
       const cardId = $el.attr('data-testid').replace('payment-card-digits-', '');

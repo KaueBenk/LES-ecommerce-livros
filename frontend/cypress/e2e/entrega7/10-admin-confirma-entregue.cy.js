@@ -58,7 +58,7 @@ describe('Cenário 10: Administrador confirma que o produto foi ENTREGUE', () =>
       });
       cy.confirmActionModal();
       
-      cy.contains('sucesso', { timeout: 10000 }).should('be.visible');
+      cy.contains('entregue', { timeout: 10000 }).should('be.visible');
     });
   });
 });

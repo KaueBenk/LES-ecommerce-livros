@@ -54,7 +54,7 @@ describe('Cenário 07: Administrador define produto como EM TRANSPORTE', () => {
       });
       cy.confirmActionModal();
 
-      cy.contains('sucesso', { timeout: 10000 }).should('be.visible');
+      cy.contains('despachado', { timeout: 10000 }).should('be.visible');
     });
   });
 });

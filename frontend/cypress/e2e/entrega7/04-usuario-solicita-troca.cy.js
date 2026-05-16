@@ -74,7 +74,7 @@ describe('Cenário 04: Usuário solicita troca ou devolução', () => {
       cy.get('[data-testid="exchange-justificativa"]').type('Troca solicitada via teste automatizado');
       cy.get('[data-testid="exchange-submit-btn"]').click();
       
-      cy.contains('sucesso', { timeout: 10000 }).should('be.visible');
+      cy.contains('Solicitação de troca enviada', { timeout: 10000 }).should('be.visible');
     });
   });
 });

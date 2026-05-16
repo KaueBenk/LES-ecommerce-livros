@@ -51,7 +51,7 @@ describe('Cenário 05: Administrador confirma o pagamento', () => {
       });
       cy.confirmActionModal();
       
-      cy.contains('sucesso', { timeout: 10000 }).should('be.visible');
+      cy.contains('confirmado', { timeout: 10000 }).should('be.visible');
     });
   });
 });
