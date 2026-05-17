@@ -14,6 +14,7 @@ const TYPE_BADGE = {
 const getTypeBadge = (tipoEndereco) => TYPE_BADGE[tipoEndereco] || 'bg-secondary';
 
 const getTypeLabel = (tipoEndereco) =>
+  (tipoEndereco === 'FINANCEIRO' ? 'Cobrança' : null) ||
   ADDRESS_TYPES.find((t) => t.value === tipoEndereco)?.label ||
   (tipoEndereco === 'AMBOS' ? 'Entrega e Financeiro' : tipoEndereco || '—');
 
@@ -110,7 +111,8 @@ const wouldViolateMinimum = (addresses, targetId) => {
   const hasBilling = remaining.some(
     (a) =>
       a.tipoEndereco === 'AMBOS' ||
-      a.tipoEndereco === 'COBRANCA'
+      a.tipoEndereco === 'COBRANCA' ||
+      a.tipoEndereco === 'FINANCEIRO'
   );
 
   return !hasDelivery || !hasBilling;

@@ -11,8 +11,8 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
   });
 
   it('deve gerar um cupom de troca após confirmação de recebimento', () => {
-    cy.intercept('PATCH', '**/pedidos/trocas/*/autorizar').as('authorizeExchange');
-    cy.intercept('PATCH', '**/pedidos/trocas/*/receber').as('confirmReceipt');
+    cy.intercept('PATCH', '**/admin/trocas/*/autorizar').as('authorizeExchange');
+    cy.intercept('PATCH', '**/admin/trocas/*/confirmar-recebimento').as('confirmReceipt');
 
     // 1. Setup: Criar pedido entregue, solicitar troca e finalizar
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);

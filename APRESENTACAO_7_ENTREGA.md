@@ -22,14 +22,18 @@ Variaveis opcionais:
 - `API_URL=http://localhost:8080`
 - `CYPRESS_API_BASE_URL=http://localhost:8080/api/v1`
 - `BROWSER=chrome` (padrao: `electron`)
+- `AUTO=1` (nao pausa entre cenarios)
+- `HEADED=0` (roda Cypress headless; padrao: headed)
 
 ## 2) Preparacao manual (caso nao use o script)
 
 ### Backend (Docker)
 
 ```bash
-docker-compose up -d backend
+docker compose up -d backend
 ```
+
+> Se sua maquina usa `docker-compose`, substitua o comando acima.
 
 ### Frontend (React + Vite)
 
@@ -82,6 +86,7 @@ Os seguintes testes correspondem diretamente aos 10 itens exigidos na 7ª entreg
 - Teste: `cypress/e2e/entrega7/04-usuario-solicita-troca.cy.js`
 - Item exigido: Usuário pode solicitar troca ou devolução de um item do pedido ou do pedido completo;
 - DRS: RF0040, RN0041
+- Observação: o spec cobre troca parcial (qtd=1) e troca total (qtd=total).
 
 ### Cenário 05: Administrador confirma o pagamento
 - Teste: `cypress/e2e/entrega7/05-admin-confirma-pagamento.cy.js`
@@ -106,7 +111,7 @@ Os seguintes testes correspondem diretamente aos 10 itens exigidos na 7ª entreg
 ### Cenário 09: Sistema gerar cupom de troca
 - Teste: `cypress/e2e/entrega7/09-sistema-gera-cupom.cy.js`
 - Item exigido: O sistema gerar cupom de troca;
-- DRS: RF0044, RN0036
+- DRS: RF0044
 
 ### Cenário 10: Administrador confirma que o produto foi ENTREGUE
 - Teste: `cypress/e2e/entrega7/10-admin-confirma-entregue.cy.js`

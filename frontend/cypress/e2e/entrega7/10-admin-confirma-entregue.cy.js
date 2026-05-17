@@ -11,9 +11,9 @@ describe('Cenário 10: Administrador confirma que o produto foi ENTREGUE', () =>
   });
 
   it('deve marcar um pedido em transporte como entregue', () => {
-    cy.intercept('PATCH', '**/vendas/*/confirmar-pagamento').as('confirmPayment');
-    cy.intercept('PATCH', '**/vendas/*/despachar').as('dispatchOrder');
-    cy.intercept('PATCH', '**/vendas/*/entregar').as('deliverOrder');
+    cy.intercept('PATCH', '**/admin/pedidos/*/confirmar-pagamento').as('confirmPayment');
+    cy.intercept('PATCH', '**/admin/pedidos/*/despachar').as('dispatchOrder');
+    cy.intercept('PATCH', '**/admin/pedidos/*/entregar').as('deliverOrder');
 
     // 1. Setup: Criar e Despachar pedido
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);

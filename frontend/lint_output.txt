@@ -1,0 +1,1337 @@
+
+> frontend@0.0.0 lint
+> eslint .
+
+(node:62931) ESLintIgnoreWarning: The ".eslintignore" file is no longer supported. Switch to using the "ignores" property in "eslint.config.js": https://eslint.org/docs/latest/use/configure/migration-guide#ignoring-files
+(Use `node --trace-warnings ...` to show where the warning was created)
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/__tests__/e2e/cypress/e2e/smoke.cy.js
+   5:1  error  'describe' is not defined    no-undef
+   6:3  error  'beforeEach' is not defined  no-undef
+   7:5  error  'cy' is not defined          no-undef
+  10:3  error  'it' is not defined          no-undef
+  11:5  error  'cy' is not defined          no-undef
+  12:5  error  'cy' is not defined          no-undef
+  13:5  error  'cy' is not defined          no-undef
+  16:3  error  'it' is not defined          no-undef
+  17:5  error  'cy' is not defined          no-undef
+  18:5  error  'cy' is not defined          no-undef
+  21:3  error  'it' is not defined          no-undef
+  22:5  error  'cy' is not defined          no-undef
+  23:5  error  'cy' is not defined          no-undef
+  26:3  error  'it' is not defined          no-undef
+  27:5  error  'cy' is not defined          no-undef
+  28:5  error  'cy' is not defined          no-undef
+  29:5  error  'cy' is not defined          no-undef
+  30:5  error  'cy' is not defined          no-undef
+  33:3  error  'it' is not defined          no-undef
+  34:5  error  'cy' is not defined          no-undef
+  35:5  error  'cy' is not defined          no-undef
+  36:5  error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress.config.js
+   3:17  error    'process' is not defined      no-undef
+   4:20  error    'process' is not defined      no-undef
+  53:11  warning  Unexpected console statement  no-console
+  57:11  warning  Unexpected console statement  no-console
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/account.cy.js
+   10:3   error  'cy' is not defined          no-undef
+   13:1   error  'describe' is not defined    no-undef
+   14:3   error  'beforeEach' is not defined  no-undef
+   15:5   error  'cy' is not defined          no-undef
+   19:3   error  'it' is not defined          no-undef
+   22:5   error  'cy' is not defined          no-undef
+   23:5   error  'cy' is not defined          no-undef
+   25:5   error  'cy' is not defined          no-undef
+   26:5   error  'cy' is not defined          no-undef
+   27:5   error  'cy' is not defined          no-undef
+   29:5   error  'cy' is not defined          no-undef
+   30:5   error  'cy' is not defined          no-undef
+   31:5   error  'cy' is not defined          no-undef
+   32:5   error  'cy' is not defined          no-undef
+   35:3   error  'it' is not defined          no-undef
+   38:5   error  'cy' is not defined          no-undef
+   39:5   error  'cy' is not defined          no-undef
+   41:5   error  'cy' is not defined          no-undef
+   44:7   error  'cy' is not defined          no-undef
+   45:7   error  'cy' is not defined          no-undef
+   47:7   error  'cy' is not defined          no-undef
+   48:7   error  'cy' is not defined          no-undef
+   49:7   error  'cy' is not defined          no-undef
+   50:7   error  'cy' is not defined          no-undef
+   51:7   error  'cy' is not defined          no-undef
+   52:7   error  'cy' is not defined          no-undef
+   53:7   error  'cy' is not defined          no-undef
+   54:7   error  'cy' is not defined          no-undef
+   55:7   error  'cy' is not defined          no-undef
+   56:7   error  'cy' is not defined          no-undef
+   58:7   error  'cy' is not defined          no-undef
+   60:7   error  'cy' is not defined          no-undef
+   61:7   error  'cy' is not defined          no-undef
+   62:7   error  'cy' is not defined          no-undef
+   66:3   error  'it' is not defined          no-undef
+   67:39  error  'Cypress' is not defined     no-undef
+   69:5   error  'cy' is not defined          no-undef
+   70:5   error  'cy' is not defined          no-undef
+   72:5   error  'cy' is not defined          no-undef
+   75:7   error  'cy' is not defined          no-undef
+   76:7   error  'cy' is not defined          no-undef
+   78:7   error  'cy' is not defined          no-undef
+   79:7   error  'cy' is not defined          no-undef
+   80:7   error  'cy' is not defined          no-undef
+   81:7   error  'cy' is not defined          no-undef
+   83:7   error  'cy' is not defined          no-undef
+   85:7   error  'cy' is not defined          no-undef
+   86:7   error  'cy' is not defined          no-undef
+   89:5   error  'cy' is not defined          no-undef
+   91:9   error  'cy' is not defined          no-undef
+   92:9   error  'cy' is not defined          no-undef
+   97:3   error  'it' is not defined          no-undef
+   98:5   error  'cy' is not defined          no-undef
+   99:5   error  'cy' is not defined          no-undef
+  101:5   error  'cy' is not defined          no-undef
+  102:5   error  'cy' is not defined          no-undef
+  103:5   error  'cy' is not defined          no-undef
+  104:5   error  'cy' is not defined          no-undef
+  106:5   error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/admin-analytics.cy.js
+   9:1  error  'describe' is not defined    no-undef
+  10:3  error  'beforeEach' is not defined  no-undef
+  11:5  error  'cy' is not defined          no-undef
+  12:5  error  'cy' is not defined          no-undef
+  13:5  error  'cy' is not defined          no-undef
+  14:5  error  'cy' is not defined          no-undef
+  17:3  error  'it' is not defined          no-undef
+  18:5  error  'cy' is not defined          no-undef
+  19:5  error  'cy' is not defined          no-undef
+  20:5  error  'cy' is not defined          no-undef
+  21:5  error  'cy' is not defined          no-undef
+  23:5  error  'cy' is not defined          no-undef
+  25:5  error  'cy' is not defined          no-undef
+  26:5  error  'cy' is not defined          no-undef
+  27:5  error  'cy' is not defined          no-undef
+  30:3  error  'it' is not defined          no-undef
+  31:5  error  'cy' is not defined          no-undef
+  32:5  error  'cy' is not defined          no-undef
+  34:5  error  'cy' is not defined          no-undef
+  35:5  error  'cy' is not defined          no-undef
+  36:5  error  'cy' is not defined          no-undef
+  38:5  error  'cy' is not defined          no-undef
+  40:5  error  'cy' is not defined          no-undef
+  41:5  error  'cy' is not defined          no-undef
+  42:5  error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/admin-book-auto-inactivation.cy.js
+  10:3   error  'cy' is not defined          no-undef
+  11:3   error  'cy' is not defined          no-undef
+  16:3   error  'cy' is not defined          no-undef
+  18:3   error  'cy' is not defined          no-undef
+  21:3   error  'cy' is not defined          no-undef
+  22:3   error  'cy' is not defined          no-undef
+  23:3   error  'cy' is not defined          no-undef
+  24:3   error  'cy' is not defined          no-undef
+  25:3   error  'cy' is not defined          no-undef
+  26:3   error  'cy' is not defined          no-undef
+  27:3   error  'cy' is not defined          no-undef
+  30:3   error  'cy' is not defined          no-undef
+  31:3   error  'cy' is not defined          no-undef
+  32:3   error  'cy' is not defined          no-undef
+  33:3   error  'cy' is not defined          no-undef
+  34:3   error  'cy' is not defined          no-undef
+  35:3   error  'cy' is not defined          no-undef
+  36:3   error  'cy' is not defined          no-undef
+  37:3   error  'cy' is not defined          no-undef
+  38:3   error  'cy' is not defined          no-undef
+  41:3   error  'cy' is not defined          no-undef
+  42:3   error  'cy' is not defined          no-undef
+  43:3   error  'cy' is not defined          no-undef
+  44:3   error  'cy' is not defined          no-undef
+  45:3   error  'cy' is not defined          no-undef
+  46:3   error  'cy' is not defined          no-undef
+  47:5   error  'expect' is not defined      no-undef
+  49:5   error  'expect' is not defined      no-undef
+  50:5   error  'cy' is not defined          no-undef
+  53:3   error  'cy' is not defined          no-undef
+  56:1   error  'describe' is not defined    no-undef
+  57:3   error  'beforeEach' is not defined  no-undef
+  58:5   error  'cy' is not defined          no-undef
+  61:3   error  'it' is not defined          no-undef
+  69:5   error  'cy' is not defined          no-undef
+  70:5   error  'cy' is not defined          no-undef
+  71:5   error  'cy' is not defined          no-undef
+  72:7   error  'expect' is not defined      no-undef
+  73:7   error  'cy' is not defined          no-undef
+  76:9   error  'expect' is not defined      no-undef
+  80:5   error  'cy' is not defined          no-undef
+  82:7   error  'expect' is not defined      no-undef
+  84:7   error  'cy' is not defined          no-undef
+  85:9   error  'cy' is not defined          no-undef
+  87:19  error  'Cypress' is not defined     no-undef
+  93:11  error  'expect' is not defined      no-undef
+  94:11  error  'expect' is not defined      no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/admin-books.cy.js
+   10:3   error  'cy' is not defined          no-undef
+   11:3   error  'cy' is not defined          no-undef
+   14:1   error  'describe' is not defined    no-undef
+   15:3   error  'beforeEach' is not defined  no-undef
+   16:5   error  'cy' is not defined          no-undef
+   19:3   error  'it' is not defined          no-undef
+   22:5   error  'cy' is not defined          no-undef
+   23:5   error  'cy' is not defined          no-undef
+   25:5   error  'cy' is not defined          no-undef
+   26:5   error  'cy' is not defined          no-undef
+   27:5   error  'cy' is not defined          no-undef
+   30:3   error  'it' is not defined          no-undef
+   38:5   error  'cy' is not defined          no-undef
+   41:5   error  'cy' is not defined          no-undef
+   42:5   error  'cy' is not defined          no-undef
+   43:5   error  'cy' is not defined          no-undef
+   44:5   error  'cy' is not defined          no-undef
+   45:5   error  'cy' is not defined          no-undef
+   46:5   error  'cy' is not defined          no-undef
+   47:5   error  'cy' is not defined          no-undef
+   50:5   error  'cy' is not defined          no-undef
+   51:5   error  'cy' is not defined          no-undef
+   52:5   error  'cy' is not defined          no-undef
+   53:5   error  'cy' is not defined          no-undef
+   54:5   error  'cy' is not defined          no-undef
+   55:5   error  'cy' is not defined          no-undef
+   56:5   error  'cy' is not defined          no-undef
+   57:5   error  'cy' is not defined          no-undef
+   58:5   error  'cy' is not defined          no-undef
+   61:5   error  'cy' is not defined          no-undef
+   62:5   error  'cy' is not defined          no-undef
+   63:5   error  'cy' is not defined          no-undef
+   64:5   error  'cy' is not defined          no-undef
+   66:9   error  'cy' is not defined          no-undef
+   69:5   error  'cy' is not defined          no-undef
+   70:5   error  'cy' is not defined          no-undef
+   71:5   error  'cy' is not defined          no-undef
+   72:7   error  'expect' is not defined      no-undef
+   74:7   error  'expect' is not defined      no-undef
+   75:7   error  'cy' is not defined          no-undef
+   78:5   error  'cy' is not defined          no-undef
+   79:5   error  'cy' is not defined          no-undef
+   81:7   error  'expect' is not defined      no-undef
+   83:7   error  'cy' is not defined          no-undef
+   84:9   error  'cy' is not defined          no-undef
+   86:19  error  'Cypress' is not defined     no-undef
+   91:11  error  'expect' is not defined      no-undef
+   92:11  error  'expect' is not defined      no-undef
+   93:11  error  'expect' is not defined      no-undef
+   98:5   error  'cy' is not defined          no-undef
+  103:7   error  'expect' is not defined      no-undef
+  106:7   error  'cy' is not defined          no-undef
+  109:5   error  'cy' is not defined          no-undef
+  110:7   error  'cy' is not defined          no-undef
+  111:7   error  'cy' is not defined          no-undef
+  114:5   error  'cy' is not defined          no-undef
+  115:5   error  'cy' is not defined          no-undef
+  116:5   error  'cy' is not defined          no-undef
+  117:5   error  'cy' is not defined          no-undef
+  118:5   error  'cy' is not defined          no-undef
+  120:5   error  'cy' is not defined          no-undef
+  122:7   error  'expect' is not defined      no-undef
+  124:7   error  'cy' is not defined          no-undef
+  125:9   error  'cy' is not defined          no-undef
+  127:19  error  'Cypress' is not defined     no-undef
+  132:11  error  'expect' is not defined      no-undef
+  133:11  error  'expect' is not defined      no-undef
+  139:3   error  'it' is not defined          no-undef
+  144:5   error  'cy' is not defined          no-undef
+  145:5   error  'cy' is not defined          no-undef
+  146:5   error  'cy' is not defined          no-undef
+  148:5   error  'cy' is not defined          no-undef
+  149:5   error  'cy' is not defined          no-undef
+  150:5   error  'cy' is not defined          no-undef
+  152:5   error  'cy' is not defined          no-undef
+  154:9   error  'cy' is not defined          no-undef
+  155:9   error  'cy' is not defined          no-undef
+  157:9   error  'cy' is not defined          no-undef
+  161:5   error  'cy' is not defined          no-undef
+  162:5   error  'cy' is not defined          no-undef
+  167:5   error  'cy' is not defined          no-undef
+  168:5   error  'cy' is not defined          no-undef
+  170:5   error  'cy' is not defined          no-undef
+  171:5   error  'cy' is not defined          no-undef
+  172:5   error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/admin-client-crud-flow.cy.js
+   28:30  error  'Cypress' is not defined     no-undef
+   31:3   error  'cy' is not defined          no-undef
+   32:3   error  'cy' is not defined          no-undef
+   33:3   error  'cy' is not defined          no-undef
+   34:3   error  'cy' is not defined          no-undef
+   35:3   error  'cy' is not defined          no-undef
+   36:3   error  'cy' is not defined          no-undef
+   37:3   error  'cy' is not defined          no-undef
+   39:3   error  'cy' is not defined          no-undef
+   40:3   error  'cy' is not defined          no-undef
+   42:3   error  'cy' is not defined          no-undef
+   43:3   error  'cy' is not defined          no-undef
+   44:3   error  'cy' is not defined          no-undef
+   45:3   error  'cy' is not defined          no-undef
+   46:3   error  'cy' is not defined          no-undef
+   47:3   error  'cy' is not defined          no-undef
+   48:3   error  'cy' is not defined          no-undef
+   49:3   error  'cy' is not defined          no-undef
+   50:3   error  'cy' is not defined          no-undef
+   51:3   error  'cy' is not defined          no-undef
+   52:3   error  'cy' is not defined          no-undef
+   56:3   error  'cy' is not defined          no-undef
+   57:3   error  'cy' is not defined          no-undef
+   58:3   error  'cy' is not defined          no-undef
+   59:3   error  'cy' is not defined          no-undef
+   62:1   error  'describe' is not defined    no-undef
+   63:3   error  'beforeEach' is not defined  no-undef
+   64:5   error  'cy' is not defined          no-undef
+   67:3   error  'it' is not defined          no-undef
+   74:5   error  'cy' is not defined          no-undef
+   75:5   error  'cy' is not defined          no-undef
+   77:5   error  'cy' is not defined          no-undef
+   78:5   error  'cy' is not defined          no-undef
+   81:5   error  'cy' is not defined          no-undef
+   82:5   error  'cy' is not defined          no-undef
+   83:5   error  'cy' is not defined          no-undef
+   84:5   error  'cy' is not defined          no-undef
+   85:5   error  'cy' is not defined          no-undef
+   86:5   error  'cy' is not defined          no-undef
+   87:5   error  'cy' is not defined          no-undef
+   88:5   error  'cy' is not defined          no-undef
+   89:5   error  'cy' is not defined          no-undef
+   92:5   error  'cy' is not defined          no-undef
+   93:5   error  'cy' is not defined          no-undef
+   95:5   error  'cy' is not defined          no-undef
+  100:5   error  'cy' is not defined          no-undef
+  104:5   error  'cy' is not defined          no-undef
+  108:5   error  'cy' is not defined          no-undef
+  109:5   error  'cy' is not defined          no-undef
+  110:5   error  'cy' is not defined          no-undef
+  112:9   error  'cy' is not defined          no-undef
+  114:5   error  'cy' is not defined          no-undef
+  117:5   error  'cy' is not defined          no-undef
+  118:5   error  'cy' is not defined          no-undef
+  119:5   error  'cy' is not defined          no-undef
+  120:5   error  'cy' is not defined          no-undef
+  123:5   error  'cy' is not defined          no-undef
+  124:5   error  'cy' is not defined          no-undef
+  125:5   error  'cy' is not defined          no-undef
+  126:5   error  'cy' is not defined          no-undef
+  127:5   error  'cy' is not defined          no-undef
+  128:5   error  'cy' is not defined          no-undef
+  129:5   error  'cy' is not defined          no-undef
+  130:5   error  'cy' is not defined          no-undef
+  131:5   error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/admin-clients-lifecycle.cy.js
+   12:3   error  'cy' is not defined          no-undef
+   13:3   error  'cy' is not defined          no-undef
+   17:3   error  'cy' is not defined          no-undef
+   19:5   error  'expect' is not defined      no-undef
+   21:5   error  'cy' is not defined          no-undef
+   23:15  error  'Cypress' is not defined     no-undef
+   36:7   error  'expect' is not defined      no-undef
+   37:7   error  'cy' is not defined          no-undef
+   43:3   error  'cy' is not defined          no-undef
+   44:3   error  'cy' is not defined          no-undef
+   45:3   error  'cy' is not defined          no-undef
+   46:3   error  'cy' is not defined          no-undef
+   52:3   error  'cy' is not defined          no-undef
+   55:5   error  'cy' is not defined          no-undef
+   56:7   error  'cy' is not defined          no-undef
+   61:11  error  'cy' is not defined          no-undef
+   67:11  error  'cy' is not defined          no-undef
+   68:11  error  'cy' is not defined          no-undef
+   74:5   error  'cy' is not defined          no-undef
+   75:7   error  'cy' is not defined          no-undef
+   83:1   error  'describe' is not defined    no-undef
+   84:3   error  'beforeEach' is not defined  no-undef
+   85:5   error  'cy' is not defined          no-undef
+   88:3   error  'it' is not defined          no-undef
+   97:5   error  'cy' is not defined          no-undef
+  100:5   error  'cy' is not defined          no-undef
+  101:5   error  'cy' is not defined          no-undef
+  102:5   error  'cy' is not defined          no-undef
+  103:5   error  'cy' is not defined          no-undef
+  104:5   error  'cy' is not defined          no-undef
+  105:5   error  'cy' is not defined          no-undef
+  106:5   error  'cy' is not defined          no-undef
+  108:7   error  'expect' is not defined      no-undef
+  110:5   error  'cy' is not defined          no-undef
+  111:5   error  'cy' is not defined          no-undef
+  116:5   error  'cy' is not defined          no-undef
+  119:5   error  'cy' is not defined          no-undef
+  120:5   error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/auth.cy.js
+  22:30  error  'Cypress' is not defined   no-undef
+  25:3   error  'cy' is not defined        no-undef
+  26:3   error  'cy' is not defined        no-undef
+  27:3   error  'cy' is not defined        no-undef
+  28:3   error  'cy' is not defined        no-undef
+  29:3   error  'cy' is not defined        no-undef
+  30:3   error  'cy' is not defined        no-undef
+  31:3   error  'cy' is not defined        no-undef
+  33:3   error  'cy' is not defined        no-undef
+  34:3   error  'cy' is not defined        no-undef
+  36:3   error  'cy' is not defined        no-undef
+  37:3   error  'cy' is not defined        no-undef
+  38:3   error  'cy' is not defined        no-undef
+  39:3   error  'cy' is not defined        no-undef
+  40:3   error  'cy' is not defined        no-undef
+  41:3   error  'cy' is not defined        no-undef
+  42:3   error  'cy' is not defined        no-undef
+  43:3   error  'cy' is not defined        no-undef
+  44:3   error  'cy' is not defined        no-undef
+  45:3   error  'cy' is not defined        no-undef
+  46:3   error  'cy' is not defined        no-undef
+  49:1   error  'describe' is not defined  no-undef
+  50:3   error  'it' is not defined        no-undef
+  51:5   error  'cy' is not defined        no-undef
+  52:5   error  'cy' is not defined        no-undef
+  59:5   error  'cy' is not defined        no-undef
+  60:5   error  'cy' is not defined        no-undef
+  63:3   error  'it' is not defined        no-undef
+  66:5   error  'cy' is not defined        no-undef
+  68:5   error  'cy' is not defined        no-undef
+  69:5   error  'cy' is not defined        no-undef
+  71:5   error  'cy' is not defined        no-undef
+  73:5   error  'cy' is not defined        no-undef
+  75:5   error  'cy' is not defined        no-undef
+  78:3   error  'it' is not defined        no-undef
+  79:5   error  'cy' is not defined        no-undef
+  80:5   error  'cy' is not defined        no-undef
+  82:5   error  'cy' is not defined        no-undef
+  83:5   error  'cy' is not defined        no-undef
+  84:5   error  'cy' is not defined        no-undef
+  86:5   error  'cy' is not defined        no-undef
+  87:5   error  'cy' is not defined        no-undef
+  90:3   error  'it' is not defined        no-undef
+  91:5   error  'cy' is not defined        no-undef
+  93:5   error  'cy' is not defined        no-undef
+  94:5   error  'cy' is not defined        no-undef
+  96:5   error  'cy' is not defined        no-undef
+  97:5   error  'cy' is not defined        no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/cart-timer.cy.js
+  10:3  error  'cy' is not defined          no-undef
+  11:3  error  'cy' is not defined          no-undef
+  13:3  error  'cy' is not defined          no-undef
+  15:7  error  'cy' is not defined          no-undef
+  16:9  error  'cy' is not defined          no-undef
+  18:7  error  'cy' is not defined          no-undef
+  19:7  error  'cy' is not defined          no-undef
+  24:1  error  'describe' is not defined    no-undef
+  25:3  error  'beforeEach' is not defined  no-undef
+  26:5  error  'cy' is not defined          no-undef
+  27:5  error  'cy' is not defined          no-undef
+  31:3  error  'afterEach' is not defined   no-undef
+  32:5  error  'cy' is not defined          no-undef
+  37:3  error  'it' is not defined          no-undef
+  38:5  error  'cy' is not defined          no-undef
+  40:5  error  'cy' is not defined          no-undef
+  47:5  error  'cy' is not defined          no-undef
+  48:5  error  'cy' is not defined          no-undef
+  50:5  error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/checkout.cy.js
+   19:3   error  'cy' is not defined          no-undef
+   20:3   error  'cy' is not defined          no-undef
+   22:3   error  'cy' is not defined          no-undef
+   24:7   error  'cy' is not defined          no-undef
+   25:9   error  'cy' is not defined          no-undef
+   27:7   error  'cy' is not defined          no-undef
+   28:7   error  'cy' is not defined          no-undef
+   34:3   error  'cy' is not defined          no-undef
+   37:3   error  'cy' is not defined          no-undef
+   39:3   error  'cy' is not defined          no-undef
+   40:3   error  'cy' is not defined          no-undef
+   41:3   error  'cy' is not defined          no-undef
+   43:3   error  'cy' is not defined          no-undef
+   44:3   error  'cy' is not defined          no-undef
+   45:3   error  'cy' is not defined          no-undef
+   47:3   error  'cy' is not defined          no-undef
+   48:3   error  'cy' is not defined          no-undef
+   50:3   error  'cy' is not defined          no-undef
+   51:3   error  'cy' is not defined          no-undef
+   55:3   error  'cy' is not defined          no-undef
+   57:5   error  'expect' is not defined      no-undef
+   59:5   error  'cy' is not defined          no-undef
+   61:15  error  'Cypress' is not defined     no-undef
+   74:7   error  'expect' is not defined      no-undef
+   75:7   error  'cy' is not defined          no-undef
+   79:3   error  'cy' is not defined          no-undef
+   80:5   error  'cy' is not defined          no-undef
+   81:5   error  'cy' is not defined          no-undef
+   83:7   error  'expect' is not defined      no-undef
+   85:7   error  'cy' is not defined          no-undef
+   91:3   error  'cy' is not defined          no-undef
+   94:1   error  'describe' is not defined    no-undef
+   95:3   error  'beforeEach' is not defined  no-undef
+   96:5   error  'cy' is not defined          no-undef
+   99:3   error  'it' is not defined          no-undef
+  103:5   error  'cy' is not defined          no-undef
+  104:5   error  'cy' is not defined          no-undef
+  106:5   error  'cy' is not defined          no-undef
+  107:5   error  'cy' is not defined          no-undef
+  108:5   error  'cy' is not defined          no-undef
+  110:5   error  'cy' is not defined          no-undef
+  111:5   error  'cy' is not defined          no-undef
+  112:5   error  'cy' is not defined          no-undef
+  115:3   error  'it' is not defined          no-undef
+  119:5   error  'cy' is not defined          no-undef
+  120:5   error  'cy' is not defined          no-undef
+  122:5   error  'cy' is not defined          no-undef
+  123:5   error  'cy' is not defined          no-undef
+  124:5   error  'cy' is not defined          no-undef
+  127:7   error  'expect' is not defined      no-undef
+  130:5   error  'cy' is not defined          no-undef
+  131:5   error  'cy' is not defined          no-undef
+  132:5   error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/entrega7/01-cliente-realiza-compra.cy.js
+  1:41  warning  'expect' is defined but never used  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/entrega7/03-cliente-novo-cartao-endereco.cy.js
+  1:41  warning  'expect' is defined but never used  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/entrega7/05-admin-confirma-pagamento.cy.js
+  1:41  warning  'expect' is defined but never used  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/entrega7/06-admin-aceita-nega-troca.cy.js
+  1:41  warning  'expect' is defined but never used  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/entrega7/07-admin-em-transporte.cy.js
+  1:41  warning  'expect' is defined but never used  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/entrega7/08-admin-confirma-recebimento.cy.js
+  1:41  warning  'expect' is defined but never used  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/entrega7/10-admin-confirma-entregue.cy.js
+  1:41  warning  'expect' is defined but never used  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/exchanges-reviews.cy.js
+   28:29  error  'cy' is not defined          no-undef
+   29:26  error  'cy' is not defined          no-undef
+   32:3   error  'cy' is not defined          no-undef
+   33:3   error  'cy' is not defined          no-undef
+   34:3   error  'cy' is not defined          no-undef
+   38:3   error  'cy' is not defined          no-undef
+   39:3   error  'cy' is not defined          no-undef
+   43:3   error  'cy' is not defined          no-undef
+   44:3   error  'cy' is not defined          no-undef
+   46:3   error  'cy' is not defined          no-undef
+   48:7   error  'cy' is not defined          no-undef
+   49:9   error  'cy' is not defined          no-undef
+   51:7   error  'cy' is not defined          no-undef
+   52:7   error  'cy' is not defined          no-undef
+   59:3   error  'cy' is not defined          no-undef
+   61:3   error  'cy' is not defined          no-undef
+   62:3   error  'cy' is not defined          no-undef
+   64:3   error  'cy' is not defined          no-undef
+   65:3   error  'cy' is not defined          no-undef
+   66:3   error  'cy' is not defined          no-undef
+   68:3   error  'cy' is not defined          no-undef
+   69:3   error  'cy' is not defined          no-undef
+   70:3   error  'cy' is not defined          no-undef
+   71:3   error  'cy' is not defined          no-undef
+   73:3   error  'cy' is not defined          no-undef
+   85:5   error  'expect' is not defined      no-undef
+   86:5   error  'cy' is not defined          no-undef
+   89:3   error  'cy' is not defined          no-undef
+   91:5   error  'cy' is not defined          no-undef
+   92:7   error  'cy' is not defined          no-undef
+   93:7   error  'cy' is not defined          no-undef
+   99:3   error  'cy' is not defined          no-undef
+  100:3   error  'cy' is not defined          no-undef
+  101:3   error  'cy' is not defined          no-undef
+  103:3   error  'cy' is not defined          no-undef
+  104:3   error  'cy' is not defined          no-undef
+  106:3   error  'cy' is not defined          no-undef
+  108:5   error  'expect' is not defined      no-undef
+  109:5   error  'cy' is not defined          no-undef
+  114:3   error  'cy' is not defined          no-undef
+  115:5   error  'cy' is not defined          no-undef
+  116:5   error  'cy' is not defined          no-undef
+  118:5   error  'cy' is not defined          no-undef
+  119:5   error  'cy' is not defined          no-undef
+  121:5   error  'cy' is not defined          no-undef
+  122:7   error  'cy' is not defined          no-undef
+  127:5   error  'cy' is not defined          no-undef
+  129:5   error  'cy' is not defined          no-undef
+  130:7   error  'cy' is not defined          no-undef
+  135:5   error  'cy' is not defined          no-undef
+  136:5   error  'cy' is not defined          no-undef
+  138:5   error  'cy' is not defined          no-undef
+  139:7   error  'cy' is not defined          no-undef
+  147:10  error  'cy' is not defined          no-undef
+  149:5   error  'expect' is not defined      no-undef
+  151:12  error  'cy' is not defined          no-undef
+  154:17  error  'Cypress' is not defined     no-undef
+  164:1   error  'describe' is not defined    no-undef
+  165:3   error  'beforeEach' is not defined  no-undef
+  166:5   error  'cy' is not defined          no-undef
+  169:3   error  'it' is not defined          no-undef
+  181:5   error  'cy' is not defined          no-undef
+  183:7   error  'cy' is not defined          no-undef
+  184:7   error  'cy' is not defined          no-undef
+  186:7   error  'cy' is not defined          no-undef
+  189:11  error  'cy' is not defined          no-undef
+  190:11  error  'cy' is not defined          no-undef
+  193:7   error  'cy' is not defined          no-undef
+  194:7   error  'cy' is not defined          no-undef
+  195:7   error  'cy' is not defined          no-undef
+  198:7   error  'cy' is not defined          no-undef
+  199:7   error  'cy' is not defined          no-undef
+  205:5   error  'cy' is not defined          no-undef
+  206:7   error  'cy' is not defined          no-undef
+  207:7   error  'cy' is not defined          no-undef
+  209:7   error  'cy' is not defined          no-undef
+  214:11  error  'cy' is not defined          no-undef
+  215:11  error  'cy' is not defined          no-undef
+  218:7   error  'cy' is not defined          no-undef
+  220:7   error  'cy' is not defined          no-undef
+  221:9   error  'cy' is not defined          no-undef
+  223:13  error  'cy' is not defined          no-undef
+  231:5   error  'cy' is not defined          no-undef
+  233:7   error  'cy' is not defined          no-undef
+  234:7   error  'cy' is not defined          no-undef
+  237:11  error  'cy' is not defined          no-undef
+  238:11  error  'cy' is not defined          no-undef
+  239:13  error  'expect' is not defined      no-undef
+  245:3   error  'it' is not defined          no-undef
+  257:5   error  'cy' is not defined          no-undef
+  259:7   error  'cy' is not defined          no-undef
+  260:7   error  'cy' is not defined          no-undef
+  262:7   error  'cy' is not defined          no-undef
+  265:11  error  'cy' is not defined          no-undef
+  266:11  error  'cy' is not defined          no-undef
+  269:7   error  'cy' is not defined          no-undef
+  270:7   error  'cy' is not defined          no-undef
+  271:7   error  'cy' is not defined          no-undef
+  274:7   error  'cy' is not defined          no-undef
+  275:7   error  'cy' is not defined          no-undef
+  281:5   error  'cy' is not defined          no-undef
+  282:5   error  'cy' is not defined          no-undef
+  283:5   error  'cy' is not defined          no-undef
+  285:5   error  'cy' is not defined          no-undef
+  290:9   error  'cy' is not defined          no-undef
+  296:5   error  'cy' is not defined          no-undef
+  298:7   error  'cy' is not defined          no-undef
+  299:7   error  'cy' is not defined          no-undef
+  302:11  error  'cy' is not defined          no-undef
+  303:11  error  'cy' is not defined          no-undef
+  304:13  error  'expect' is not defined      no-undef
+  310:3   error  'it' is not defined          no-undef
+  322:43  error  'cy' is not defined          no-undef
+  324:5   error  'cy' is not defined          no-undef
+  326:7   error  'cy' is not defined          no-undef
+  327:7   error  'cy' is not defined          no-undef
+  330:11  error  'cy' is not defined          no-undef
+  331:11  error  'cy' is not defined          no-undef
+  334:7   error  'cy' is not defined          no-undef
+  336:7   error  'cy' is not defined          no-undef
+  337:9   error  'cy' is not defined          no-undef
+  340:7   error  'cy' is not defined          no-undef
+  342:9   error  'cy' is not defined          no-undef
+  345:7   error  'cy' is not defined          no-undef
+  348:7   error  'cy' is not defined          no-undef
+  349:7   error  'cy' is not defined          no-undef
+  355:5   error  'cy' is not defined          no-undef
+  356:5   error  'cy' is not defined          no-undef
+  358:5   error  'cy' is not defined          no-undef
+  363:9   error  'cy' is not defined          no-undef
+  365:9   error  'cy' is not defined          no-undef
+  366:9   error  'cy' is not defined          no-undef
+  368:13  error  'cy' is not defined          no-undef
+  376:7   error  'cy' is not defined          no-undef
+  377:9   error  'expect' is not defined      no-undef
+  383:1   error  'describe' is not defined    no-undef
+  384:3   error  'beforeEach' is not defined  no-undef
+  385:5   error  'cy' is not defined          no-undef
+  388:3   error  'it' is not defined          no-undef
+  393:5   error  'cy' is not defined          no-undef
+  394:5   error  'cy' is not defined          no-undef
+  396:5   error  'cy' is not defined          no-undef
+  397:5   error  'cy' is not defined          no-undef
+  398:5   error  'cy' is not defined          no-undef
+  400:5   error  'cy' is not defined          no-undef
+  404:5   error  'cy' is not defined          no-undef
+  405:5   error  'cy' is not defined          no-undef
+  407:5   error  'cy' is not defined          no-undef
+  408:7   error  'cy' is not defined          no-undef
+  411:5   error  'cy' is not defined          no-undef
+  415:5   error  'cy' is not defined          no-undef
+  416:5   error  'cy' is not defined          no-undef
+  417:5   error  'cy' is not defined          no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/e2e/pedido-venda-sucesso.cy.js
+   16:30  error  'Cypress' is not defined  no-undef
+  122:15  error  'Cypress' is not defined  no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/support/commands.js
+   11:1   error  'Cypress' is not defined  no-undef
+   12:3   error  'cy' is not defined       no-undef
+   13:3   error  'cy' is not defined       no-undef
+   14:3   error  'cy' is not defined       no-undef
+   15:3   error  'cy' is not defined       no-undef
+   16:3   error  'cy' is not defined       no-undef
+   24:1   error  'Cypress' is not defined  no-undef
+   25:3   error  'cy' is not defined       no-undef
+   27:13  error  'Cypress' is not defined  no-undef
+   38:9   error  'cy' is not defined       no-undef
+   52:3   error  'cy' is not defined       no-undef
+   60:1   error  'Cypress' is not defined  no-undef
+   61:21  error  'cy' is not defined       no-undef
+   77:1   error  'Cypress' is not defined  no-undef
+   79:5   error  'cy' is not defined       no-undef
+   80:5   error  'cy' is not defined       no-undef
+   84:5   error  'cy' is not defined       no-undef
+   92:3   error  'cy' is not defined       no-undef
+   93:3   error  'cy' is not defined       no-undef
+   95:3   error  'cy' is not defined       no-undef
+   97:7   error  'cy' is not defined       no-undef
+  103:7   error  'cy' is not defined       no-undef
+  106:5   error  'cy' is not defined       no-undef
+  107:5   error  'cy' is not defined       no-undef
+  116:1   error  'Cypress' is not defined  no-undef
+  117:3   error  'cy' is not defined       no-undef
+  119:7   error  'cy' is not defined       no-undef
+  120:7   error  'cy' is not defined       no-undef
+  121:7   error  'cy' is not defined       no-undef
+  125:5   error  'cy' is not defined       no-undef
+  130:5   error  'cy' is not defined       no-undef
+  131:5   error  'cy' is not defined       no-undef
+  137:1   error  'Cypress' is not defined  no-undef
+  138:3   error  'cy' is not defined       no-undef
+  139:3   error  'cy' is not defined       no-undef
+  142:7   error  'cy' is not defined       no-undef
+  143:9   error  'cy' is not defined       no-undef
+  145:7   error  'cy' is not defined       no-undef
+  146:7   error  'cy' is not defined       no-undef
+  153:1   error  'Cypress' is not defined  no-undef
+  154:3   error  'cy' is not defined       no-undef
+  155:3   error  'cy' is not defined       no-undef
+  156:3   error  'cy' is not defined       no-undef
+  161:1   error  'Cypress' is not defined  no-undef
+  162:3   error  'cy' is not defined       no-undef
+  165:1   error  'Cypress' is not defined  no-undef
+  166:3   error  'cy' is not defined       no-undef
+  169:1   error  'Cypress' is not defined  no-undef
+  170:3   error  'cy' is not defined       no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/cypress/support/e2e.js
+  8:1  error  'Cypress' is not defined  no-undef
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/account/AddressForm.jsx
+  40:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  38 |   useEffect(() => {
+  39 |     if (address) {
+> 40 |       setForm({
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  41 |         apelido: address.apelido || '',
+  42 |         tipoResidencia: address.tipoResidencia || 'CASA',
+  43 |         tipoLogradouro: address.tipoLogradouro || 'RUA',  react-hooks/set-state-in-effect
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/account/AddressList.jsx
+  175:42  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  175:58  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/account/CreditCardForm.jsx
+  14:47  error  Unsafe usage of optional chaining. If it short-circuits with 'undefined' the evaluation will throw TypeError                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                       no-unsafe-optional-chaining
+  46:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  44 |   useEffect(() => {
+  45 |     if (card) {
+> 46 |       setForm({
+     |       ^^^^^^^ Avoid calling setState() directly within an effect
+  47 |         numero: card.numero || '',
+  48 |         nomeImpresso: card.nomeImpresso || '',
+  49 |         bandeira: normalizeBrandToCode(card.bandeira),  react-hooks/set-state-in-effect
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/account/ProfileForm.jsx
+  139:7  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  137 |   useEffect(() => {
+  138 |     if (profile) {
+> 139 |       setNome(profile.nome || '');
+      |       ^^^^^^^ Avoid calling setState() directly within an effect
+  140 |       setGenero(profile.genero || '');
+  141 |       setDataNascimento(profile.dataNascimento || '');
+  142 |       setTelefones(  react-hooks/set-state-in-effect
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/admin/AnalyticsDashboard.jsx
+   60:3   error  'dataInicio' is missing in props validation                      react/prop-types
+   60:15  error  'setDataInicio' is missing in props validation                   react/prop-types
+   61:3   error  'dataFim' is missing in props validation                         react/prop-types
+   61:12  error  'setDataFim' is missing in props validation                      react/prop-types
+   62:3   error  'formErrors' is missing in props validation                      react/prop-types
+   63:3   error  'onSubmit' is missing in props validation                        react/prop-types
+   64:3   error  'loading' is missing in props validation                         react/prop-types
+   65:3   error  'extra' is missing in props validation                           react/prop-types
+   80:68  error  'formErrors.dataInicio' is missing in props validation           react/prop-types
+   85:24  error  'formErrors.dataInicio' is missing in props validation           react/prop-types
+   86:59  error  'formErrors.dataInicio' is missing in props validation           react/prop-types
+   95:68  error  'formErrors.dataFim' is missing in props validation              react/prop-types
+  100:24  error  'formErrors.dataFim' is missing in props validation              react/prop-types
+  101:59  error  'formErrors.dataFim' is missing in props validation              react/prop-types
+  278:63  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  278:79  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  464:63  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+  464:79  error  `"` can be escaped with `&quot;`, `&ldquo;`, `&#34;`, `&rdquo;`  react/no-unescaped-entities
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/admin/ClientSearchAdmin.jsx
+  14:25  error  'ranking' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react/prop-types
+  22:25  error  'ranking.toFixed' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react/prop-types
+  29:30  error  'clientId' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react/prop-types
+  29:40  error  'onClose' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react/prop-types
+  37:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  35 |   useEffect(() => {
+  36 |     let cancelled = false;
+> 37 |     setLoading(true);
+     |     ^^^^^^^^^^ Avoid calling setState() directly within an effect
+  38 |     adminService
+  39 |       .getCustomer(clientId)
+  40 |       .then((data) => {  react-hooks/set-state-in-effect
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/admin/ExchangeWorkflow.jsx
+   14:24  error  'status' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         react/prop-types
+   27:23  error  'page' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                           react/prop-types
+   27:29  error  'totalPages' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                     react/prop-types
+   27:41  error  'totalElements' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                  react/prop-types
+   27:56  error  'label' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react/prop-types
+   27:63  error  'onChangePage' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react/prop-types
+   83:24  error  'itens' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                          react/prop-types
+   84:15  error  'itens.length' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react/prop-types
+   87:14  error  'itens.map' is missing in props validation                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                      react/prop-types
+  260:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  258 |   // Initialize checkboxes when exchanges loaded
+  259 |   useEffect(() => {
+> 260 |     setReturnMap((prev) => {
+      |     ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  261 |       const next = { ...prev };
+  262 |       exchanges.forEach((ex) => {
+  263 |         if (!next[ex.id]) {  react-hooks/set-state-in-effect
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/admin/ReviewModeration.jsx
+   14:18  error  'value' is missing in props validation                 react/prop-types
+   27:30  error  'aprovada' is missing in props validation              react/prop-types
+   37:30  error  'review' is missing in props validation                react/prop-types
+   37:38  error  'onClose' is missing in props validation               react/prop-types
+   37:47  error  'onApprove' is missing in props validation             react/prop-types
+   37:58  error  'onReject' is missing in props validation              react/prop-types
+   37:68  error  'actioning' is missing in props validation             react/prop-types
+   57:35  error  'review.livroTitulo' is missing in props validation    react/prop-types
+   70:48  error  'review.livroTitulo' is missing in props validation    react/prop-types
+   73:48  error  'review.clienteNome' is missing in props validation    react/prop-types
+   76:61  error  'review.estrelas' is missing in props validation       react/prop-types
+   80:25  error  'review.dataAvaliacao' is missing in props validation  react/prop-types
+   80:59  error  'review.dataAvaliacao' is missing in props validation  react/prop-types
+   84:76  error  'review.aprovada' is missing in props validation       react/prop-types
+   92:25  error  'review.texto' is missing in props validation          react/prop-types
+  105:21  error  'review.aprovada' is missing in props validation       react/prop-types
+  110:48  error  'review.id' is missing in props validation             react/prop-types
+  111:54  error  'review.id' is missing in props validation             react/prop-types
+  113:39  error  'review.id' is missing in props validation             react/prop-types
+  118:21  error  'review.aprovada' is missing in props validation       react/prop-types
+  123:48  error  'review.id' is missing in props validation             react/prop-types
+  124:53  error  'review.id' is missing in props validation             react/prop-types
+  126:39  error  'review.id' is missing in props validation             react/prop-types
+  140:23  error  'page' is missing in props validation                  react/prop-types
+  140:29  error  'totalPages' is missing in props validation            react/prop-types
+  140:41  error  'totalElements' is missing in props validation         react/prop-types
+  140:56  error  'onChangePage' is missing in props validation          react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/components/common/ChatbotWidget.jsx
+  10:26  error  'message' is missing in props validation       react/prop-types
+  11:26  error  'message.role' is missing in props validation  react/prop-types
+  15:40  error  'message.id' is missing in props validation    react/prop-types
+  38:18  error  'message.text' is missing in props validation  react/prop-types
+  43:20  error  'message.time' is missing in props validation  react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/hooks/useAuth.js
+  1:10  warning  'useAuth' is defined but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/hooks/useCartTimer.js
+  113:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  111 |     }
+  112 |     // Run immediately on mount/change
+> 113 |     tick();
+      |     ^^^^ Avoid calling setState() directly within an effect
+  114 |   }, [items]); // eslint-disable-line react-hooks/exhaustive-deps
+  115 |
+  116 |   // Tick every second             react-hooks/set-state-in-effect
+  118:5  error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  116 |   // Tick every second
+  117 |   useEffect(() => {
+> 118 |     tick();
+      |     ^^^^ Avoid calling setState() directly within an effect
+  119 |     const interval = setInterval(tick, 1000);
+  120 |     return () => clearInterval(interval);
+  121 |   }, [tick]);  react-hooks/set-state-in-effect
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/AdminPage.jsx
+   25:24  error    'book' is missing in props validation            react/prop-types
+   25:30  error    'isActivating' is missing in props validation    react/prop-types
+   25:44  error    'categories' is missing in props validation      react/prop-types
+   25:56  error    'onConfirm' is missing in props validation       react/prop-types
+   25:67  error    'onClose' is missing in props validation         react/prop-types
+   49:14  warning  'err' is defined but never used                  no-unused-vars
+   79:48  error    'book.titulo' is missing in props validation     react/prop-types
+  117:31  error    'categories.map' is missing in props validation  react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/BookFormPage.jsx
+   14:20  error    'currentStep' is missing in props validation                 react/prop-types
+   63:18  error    'label' is missing in props validation                       react/prop-types
+   63:25  error    'required' is missing in props validation                    react/prop-types
+   63:35  error    'error' is missing in props validation                       react/prop-types
+   63:42  error    'children' is missing in props validation                    react/prop-types
+   63:52  error    'hint' is missing in props validation                        react/prop-types
+   77:18  error    'form' is missing in props validation                        react/prop-types
+   77:24  error    'errors' is missing in props validation                      react/prop-types
+   77:32  error    'onChange' is missing in props validation                    react/prop-types
+   77:42  error    'authors' is missing in props validation                     react/prop-types
+   77:51  error    'publishers' is missing in props validation                  react/prop-types
+   77:63  error    'loadingRefs' is missing in props validation                 react/prop-types
+   81:50  error    'errors.titulo' is missing in props validation               react/prop-types
+   84:43  error    'errors.titulo' is missing in props validation               react/prop-types
+   85:21  error    'form.titulo' is missing in props validation                 react/prop-types
+   94:53  error    'errors.autorId' is missing in props validation              react/prop-types
+  101:48  error    'errors.autorId' is missing in props validation              react/prop-types
+  102:27  error    'form.autorId' is missing in props validation                react/prop-types
+  107:24  error    'authors.map' is missing in props validation                 react/prop-types
+  115:55  error    'errors.editoraId' is missing in props validation            react/prop-types
+  122:48  error    'errors.editoraId' is missing in props validation            react/prop-types
+  123:27  error    'form.editoraId' is missing in props validation              react/prop-types
+  128:27  error    'publishers.map' is missing in props validation              react/prop-types
+  139:54  error    'errors.edicao' is missing in props validation               react/prop-types
+  142:47  error    'errors.edicao' is missing in props validation               react/prop-types
+  143:25  error    'form.edicao' is missing in props validation                 react/prop-types
+  151:65  error    'errors.ano' is missing in props validation                  react/prop-types
+  154:47  error    'errors.ano' is missing in props validation                  react/prop-types
+  155:25  error    'form.ano' is missing in props validation                    react/prop-types
+  165:52  error    'errors.isbn' is missing in props validation                 react/prop-types
+  168:47  error    'errors.isbn' is missing in props validation                 react/prop-types
+  169:25  error    'form.isbn' is missing in props validation                   react/prop-types
+  183:18  error    'form' is missing in props validation                        react/prop-types
+  183:24  error    'errors' is missing in props validation                      react/prop-types
+  183:32  error    'onChange' is missing in props validation                    react/prop-types
+  189:56  error    'errors.numeroPaginas' is missing in props validation        react/prop-types
+  192:47  error    'errors.numeroPaginas' is missing in props validation        react/prop-types
+  193:25  error    'form.numeroPaginas' is missing in props validation          react/prop-types
+  202:55  error    'errors.codigoBarras' is missing in props validation         react/prop-types
+  205:47  error    'errors.codigoBarras' is missing in props validation         react/prop-types
+  206:25  error    'form.codigoBarras' is missing in props validation           react/prop-types
+  215:42  error    'errors.sinopse' is missing in props validation              react/prop-types
+  217:43  error    'errors.sinopse' is missing in props validation              react/prop-types
+  218:21  error    'form.sinopse' is missing in props validation                react/prop-types
+  229:50  error    'errors.altura' is missing in props validation               react/prop-types
+  232:47  error    'errors.altura' is missing in props validation               react/prop-types
+  233:25  error    'form.altura' is missing in props validation                 react/prop-types
+  243:51  error    'errors.largura' is missing in props validation              react/prop-types
+  246:47  error    'errors.largura' is missing in props validation              react/prop-types
+  247:25  error    'form.largura' is missing in props validation                react/prop-types
+  257:56  error    'errors.profundidade' is missing in props validation         react/prop-types
+  260:47  error    'errors.profundidade' is missing in props validation         react/prop-types
+  261:25  error    'form.profundidade' is missing in props validation           react/prop-types
+  271:48  error    'errors.peso' is missing in props validation                 react/prop-types
+  274:47  error    'errors.peso' is missing in props validation                 react/prop-types
+  275:25  error    'form.peso' is missing in props validation                   react/prop-types
+  290:18  error    'form' is missing in props validation                        react/prop-types
+  290:24  error    'errors' is missing in props validation                      react/prop-types
+  290:32  error    'onChange' is missing in props validation                    react/prop-types
+  290:42  error    'categories' is missing in props validation                  react/prop-types
+  290:54  error    'pricingGroups' is missing in props validation               react/prop-types
+  290:69  error    'loadingRefs' is missing in props validation                 react/prop-types
+  290:82  error    'bookId' is missing in props validation                      react/prop-types
+  292:39  error    'pricingGroups.find' is missing in props validation          react/prop-types
+  292:80  error    'form.grupoPrecificacaoId' is missing in props validation    react/prop-types
+  295:51  error    'form.valorCusto' is missing in props validation             react/prop-types
+  298:44  error    'form.valorCusto' is missing in props validation             react/prop-types
+  305:26  error    'form.precoVenda' is missing in props validation             react/prop-types
+  305:62  error    'form.precoVenda' is missing in props validation             react/prop-types
+  314:26  error    'form.categoriaIds' is missing in props validation           react/prop-types
+  326:58  error    'errors.grupoPrecificacaoId' is missing in props validation  react/prop-types
+  331:27  error    'pricingGroups.length' is missing in props validation        react/prop-types
+  337:46  error    'errors.grupoPrecificacaoId' is missing in props validation  react/prop-types
+  338:25  error    'form.grupoPrecificacaoId' is missing in props validation    react/prop-types
+  343:30  error    'pricingGroups.map' is missing in props validation           react/prop-types
+  360:25  error    'errors.valorCusto' is missing in props validation           react/prop-types
+  367:27  error    'form.valorCusto' is missing in props validation             react/prop-types
+  409:56  error    'errors.precoVenda' is missing in props validation           react/prop-types
+  416:24  error    'errors.precoVenda' is missing in props validation           react/prop-types
+  424:27  error    'form.precoVenda' is missing in props validation             react/prop-types
+  466:31  error    'form.autorizacaoGerencial' is missing in props validation   react/prop-types
+  479:47  error    'errors.categoriaIds' is missing in props validation         react/prop-types
+  484:24  error    'categories.length' is missing in props validation           react/prop-types
+  492:25  error    'categories.map' is missing in props validation              react/prop-types
+  493:39  error    'form.categoriaIds' is missing in props validation           react/prop-types
+  676:16  warning  'err' is defined but never used                              no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/CartPage.jsx
+   29:26  error    'itemId' is missing in props validation                                                                       react/prop-types
+   29:34  error    'value' is missing in props validation                                                                        react/prop-types
+   29:41  error    'onCommit' is missing in props validation                                                                     react/prop-types
+   29:51  error    'disabled' is missing in props validation                                                                     react/prop-types
+   83:27  error    'timer' is missing in props validation                                                                        react/prop-types
+   85:13  error    'timer.isExpired' is missing in props validation                                                              react/prop-types
+   92:13  error    'timer.isWarning' is missing in props validation                                                              react/prop-types
+   95:18  error    'timer.display' is missing in props validation                                                                react/prop-types
+  101:16  error    'timer.display' is missing in props validation                                                                react/prop-types
+  150:6   warning  React Hook useEffect has a missing dependency: 'fetchCart'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/CatalogPage.jsx
+  24:23  error  'currentPage' is missing in props validation   react/prop-types
+  24:36  error  'totalPages' is missing in props validation    react/prop-types
+  24:48  error  'onPageChange' is missing in props validation  react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/ChangePasswordPage.test.jsx
+   33:20  error    'Buffer' is not defined                                                        no-undef
+  252:83  warning  'confirmacao' is defined but never used. Allowed unused args must match /^_/u  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/CheckoutPage.jsx
+    14:8   warning  'logger' is defined but never used. Allowed unused vars must match /^[A-Z_]/u                                   no-unused-vars
+    20:20  error    'currentStep' is missing in props validation                                                                    react/prop-types
+    66:24  error    'address' is missing in props validation                                                                        react/prop-types
+    66:33  error    'selected' is missing in props validation                                                                       react/prop-types
+    66:43  error    'onSelect' is missing in props validation                                                                       react/prop-types
+    67:60  error    'address.tipoEndereco' is missing in props validation                                                           react/prop-types
+    73:44  error    'address.id' is missing in props validation                                                                     react/prop-types
+    79:31  error    'address.id' is missing in props validation                                                                     react/prop-types
+    82:49  error    'address.id' is missing in props validation                                                                     react/prop-types
+    84:41  error    'address.id' is missing in props validation                                                                     react/prop-types
+    85:20  error    'address.apelido' is missing in props validation                                                                react/prop-types
+    86:56  error    'address.apelido' is missing in props validation                                                                react/prop-types
+    89:22  error    'address.tipoLogradouro' is missing in props validation                                                         react/prop-types
+    89:47  error    'address.logradouro' is missing in props validation                                                             react/prop-types
+    89:69  error    'address.numero' is missing in props validation                                                                 react/prop-types
+    90:22  error    'address.complemento' is missing in props validation                                                            react/prop-types
+    90:50  error    'address.complemento' is missing in props validation                                                            react/prop-types
+    91:22  error    'address.bairro' is missing in props validation                                                                 react/prop-types
+    91:41  error    'address.cidade' is missing in props validation                                                                 react/prop-types
+    91:58  error    'address.estado' is missing in props validation                                                                 react/prop-types
+    91:81  error    'address.cep' is missing in props validation                                                                    react/prop-types
+   111:25  error    'cart' is missing in props validation                                                                           react/prop-types
+   111:31  error    'shippingFee' is missing in props validation                                                                    react/prop-types
+   111:44  error    'step' is missing in props validation                                                                           react/prop-types
+   111:50  error    'couponDiscount' is missing in props validation                                                                 react/prop-types
+   112:23  error    'cart.itens' is missing in props validation                                                                     react/prop-types
+   113:26  error    'cart.valorSubtotal' is missing in props validation                                                             react/prop-types
+   169:28  error    'onClose' is missing in props validation                                                                        react/prop-types
+   169:37  error    'onAdded' is missing in props validation                                                                        react/prop-types
+   237:25  error    'onClose' is missing in props validation                                                                        react/prop-types
+   237:34  error    'onAdded' is missing in props validation                                                                        react/prop-types
+   271:24  error    'addresses' is missing in props validation                                                                      react/prop-types
+   271:35  error    'selectedAddress' is missing in props validation                                                                react/prop-types
+   271:52  error    'onSelect' is missing in props validation                                                                       react/prop-types
+   271:62  error    'shippingFee' is missing in props validation                                                                    react/prop-types
+   271:75  error    'shippingLoading' is missing in props validation                                                                react/prop-types
+   271:92  error    'onAddAddress' is missing in props validation                                                                   react/prop-types
+   272:39  error    'addresses.filter' is missing in props validation                                                               react/prop-types
+   280:18  error    'addresses.length' is missing in props validation                                                               react/prop-types
+   295:42  error    'selectedAddress.id' is missing in props validation                                                             react/prop-types
+   300:22  error    'addresses.filter' is missing in props validation                                                               react/prop-types
+   348:24  error    'tradeCoupons' is missing in props validation                                                                   react/prop-types
+   348:38  error    'couponsLoading' is missing in props validation                                                                 react/prop-types
+   348:54  error    'checkoutData' is missing in props validation                                                                   react/prop-types
+   348:68  error    'onCouponChange' is missing in props validation                                                                 react/prop-types
+   349:61  error    'checkoutData.promotionalCoupon' is missing in props validation                                                 react/prop-types
+   352:18  error    'checkoutData.couponDiscount' is missing in props validation                                                    react/prop-types
+   354:42  error    'checkoutData.cupomsTrocaValor' is missing in props validation                                                  react/prop-types
+   355:47  error    'checkoutData.cupomPromocionalValor' is missing in props validation                                             react/prop-types
+   356:34  error    'checkoutData.couponDiscount' is missing in props validation                                                    react/prop-types
+   357:34  error    'checkoutData.couponRestante' is missing in props validation                                                    react/prop-types
+   386:36  error    'checkoutData.selectedAddress' is missing in props validation                                                   react/prop-types
+   386:53  error    'checkoutData.selectedAddress.id' is missing in props validation                                                react/prop-types
+   416:35  error    'checkoutData.selectedAddress' is missing in props validation                                                   react/prop-types
+   421:34  error    'checkoutData.selectedTradeCoupons' is missing in props validation                                              react/prop-types
+   430:27  error    'checkoutData.selectedTradeCoupons' is missing in props validation                                              react/prop-types
+   439:27  error    'checkoutData.selectedTradeCoupons' is missing in props validation                                              react/prop-types
+   442:36  error    'checkoutData.selectedTradeCoupons' is missing in props validation                                              react/prop-types
+   466:28  error    'tradeCoupons.length' is missing in props validation                                                            react/prop-types
+   472:29  error    'tradeCoupons.map' is missing in props validation                                                               react/prop-types
+   628:23  error    'nome' is missing in props validation                                                                           react/prop-types
+   650:3   error    'checkoutData' is missing in props validation                                                                   react/prop-types
+   651:3   error    'creditCards' is missing in props validation                                                                    react/prop-types
+   652:3   error    'cardsLoading' is missing in props validation                                                                   react/prop-types
+   653:3   error    'remainingBalance' is missing in props validation                                                               react/prop-types
+   654:3   error    'onPaymentChange' is missing in props validation                                                                react/prop-types
+   655:3   error    'onAddCard' is missing in props validation                                                                      react/prop-types
+   660:21  error    'checkoutData.paymentSplits' is missing in props validation                                                     react/prop-types
+   667:25  error    'checkoutData.paymentSplits' is missing in props validation                                                     react/prop-types
+   779:23  error    'creditCards.length' is missing in props validation                                                             react/prop-types
+   789:26  error    'creditCards.map' is missing in props validation                                                                react/prop-types
+   927:3   error    'checkoutData' is missing in props validation                                                                   react/prop-types
+   928:3   error    'cart' is missing in props validation                                                                           react/prop-types
+   929:3   error    'creditCards' is missing in props validation                                                                    react/prop-types
+   930:3   error    'finalizing' is missing in props validation                                                                     react/prop-types
+   931:3   error    'finalizeError' is missing in props validation                                                                  react/prop-types
+   932:3   error    'onFinalize' is missing in props validation                                                                     react/prop-types
+   934:23  error    'cart.itens' is missing in props validation                                                                     react/prop-types
+   935:26  error    'cart.valorSubtotal' is missing in props validation                                                             react/prop-types
+   936:30  error    'checkoutData.shippingFee' is missing in props validation                                                       react/prop-types
+   937:33  error    'checkoutData.couponDiscount' is missing in props validation                                                    react/prop-types
+   940:32  error    'checkoutData.selectedAddress' is missing in props validation                                                   react/prop-types
+   941:31  error    'checkoutData.paymentSplits' is missing in props validation                                                     react/prop-types
+   942:31  error    'creditCards.reduce' is missing in props validation                                                             react/prop-types
+  1010:22  error    'checkoutData.selectedAddress.apelido' is missing in props validation                                           react/prop-types
+  1011:58  error    'checkoutData.selectedAddress.apelido' is missing in props validation                                           react/prop-types
+  1014:24  error    'checkoutData.selectedAddress.tipoLogradouro' is missing in props validation                                    react/prop-types
+  1014:49  error    'checkoutData.selectedAddress.logradouro' is missing in props validation                                        react/prop-types
+  1014:71  error    'checkoutData.selectedAddress.numero' is missing in props validation                                            react/prop-types
+  1015:24  error    'checkoutData.selectedAddress.complemento' is missing in props validation                                       react/prop-types
+  1015:52  error    'checkoutData.selectedAddress.complemento' is missing in props validation                                       react/prop-types
+  1018:24  error    'checkoutData.selectedAddress.bairro' is missing in props validation                                            react/prop-types
+  1018:43  error    'checkoutData.selectedAddress.cidade' is missing in props validation                                            react/prop-types
+  1018:60  error    'checkoutData.selectedAddress.estado' is missing in props validation                                            react/prop-types
+  1018:83  error    'checkoutData.selectedAddress.cep' is missing in props validation                                               react/prop-types
+  1060:26  error    'finalizeError.errors' is missing in props validation                                                           react/prop-types
+  1060:50  error    'finalizeError.errors' is missing in props validation                                                           react/prop-types
+  1060:57  error    'finalizeError.errors.length' is missing in props validation                                                    react/prop-types
+  1062:30  error    'finalizeError.errors' is missing in props validation                                                           react/prop-types
+  1062:37  error    'finalizeError.errors.map' is missing in props validation                                                       react/prop-types
+  1072:50  error    'finalizeError.message' is missing in props validation                                                          react/prop-types
+  1187:6   warning  React Hook useEffect has a missing dependency: 'notifyError'. Either include it or remove the dependency array  react-hooks/exhaustive-deps
+  1228:14  warning  'err' is defined but never used                                                                                 no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/CheckoutPage.test.jsx
+  326:13  warning  'user' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/HomePage.jsx
+  15:23  error  'currentPage' is missing in props validation   react/prop-types
+  15:36  error  'totalPages' is missing in props validation    react/prop-types
+  15:48  error  'onPageChange' is missing in props validation  react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/LogisticsPage.jsx
+   36:29  error  'order' is missing in props validation                react/prop-types
+   36:36  error  'onClose' is missing in props validation              react/prop-types
+   59:31  error  'order.numero' is missing in props validation         react/prop-types
+   59:51  error  'order.id' is missing in props validation             react/prop-types
+   75:28  error  'order.numero' is missing in props validation         react/prop-types
+   75:48  error  'order.id' is missing in props validation             react/prop-types
+   81:28  error  'order.dataPedido' is missing in props validation     react/prop-types
+   88:50  error  'order.dataPedido' is missing in props validation     react/prop-types
+   95:61  error  'order.status' is missing in props validation         react/prop-types
+   98:40  error  'order.status' is missing in props validation         react/prop-types
+  104:28  error  'order.valorTotal' is missing in props validation     react/prop-types
+  104:70  error  'order.valorTotal' is missing in props validation     react/prop-types
+  110:22  error  'order.cliente' is missing in props validation        react/prop-types
+  116:70  error  'order.cliente' is missing in props validation        react/prop-types
+  116:78  error  'order.cliente.nome' is missing in props validation   react/prop-types
+  118:28  error  'order.cliente' is missing in props validation        react/prop-types
+  118:36  error  'order.cliente.email' is missing in props validation  react/prop-types
+  121:71  error  'order.cliente' is missing in props validation        react/prop-types
+  121:79  error  'order.cliente.email' is missing in props validation  react/prop-types
+  129:22  error  'order.itens' is missing in props validation          react/prop-types
+  129:37  error  'order.itens' is missing in props validation          react/prop-types
+  129:43  error  'order.itens.length' is missing in props validation   react/prop-types
+  145:30  error  'order.itens' is missing in props validation          react/prop-types
+  145:36  error  'order.itens.map' is missing in props validation      react/prop-types
+  170:34  error  'order.valorTotal' is missing in props validation     react/prop-types
+  170:76  error  'order.valorTotal' is missing in props validation     react/prop-types
+  197:31  error  'title' is missing in props validation                react/prop-types
+  197:38  error  'message' is missing in props validation              react/prop-types
+  197:47  error  'confirmLabel' is missing in props validation         react/prop-types
+  197:61  error  'confirmClass' is missing in props validation         react/prop-types
+  197:75  error  'onConfirm' is missing in props validation            react/prop-types
+  197:86  error  'onClose' is missing in props validation              react/prop-types
+  197:95  error  'loading' is missing in props validation              react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/OrderConfirmationPage.jsx
+  15:9  warning  'navigate' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/OrderHistoryPage.jsx
+   27:24  error  'status' is missing in props validation                             react/prop-types
+   43:26  error  'order' is missing in props validation                              react/prop-types
+   43:33  error  'onClose' is missing in props validation                            react/prop-types
+   43:42  error  'onSuccess' is missing in props validation                          react/prop-types
+   49:12  error  'order.itens' is missing in props validation                        react/prop-types
+   68:24  error  'order.itens' is missing in props validation                        react/prop-types
+   68:30  error  'order.itens.find' is missing in props validation                   react/prop-types
+   93:51  error  'order.id' is missing in props validation                           react/prop-types
+  131:26  error  'order.numeroNota' is missing in props validation                   react/prop-types
+  131:46  error  'order.numero' is missing in props validation                       react/prop-types
+  131:69  error  'order.id' is missing in props validation                           react/prop-types
+  164:31  error  'order.itens' is missing in props validation                        react/prop-types
+  264:22  error  'order' is missing in props validation                              react/prop-types
+  264:29  error  'onExchange' is missing in props validation                         react/prop-types
+  267:24  error  'order.numeroNota' is missing in props validation                   react/prop-types
+  267:44  error  'order.numero' is missing in props validation                       react/prop-types
+  267:67  error  'order.id' is missing in props validation                           react/prop-types
+  268:22  error  'order.dataPedido' is missing in props validation                   react/prop-types
+  269:22  error  'order.dataPedido' is missing in props validation                   react/prop-types
+  275:28  error  'order.itens' is missing in props validation                        react/prop-types
+  275:35  error  'order.itens.reduce' is missing in props validation                 react/prop-types
+  278:65  error  'order.id' is missing in props validation                           react/prop-types
+  285:44  error  'order.id' is missing in props validation                           react/prop-types
+  295:38  error  'order.status' is missing in props validation                       react/prop-types
+  304:35  error  'order.valorTotal' is missing in props validation                   react/prop-types
+  320:71  error  'order.id' is missing in props validation                           react/prop-types
+  322:18  error  'order.itens' is missing in props validation                        react/prop-types
+  322:33  error  'order.itens' is missing in props validation                        react/prop-types
+  322:39  error  'order.itens.length' is missing in props validation                 react/prop-types
+  335:26  error  'order.itens' is missing in props validation                        react/prop-types
+  335:32  error  'order.itens.map' is missing in props validation                    react/prop-types
+  358:18  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  362:24  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  362:40  error  'order.enderecoEntrega.logradouro' is missing in props validation   react/prop-types
+  362:60  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  362:76  error  'order.enderecoEntrega.numero' is missing in props validation       react/prop-types
+  363:24  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  363:40  error  'order.enderecoEntrega.complemento' is missing in props validation  react/prop-types
+  364:33  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  364:49  error  'order.enderecoEntrega.complemento' is missing in props validation  react/prop-types
+  366:26  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  366:42  error  'order.enderecoEntrega.bairro' is missing in props validation       react/prop-types
+  366:58  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  366:74  error  'order.enderecoEntrega.cidade' is missing in props validation       react/prop-types
+  367:24  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  367:40  error  'order.enderecoEntrega.estado' is missing in props validation       react/prop-types
+  367:61  error  'order.enderecoEntrega' is missing in props validation              react/prop-types
+  367:77  error  'order.enderecoEntrega.cep' is missing in props validation          react/prop-types
+  373:18  error  'order.pagamento' is missing in props validation                    react/prop-types
+  377:24  error  'order.pagamento' is missing in props validation                    react/prop-types
+  377:34  error  'order.pagamento.bandeira' is missing in props validation           react/prop-types
+  378:30  error  'order.pagamento' is missing in props validation                    react/prop-types
+  378:40  error  'order.pagamento.bandeira' is missing in props validation           react/prop-types
+  378:64  error  'order.pagamento' is missing in props validation                    react/prop-types
+  378:74  error  'order.pagamento.ultimosDigitos' is missing in props validation     react/prop-types
+  379:27  error  'order.pagamento' is missing in props validation                    react/prop-types
+  379:37  error  'order.pagamento.tipo' is missing in props validation               react/prop-types
+  386:20  error  'order.valorFrete' is missing in props validation                   react/prop-types
+  388:54  error  'order.valorFrete' is missing in props validation                   react/prop-types
+  392:82  error  'order.valorTotal' is missing in props validation                   react/prop-types
+  397:18  error  'order.status' is missing in props validation                       react/prop-types
+  406:52  error  'order.id' is missing in props validation                           react/prop-types
+  414:18  error  'order.status' is missing in props validation                       react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/ProductPage.jsx
+  29:22  error  'label' is missing in props validation     react/prop-types
+  29:29  error  'value' is missing in props validation     react/prop-types
+  29:36  error  'testId' is missing in props validation    react/prop-types
+  41:29  error  'value' is missing in props validation     react/prop-types
+  41:36  error  'onChange' is missing in props validation  react/prop-types
+  41:46  error  'max' is missing in props validation       react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/RegisterPage.test.jsx
+  67:7  warning  'existingEmail' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+  68:7  warning  'existingCpf' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u    no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/pages/StockEntryPage.jsx
+   26:29  error  'value' is missing in props validation          react/prop-types
+   26:36  error  'selectedTitle' is missing in props validation  react/prop-types
+   26:51  error  'onChange' is missing in props validation       react/prop-types
+   26:61  error  'error' is missing in props validation          react/prop-types
+  134:25  error  'livroId' is missing in props validation        react/prop-types
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/store/authContext.jsx
+  94:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/store/cartContext.jsx
+   82:7   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  80 |   useEffect(() => {
+  81 |     if (items.length > 0 && !hasAuthToken()) {
+> 82 |       setExpiresAt(Date.now() + CART_TTL_MS);
+     |       ^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  83 |     }
+  84 |   }, [items.length]);
+  85 |                                           react-hooks/set-state-in-effect
+   89:5   error  Error: Calling setState synchronously within an effect can trigger cascading renders
+
+Effects are intended to synchronize state between React and external systems such as manually updating the DOM, state management libraries, or other platform APIs. In general, the body of an effect should do one or both of the following:
+* Update external systems with the latest state from React.
+* Subscribe for updates from some external system, calling setState in a callback function when external state changes.
+
+Calling setState synchronously within an effect body causes cascading renders that can hurt performance, and is not recommended. (https://react.dev/learn/you-might-not-need-an-effect).
+
+  87 |   useEffect(() => {
+  88 |     if (!hasAuthToken()) return;
+> 89 |     syncFromBackend().catch(() => undefined);
+     |     ^^^^^^^^^^^^^^^ Avoid calling setState() directly within an effect
+  90 |   }, [syncFromBackend]);
+  91 |
+  92 |   // React to login/logout in the same tab or other tabs  react-hooks/set-state-in-effect
+  251:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                   react-refresh/only-export-components
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/store/cartContext.test.jsx
+    2:27  warning  'waitFor' is defined but never used. Allowed unused vars must match /^[A-Z_]/u             no-unused-vars
+  453:11  warning  'beforeAdd' is assigned a value but never used. Allowed unused vars must match /^[A-Z_]/u  no-unused-vars
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/store/notificationContext.jsx
+  96:14  error  Fast refresh only works when a file only exports components. Use a new file to share constants or functions between components  react-refresh/only-export-components
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/src/utils/logger.js
+   23:12  warning  'error' is defined but never used  no-unused-vars
+   43:3   warning  Unexpected console statement       no-console
+   60:3   warning  Unexpected console statement       no-console
+   79:3   warning  Unexpected console statement       no-console
+  104:3   warning  Unexpected console statement       no-console
+  121:3   warning  Unexpected console statement       no-console
+  140:3   warning  Unexpected console statement       no-console
+  158:3   warning  Unexpected console statement       no-console
+  174:3   warning  Unexpected console statement       no-console
+  188:3   warning  Unexpected console statement       no-console
+  202:3   warning  Unexpected console statement       no-console
+
+/Users/kauebenk/repos/LES-ecommerce-livros/frontend/vite.config.js
+  29:17  error  'process' is not defined  no-undef
+
+✖ 1096 problems (1062 errors, 34 warnings)
+

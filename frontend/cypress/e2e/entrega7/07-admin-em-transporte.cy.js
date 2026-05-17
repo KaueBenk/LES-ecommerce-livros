@@ -11,8 +11,8 @@ describe('Cenário 07: Administrador define produto como EM TRANSPORTE', () => {
   });
 
   it('deve despachar um pedido aprovado', () => {
-    cy.intercept('PATCH', '**/vendas/*/confirmar-pagamento').as('confirmPayment');
-    cy.intercept('PATCH', '**/vendas/*/despachar').as('dispatchOrder');
+    cy.intercept('PATCH', '**/admin/pedidos/*/confirmar-pagamento').as('confirmPayment');
+    cy.intercept('PATCH', '**/admin/pedidos/*/despachar').as('dispatchOrder');
 
     // 1. Cliente faz compra
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);

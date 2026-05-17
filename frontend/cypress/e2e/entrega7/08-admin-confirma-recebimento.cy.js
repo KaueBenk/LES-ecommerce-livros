@@ -11,8 +11,8 @@ describe('Cenário 08: Administrador confirma recebimento do produto devolvido',
   });
 
   it('deve confirmar recebimento de uma troca autorizada', () => {
-    cy.intercept('PATCH', '**/pedidos/trocas/*/autorizar').as('authorizeExchange');
-    cy.intercept('PATCH', '**/pedidos/trocas/*/receber').as('confirmReceipt');
+    cy.intercept('PATCH', '**/admin/trocas/*/autorizar').as('authorizeExchange');
+    cy.intercept('PATCH', '**/admin/trocas/*/confirmar-recebimento').as('confirmReceipt');
 
     // 1. Setup: Criar pedido entregue e solicitar troca
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);

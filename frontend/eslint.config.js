@@ -32,4 +32,38 @@ export default defineConfig([
       'no-console': 'warn',
     },
   },
+
+  // Node-only config files (process/env)
+  {
+    files: ['vite.config.js', 'cypress.config.js', 'eslint.config.js'],
+    languageOptions: {
+      globals: globals.node,
+    },
+  },
+
+  // Cypress specs/support (cy, Cypress, describe/it, expect)
+  {
+    files: [
+      'cypress/**/*.{js,jsx}',
+      '__tests__/e2e/cypress/**/*.{js,jsx}',
+    ],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.mocha,
+        ...globals.chai,
+        cy: 'readonly',
+        Cypress: 'readonly',
+      },
+    },
+  },
+
+  // React Contexts/Providers export hooks + constants (Fast Refresh rule is too strict)
+  {
+    files: ['src/store/**/*.{js,jsx}'],
+    rules: {
+      'react-refresh/only-export-components': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+    },
+  },
 ])

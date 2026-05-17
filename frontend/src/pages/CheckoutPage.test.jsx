@@ -147,7 +147,7 @@ describe('RF0033: Realizar compra', () => {
     cartService.getCart.mockResolvedValue(MOCK_CART);
     customerService.getAddresses.mockResolvedValue(MOCK_ADDRESSES);
     customerService.getCreditCards.mockResolvedValue(MOCK_CREDIT_CARDS);
-    customerService.getCuponsTraoca.mockResolvedValue([]);
+    customerService.getCuponsTroca.mockResolvedValue([]);
     checkoutService.calculateShipping.mockResolvedValue({ valorFrete: 10.0 });
     checkoutService.finalizeOrder.mockResolvedValue(MOCK_FINALIZED_ORDER);
   });
@@ -184,7 +184,7 @@ describe('RF0033: Realizar compra', () => {
       cartService.getCart.mockResolvedValue(MOCK_CART);
       customerService.getAddresses.mockResolvedValue(MOCK_ADDRESSES);
       customerService.getCreditCards.mockResolvedValue(MOCK_CREDIT_CARDS);
-      customerService.getCuponsTraoca.mockResolvedValue([]);
+      customerService.getCuponsTroca.mockResolvedValue([]);
       checkoutService.calculateShipping.mockResolvedValue({ valorFrete: 10.0 });
 
       renderWithRouter(<CheckoutPage />);
