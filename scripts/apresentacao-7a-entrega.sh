@@ -89,7 +89,7 @@ for spec in "${SPECS[@]}"; do
   cd "$FRONTEND_DIR"
   CYPRESS_BASE_URL="$BASE_URL" \
   CYPRESS_API_BASE_URL="$CYPRESS_API_BASE_URL" \
-  npx cypress run "${CYPRESS_UI_ARGS[@]}" --browser "$BROWSER" --spec "$spec"
+  npx cypress run ${CYPRESS_UI_ARGS[@]:+"${CYPRESS_UI_ARGS[@]}"} --browser "$BROWSER" --spec "$spec"
 
   cd "$ROOT_DIR"
   echo ""
