@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect */
 
 /**
  * cypress/e2e/checkout-new-card-address.cy.js

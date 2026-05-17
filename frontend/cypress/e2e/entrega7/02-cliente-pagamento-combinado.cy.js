@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect */
 
 describe('Cenário 02: Cliente paga com todas as combinações', () => {
   const CUSTOMER_EMAIL = 'joao@example.com';

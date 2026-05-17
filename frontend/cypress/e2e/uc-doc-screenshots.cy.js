@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect */
 
 /**
  * cypress/e2e/uc-doc-screenshots.cy.js

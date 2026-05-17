@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect */
 
 describe('Cenário 03: Cliente registra novo cartão e novo endereço no ato da compra', () => {
   const CUSTOMER_EMAIL = 'joao@example.com';

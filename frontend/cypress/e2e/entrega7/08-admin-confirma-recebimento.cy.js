@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect */
 
 describe('Cenário 08: Administrador confirma recebimento do produto devolvido', () => {
   const CUSTOMER_EMAIL = 'joao@example.com';

@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect */
 
 /**
  * cypress/e2e/pedido-venda-sucesso.cy.js

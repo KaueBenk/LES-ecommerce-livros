@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect, Cypress */
 
 describe('Cenário 09: Sistema gera cupom de troca', () => {
   const CUSTOMER_EMAIL = 'joao@example.com';

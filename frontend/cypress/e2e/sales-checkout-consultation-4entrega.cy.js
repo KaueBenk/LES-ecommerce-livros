@@ -1,4 +1,3 @@
-/* global cy, describe, it, beforeEach, expect */
 
 /**
  * cypress/e2e/sales-checkout-consultation-4entrega.cy.js

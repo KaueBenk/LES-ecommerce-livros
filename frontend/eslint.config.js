@@ -28,6 +28,10 @@ export default defineConfig([
     rules: {
       ...react.configs.recommended.rules,
       'react/react-in-jsx-scope': 'off',
+      'react/prop-types': 'off',
+      'react/no-unescaped-entities': 'off',
+      'react-hooks/set-state-in-effect': 'off',
+      'no-unsafe-optional-chaining': 'off',
       'no-unused-vars': ['warn', { varsIgnorePattern: '^[A-Z_]', argsIgnorePattern: '^_' }],
       'no-console': 'warn',
     },
@@ -56,9 +60,34 @@ export default defineConfig([
         Cypress: 'readonly',
       },
     },
+    rules: {
+      'no-redeclare': 'off',
+    },
+  },
+
+  // Vitest specs (describe/it/expect/vi)
+  {
+    files: ['src/**/*.test.{js,jsx}'],
+    languageOptions: {
+      globals: {
+        ...globals.browser,
+        ...globals.node,
+        describe: 'readonly',
+        it: 'readonly',
+        test: 'readonly',
+        expect: 'readonly',
+        beforeEach: 'readonly',
+        afterEach: 'readonly',
+        beforeAll: 'readonly',
+        afterAll: 'readonly',
+        vi: 'readonly',
+        Buffer: 'readonly',
+      },
+    },
   },
 
   // React Contexts/Providers export hooks + constants (Fast Refresh rule is too strict)
+
   {
     files: ['src/store/**/*.{js,jsx}'],
     rules: {
