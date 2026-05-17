@@ -11,6 +11,9 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
   });
 
   it('deve gerar um cupom de troca após confirmação de recebimento', () => {
+    cy.intercept('PATCH', '**/pedidos/trocas/*/autorizar').as('authorizeExchange');
+    cy.intercept('PATCH', '**/pedidos/trocas/*/receber').as('confirmReceipt');
+
     // 1. Setup: Criar pedido entregue, solicitar troca e finalizar
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
     cy.clearCart();
@@ -73,11 +76,14 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
       cy.contains('[data-testid^="pending-exchange-row-"]', justification).within(() => {
         cy.get('[data-testid^="authorize-exchange-"]').click();
       });
+      cy.wait('@authorizeExchange');
       cy.contains('autorizada', { timeout: 10000 }).should('be.visible');
+      
       cy.get('[data-testid="tab-authorized"]').click();
       cy.contains('[data-testid^="authorized-exchange-row-"]', orderNum).within(() => {
         cy.get('[data-testid^="confirm-receipt-"]').click();
       });
+      cy.wait('@confirmReceipt');
       cy.contains('finalizada', { timeout: 10000 }).should('be.visible');
 
       // 2. Verificar cupom via API (mais rápido e seguro)

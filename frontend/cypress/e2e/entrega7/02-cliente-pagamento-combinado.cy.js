@@ -11,9 +11,6 @@ describe('Cenário 02: Cliente paga com todas as combinações', () => {
   });
 
   it('deve pagar usando 2 cartões e cupons', () => {
-    // Intercepta a chamada de cupons para garantir que a UI carregou
-    cy.intercept('GET', '**/clientes/cupons-troca*').as('getCupons');
-
     // Adiciona valor suficiente para 2 cartões (mínimo 10 cada)
     cy.addToCart(1, 3);
     cy.visit('/cart');
@@ -24,18 +21,19 @@ describe('Cenário 02: Cliente paga com todas as combinações', () => {
     cy.get('[data-testid="checkout-next-btn"]').click();
 
     // Cupons
-    cy.wait('@getCupons');
-    cy.get('body').then(($body) => {
+    cy.get('body', { timeout: 10000 }).then(($body) => {
       if ($body.find('[data-testid^="trade-coupon-checkbox-"]').length > 0) {
         cy.get('[data-testid^="trade-coupon-checkbox-"]').first().check({ force: true });
+        cy.get('[data-testid^="trade-coupon-selected-"]', { timeout: 10000 }).should('be.visible');
       }
     });
     
     cy.get('[data-testid="promo-coupon-input"]').type('PROMO123');
     cy.get('[data-testid="promo-coupon-apply-btn"]').click();
     
-    // Aguarda a aplicação do cupom promocional para evitar race condition
+    // Aguarda a aplicação do cupom via UI
     cy.get('[data-testid="promo-coupon-discount-value"]', { timeout: 15000 }).should('be.visible');
+    cy.get('[data-testid="promo-coupon-apply-btn"]').should('not.be.disabled');
     
     cy.get('[data-testid="checkout-next-btn"]').click();
 

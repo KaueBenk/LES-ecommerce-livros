@@ -11,6 +11,11 @@ describe('Cenário 03: Cliente registra novo cartão e novo endereço no ato da 
   });
 
   it('deve registrar novo endereço e novo cartão durante o checkout', () => {
+    cy.intercept('GET', '**/clientes/enderecos').as('getAddresses');
+    cy.intercept('GET', '**/clientes/cartoes').as('getCards');
+    cy.intercept('POST', '**/clientes/enderecos').as('postAddress');
+    cy.intercept('POST', '**/clientes/cartoes').as('postCard');
+
     cy.addToCart(1, 1);
     cy.visit('/cart');
     cy.get('[data-testid="checkout-btn"]').click();
@@ -31,6 +36,9 @@ describe('Cenário 03: Cliente registra novo cartão e novo endereço no ato da 
     cy.get('[data-testid="address-pais-input"]').type('Brasil');
     cy.get('[data-testid="address-form-save-button"]').click();
     
+    cy.wait('@postAddress');
+    cy.wait('@getAddresses');
+    
     cy.contains('[data-testid^="address-card-"]', uniqueAddr, { timeout: 15000 }).click();
     cy.get('[data-testid="checkout-next-btn"]').click();
     cy.get('[data-testid="checkout-next-btn"]').click(); // pula cupons
@@ -43,9 +51,12 @@ describe('Cenário 03: Cliente registra novo cartão e novo endereço no ato da 
     cy.get('[data-testid="credit-card-bandeira"]').select('VISA');
     cy.get('[data-testid="credit-card-cvv"]').type('123');
     cy.get('[data-testid="credit-card-form-submit"]').click();
+    
+    cy.wait('@postCard');
+    cy.wait('@getCards');
     cy.get('[data-testid="credit-card-form-modal"]', { timeout: 15000 }).should('not.exist');
 
-    cy.contains('[data-testid^="payment-card-digits-"]', cardNum.slice(-4), { timeout: 10000 }).then(($el) => {
+    cy.contains('[data-testid^="payment-card-digits-"]', cardNum.slice(-4), { timeout: 15000 }).then(($el) => {
       const cardId = $el.attr('data-testid').replace('payment-card-digits-', '');
       cy.get(`[data-testid="payment-card-checkbox-${cardId}"]`).check({ force: true });
       cy.get('[data-testid="payment-remaining-balance"]').invoke('text').then((text) => {

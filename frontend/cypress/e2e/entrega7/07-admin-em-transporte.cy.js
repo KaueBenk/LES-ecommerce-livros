@@ -11,6 +11,9 @@ describe('Cenário 07: Administrador define produto como EM TRANSPORTE', () => {
   });
 
   it('deve despachar um pedido aprovado', () => {
+    cy.intercept('PATCH', '**/vendas/*/confirmar-pagamento').as('confirmPayment');
+    cy.intercept('PATCH', '**/vendas/*/despachar').as('dispatchOrder');
+
     // 1. Cliente faz compra
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
     cy.clearCart();
@@ -48,11 +51,13 @@ describe('Cenário 07: Administrador define produto como EM TRANSPORTE', () => {
         cy.get('[data-testid^="confirm-payment-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@confirmPayment');
       
       cy.contains('[data-testid^="order-row-"]', orderNum).within(() => {
         cy.get('[data-testid^="dispatch-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@dispatchOrder');
 
       cy.contains('despachado', { timeout: 10000 }).should('be.visible');
     });

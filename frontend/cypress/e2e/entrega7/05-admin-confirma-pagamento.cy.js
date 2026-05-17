@@ -11,6 +11,8 @@ describe('Cenário 05: Administrador confirma o pagamento', () => {
   });
 
   it('deve confirmar o pagamento de um pedido pendente', () => {
+    cy.intercept('PATCH', '**/vendas/*/confirmar-pagamento').as('confirmPayment');
+
     // 1. Cliente faz compra
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
     cy.clearCart();
@@ -51,6 +53,7 @@ describe('Cenário 05: Administrador confirma o pagamento', () => {
       });
       cy.confirmActionModal();
       
+      cy.wait('@confirmPayment');
       cy.contains('confirmado', { timeout: 10000 }).should('be.visible');
     });
   });

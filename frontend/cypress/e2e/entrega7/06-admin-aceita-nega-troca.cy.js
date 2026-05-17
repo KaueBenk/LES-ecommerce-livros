@@ -11,6 +11,9 @@ describe('Cenário 06: Administrador aceita ou nega a troca/devolução', () => 
   });
 
   it('deve rejeitar uma solicitação de troca', () => {
+    cy.intercept('PATCH', '**/pedidos/trocas/*/autorizar').as('authorizeExchange');
+    cy.intercept('PATCH', '**/pedidos/trocas/*/rejeitar').as('rejectExchange');
+
     // 1. Setup: Criar pedido entregue e solicitar troca
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
     cy.clearCart();
@@ -76,6 +79,7 @@ describe('Cenário 06: Administrador aceita ou nega a troca/devolução', () => 
         cy.get('[data-testid^="reject-exchange-"]').click();
       });
       
+      cy.wait('@rejectExchange');
       cy.contains('rejeitada', { timeout: 10000 }).should('be.visible');
     });
   });

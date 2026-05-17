@@ -11,6 +11,12 @@ describe('Cenário 04: Usuário solicita troca ou devolução', () => {
   });
 
   it('deve solicitar troca de um pedido entregue', () => {
+    // Intercepta ações de logística para garantir sincronização
+    cy.intercept('PATCH', '**/vendas/*/confirmar-pagamento').as('confirmPayment');
+    cy.intercept('PATCH', '**/vendas/*/despachar').as('dispatchOrder');
+    cy.intercept('PATCH', '**/vendas/*/entregar').as('deliverOrder');
+    cy.intercept('POST', '**/pedidos/*/trocas').as('requestExchange');
+
     // 1. Setup: Criar e Entregar um pedido
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
     cy.clearCart();
@@ -50,16 +56,19 @@ describe('Cenário 04: Usuário solicita troca ou devolução', () => {
         cy.get('[data-testid^="confirm-payment-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@confirmPayment');
       
       cy.contains('[data-testid^="order-row-"]', orderNum).within(() => {
         cy.get('[data-testid^="dispatch-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@dispatchOrder');
       
       cy.contains('[data-testid^="order-row-"]', orderNum).within(() => {
         cy.get('[data-testid^="deliver-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@deliverOrder');
 
       // 3. Cliente solicita troca
       cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
@@ -74,6 +83,7 @@ describe('Cenário 04: Usuário solicita troca ou devolução', () => {
       cy.get('[data-testid="exchange-justificativa"]').type('Troca solicitada via teste automatizado');
       cy.get('[data-testid="exchange-submit-btn"]').click();
       
+      cy.wait('@requestExchange');
       cy.contains('Solicitação de troca enviada', { timeout: 10000 }).should('be.visible');
     });
   });

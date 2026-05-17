@@ -11,6 +11,9 @@ describe('Cenário 08: Administrador confirma recebimento do produto devolvido',
   });
 
   it('deve confirmar recebimento de uma troca autorizada', () => {
+    cy.intercept('PATCH', '**/pedidos/trocas/*/autorizar').as('authorizeExchange');
+    cy.intercept('PATCH', '**/pedidos/trocas/*/receber').as('confirmReceipt');
+
     // 1. Setup: Criar pedido entregue e solicitar troca
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
     cy.clearCart();
@@ -75,6 +78,7 @@ describe('Cenário 08: Administrador confirma recebimento do produto devolvido',
       cy.contains('[data-testid^="pending-exchange-row-"]', justification).within(() => {
         cy.get('[data-testid^="authorize-exchange-"]').click();
       });
+      cy.wait('@authorizeExchange');
       cy.contains('autorizada', { timeout: 10000 }).should('be.visible');
 
       cy.get('[data-testid="tab-authorized"]').click();
@@ -82,6 +86,7 @@ describe('Cenário 08: Administrador confirma recebimento do produto devolvido',
         cy.get('[data-testid^="confirm-receipt-"]').click();
       });
       
+      cy.wait('@confirmReceipt');
       cy.contains('finalizada', { timeout: 10000 }).should('be.visible');
     });
   });

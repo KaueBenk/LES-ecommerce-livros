@@ -11,6 +11,10 @@ describe('Cenário 10: Administrador confirma que o produto foi ENTREGUE', () =>
   });
 
   it('deve marcar um pedido em transporte como entregue', () => {
+    cy.intercept('PATCH', '**/vendas/*/confirmar-pagamento').as('confirmPayment');
+    cy.intercept('PATCH', '**/vendas/*/despachar').as('dispatchOrder');
+    cy.intercept('PATCH', '**/vendas/*/entregar').as('deliverOrder');
+
     // 1. Setup: Criar e Despachar pedido
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
     cy.clearCart();
@@ -42,21 +46,27 @@ describe('Cenário 10: Administrador confirma que o produto foi ENTREGUE', () =>
       cy.login(ADMIN_EMAIL, ADMIN_PASSWORD);
       cy.visit('/admin/logistica');
       cy.get('[data-testid="filter-status"]').select('');
+      cy.get('[data-testid^="order-row-"]', { timeout: 15000 }).should('be.visible');
       cy.get('[data-testid="filter-submit"]').click();
+      
       cy.contains('[data-testid^="order-row-"]', orderNum).within(() => {
         cy.get('[data-testid^="confirm-payment-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@confirmPayment');
+      
       cy.contains('[data-testid^="order-row-"]', orderNum).within(() => {
         cy.get('[data-testid^="dispatch-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@dispatchOrder');
 
       // 2. Admin confirma entrega
       cy.contains('[data-testid^="order-row-"]', orderNum).within(() => {
         cy.get('[data-testid^="deliver-btn-"]').click();
       });
       cy.confirmActionModal();
+      cy.wait('@deliverOrder');
       
       cy.contains('entregue', { timeout: 10000 }).should('be.visible');
     });

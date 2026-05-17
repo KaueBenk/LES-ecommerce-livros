@@ -11,19 +11,21 @@ describe('Cenário 01: Cliente realiza compra', () => {
   });
 
   it('deve realizar uma compra completa com sucesso', () => {
+    cy.intercept('POST', '**/checkout/finalizar').as('finalizeOrder');
+
     cy.addToCart(1, 1);
     cy.visit('/cart');
     cy.get('[data-testid="checkout-btn"]').click();
 
     // Endereço (seleciona o primeiro)
-    cy.get('[data-testid^="address-card-"]').first().click();
+    cy.get('[data-testid^="address-card-"]', { timeout: 15000 }).first().click();
     cy.get('[data-testid="checkout-next-btn"]').click();
 
     // Cupons (pula)
     cy.get('[data-testid="checkout-next-btn"]').click();
 
     // Pagamento (seleciona um cartão ímpar para aprovação automática)
-    cy.get('[data-testid^="payment-card-digits-"]').each(($el) => {
+    cy.get('[data-testid^="payment-card-digits-"]', { timeout: 15000 }).each(($el) => {
       const text = $el.text().trim();
       if (Number(text.slice(-1)) % 2 === 1) {
         const id = $el.attr('data-testid').replace('payment-card-digits-', '');
@@ -42,6 +44,7 @@ describe('Cenário 01: Cliente realiza compra', () => {
     cy.get('[data-testid="checkout-next-btn"]').click();
     cy.get('[data-testid="confirm-purchase-btn"]').click();
 
+    cy.wait('@finalizeOrder');
     cy.url({ timeout: 20000 }).should('include', '/order-confirmation');
     cy.get('[data-testid="order-number"]').should('be.visible').and('contain.text', 'PED-');
   });
