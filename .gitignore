@@ -6,3 +6,6 @@ _bmad
 bmalph
 
 .home
+
+frontend/cypress/screenshots
+frontend/cypress/videos
