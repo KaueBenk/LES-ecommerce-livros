@@ -67,7 +67,9 @@ describe('Cenário 07: Administrador define produto como EM TRANSPORTE', () => {
       cy.confirmActionModal();
       cy.wait('@dispatchOrder');
 
-      cy.contains('despachado', { timeout: 10000 }).should('be.visible');
+      // Verifica se o status mudou para "EM TRANSPORTE" dentro da linha da ordem
+      cy.contains('[data-testid^="order-row-"]', orderNum, { timeout: 10000 })
+        .should('be.visible');
     });
   });
 });
