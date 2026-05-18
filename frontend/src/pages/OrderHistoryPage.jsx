@@ -15,13 +15,16 @@ const PAGE_SIZE = 20;
 const STATUS_CONFIG = {
   EM_PROCESSAMENTO: { label: 'Em Processamento', className: 'bg-warning text-dark' },
   AGUARDANDO_PAGAMENTO: { label: 'Aguardando Pagamento', className: 'bg-warning text-dark' },
-  APROVADO: { label: 'Aprovado', className: 'bg-warning text-dark' },
+  APROVADO: { label: 'Aprovada', className: 'bg-primary' },
   ENTREGUE: { label: 'Entregue', className: 'bg-success' },
   REPROVADA: { label: 'Reprovada', className: 'bg-danger' },
-  CANCELADO: { label: 'Cancelado', className: 'bg-danger' },
-  EM_TRANSITO: { label: 'Em Trânsito', className: 'bg-info text-dark' },
+  CANCELADO: { label: 'Cancelada', className: 'bg-danger' },
+  EM_TRANSITO: { label: 'Em Transporte', className: 'bg-info text-dark' },
   EM_TRANSPORTE: { label: 'Em Transporte', className: 'bg-info text-dark' },
-  EM_TROCA: { label: 'Em Troca', className: 'bg-secondary' },
+  EM_TROCA: { label: 'Em Troca', className: 'bg-warning text-dark' },
+  TROCA_AUTORIZADA: { label: 'Troca Autorizada', className: 'bg-info text-dark' },
+  TROCADO: { label: 'Trocado', className: 'bg-success' },
+  REJEITADA: { label: 'Troca Rejeitada', className: 'bg-danger' },
 };
 
 const StatusBadge = ({ status }) => {

@@ -78,7 +78,8 @@ SPECS=(
   "cypress/e2e/entrega7/10-admin-confirma-entregue.cy.js"
 )
 
-for spec in "${SPECS[@]}"; do
+for i in "${!SPECS[@]}"; do
+  spec="${SPECS[$i]}"
   FILENAME=$(basename "$spec")
   SCENARIO_NAME="${FILENAME%.cy.js}"
   
@@ -94,7 +95,12 @@ for spec in "${SPECS[@]}"; do
   cd "$ROOT_DIR"
   echo ""
   if [[ "$AUTO" != "1" ]]; then
-    read -r -p "Pressione Enter para o proximo cenario ($spec)..."
+    if (( i + 1 < ${#SPECS[@]} )); then
+      next_spec="${SPECS[$i+1]}"
+      read -r -p "Pressione Enter para o proximo cenario ($next_spec)..."
+    else
+      read -r -p "Pressione Enter para finalizar..."
+    fi
   fi
 done
 

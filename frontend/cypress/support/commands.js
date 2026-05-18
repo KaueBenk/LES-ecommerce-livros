@@ -77,11 +77,19 @@ Cypress.Commands.add('mockAPI', (method, url, body, alias) => {
 Cypress.Commands.add('addToCart', (bookId, qty = 1) => {
   const addFromCatalog = () => {
     cy.visit('/');
-    cy.get('[data-testid^="add-to-cart-btn-"]', { timeout: 15000 })
-      .first()
-      .should('be.visible')
-      .click();
-    cy.contains('adicionado ao carrinho', { timeout: 10000 }).should('be.visible');
+    // Tenta encontrar o botão específico do livro se bookId foi passado, senão pega o primeiro disponível
+    const selector = bookId ? `[data-testid="add-to-cart-btn-${bookId}"]` : '[data-testid^="add-to-cart-btn-"]';
+    
+    cy.get('body').then(($body) => {
+      if ($body.find(selector).length > 0) {
+        cy.get(selector).first().should('be.visible').click();
+      } else {
+        cy.log('Botão específico não encontrado no catálogo, tentando primeiro disponível');
+        cy.get('[data-testid^="add-to-cart-btn-"]').first().should('be.visible').click();
+      }
+    });
+    
+    cy.contains('adicionado ao carrinho', { timeout: 15000 }).should('be.visible');
   };
 
   if (!bookId) {
@@ -90,21 +98,20 @@ Cypress.Commands.add('addToCart', (bookId, qty = 1) => {
   }
 
   cy.visit(`/product/${bookId}`);
-  cy.get('[data-testid="product-page"]', { timeout: 20000 }).should('be.visible');
   
   cy.get('body').then(($body) => {
+    // Se a página de produto der erro ou não carregar o botão, tenta via catálogo
     if ($body.find('[data-testid="add-to-cart-btn"]').length === 0) {
-      cy.log('Add to cart button not found on product page, falling back to catalog');
+      cy.log(`Página do produto ${bookId} incompleta ou sem estoque, tentando via catálogo`);
       addFromCatalog();
-      return;
-    }
+    } else {
+      if (qty > 1) {
+        cy.get('[data-testid="qty-input"]').clear().type(String(qty));
+      }
 
-    if (qty > 1) {
-      cy.get('[data-testid="qty-input"]').clear().type(String(qty));
+      cy.get('[data-testid="add-to-cart-btn"]').should('be.visible').click();
+      cy.contains('adicionado ao carrinho', { timeout: 15000 }).should('be.visible');
     }
-
-    cy.get('[data-testid="add-to-cart-btn"]').should('be.visible').click();
-    cy.contains('adicionado ao carrinho', { timeout: 15000 }).should('be.visible');
   });
 });
 

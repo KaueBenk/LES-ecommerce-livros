@@ -32,7 +32,7 @@ export default defineConfig({
 
     // Retry failed tests once in CI
     retries: {
-      runMode: 1,
+      runMode: 0,
       openMode: 0,
     },
 

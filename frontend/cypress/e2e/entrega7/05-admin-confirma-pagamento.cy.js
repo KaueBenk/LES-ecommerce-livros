@@ -18,26 +18,33 @@ describe('Cenário 05: Administrador confirma o pagamento', () => {
     cy.addToCart(1, 1);
     cy.visit('/cart');
     cy.get('[data-testid="checkout-btn"]').click();
-    cy.get('[data-testid^="address-card-"]').first().click();
+    // Step 1: Address
+    cy.get('[data-testid^="address-card-"]', { timeout: 15000 }).first().click();
     cy.get('[data-testid="checkout-next-btn"]').click();
+
+    // Step 2: Coupons
     cy.get('[data-testid="checkout-next-btn"]').click();
     
-    // Escolhe cartão ímpar (para cair em APROVADA e precisar confirmar pagamento no admin)
-    cy.get('[data-testid^="payment-card-digits-"]').each(($el) => {
-      if (Number($el.text().trim().slice(-1)) % 2 === 1) {
-        const id = $el.attr('data-testid').replace('payment-card-digits-', '');
-        cy.wrap(id).as('cid');
-      }
-    });
-    cy.get('@cid').then(id => {
-      cy.get(`[data-testid="payment-card-checkbox-${id}"]`).check({ force: true });
-      cy.get('[data-testid="payment-remaining-balance"]').invoke('text').then(t => {
-        const val = t.replace(/\s/g, '').replace('R$', '').replace(/\./g, '').replace(',', '.');
-        cy.get(`[data-testid="payment-card-value-${id}"]`).clear().type(val);
+    // Step 3: Payment
+    cy.get('[data-testid^="payment-card-digits-"]', { timeout: 15000 })
+      .should('have.length.at.least', 1)
+      .then(($els) => {
+        const oddEl = [...$els].find(
+          (el) => Number(el.textContent.trim().slice(-1)) % 2 === 1,
+        );
+
+        expect(oddEl, 'Necessário 1 cartão ímpar para aprovação').to.exist;
+        const id = oddEl.getAttribute('data-testid').replace('payment-card-digits-', '');
+        
+        cy.get(`[data-testid="payment-card-checkbox-${id}"]`).check({ force: true });
+        cy.get('[data-testid="payment-remaining-balance"]').invoke('text').then(t => {
+          const val = t.replace(/\s/g, '').replace('R$', '').replace(/\./g, '').replace(',', '.');
+          cy.get(`[data-testid="payment-card-value-${id}"]`).clear().type(val);
+        });
       });
-    });
+
     cy.get('[data-testid="checkout-next-btn"]').click();
-    cy.get('[data-testid="confirm-purchase-btn"]').click();
+    cy.get('[data-testid="confirm-purchase-btn"]').should('be.visible').click();
     cy.get('[data-testid="order-number"]').invoke('text').then(num => {
       const orderNum = num.trim();
 

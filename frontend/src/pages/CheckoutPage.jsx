@@ -699,7 +699,10 @@ const StepPayment = ({
     const hasCardErrors = selectedIds.some((id) => {
       const v = parseFloat((cardValues[id] || '0').replace(',', '.'));
       if (isNaN(v) || v <= 0) return true;
-      if (target >= 10 && v < 10) return true;
+      // RN0034: valor mínimo de R$ 10,00 por cartão.
+      // RN0035: se cupom for usado e total < 10, permite valor menor.
+      // Se o target >= 10, o cartão individual também deve ser >= 10.
+      if (target >= 10 && v < 9.995) return true;
       return false;
     });
 
@@ -708,17 +711,19 @@ const StepPayment = ({
       paymentValid: isExact && selectedIds.length > 0 && !hasCardErrors,
     });
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [cardValues, selectedIds, target, allowNoPayment]);
+  }, [cardValues, selectedIds, target, allowNoPayment, isExact]);
 
   const toggleCard = (cardId) => {
+    const isNowSelected = !selectedIds.includes(cardId);
+    
     setSelectedIds((prev) => {
-      const next = prev.includes(cardId) ? prev.filter((id) => id !== cardId) : [...prev, cardId];
+      const next = isNowSelected ? [...prev, cardId] : prev.filter((id) => id !== cardId);
       return next;
     });
-    // If newly selected and only one card, pre-fill with remaining
+
+    // If newly selected and it's the only one, pre-fill with remaining balance
     setCardValues((prev) => {
-      const alreadySelected = selectedIds.includes(cardId);
-      if (!alreadySelected && !prev[cardId]) {
+      if (isNowSelected && !prev[cardId]) {
         return { ...prev, [cardId]: String(target.toFixed(2)) };
       }
       return prev;
@@ -733,7 +738,7 @@ const StepPayment = ({
     if (!selectedIds.includes(cardId)) return null;
     const v = parseFloat((cardValues[cardId] || '0').replace(',', '.'));
     if (isNaN(v) || v <= 0) return 'Informe um valor.';
-    if (target >= 10 && v < 10) return 'Valor mínimo: R$ 10,00.';
+    if (target >= 10 && v < 9.995) return 'Valor mínimo: R$ 10,00.';
     return null;
   };
 
@@ -789,6 +794,9 @@ const StepPayment = ({
             {creditCards.map((card) => {
               const isSelected = selectedIds.includes(card.id);
               const cardError = getCardError(card.id);
+              const cardValue = parseFloat((cardValues[card.id] || '0').replace(',', '.'));
+              const isValid = isSelected && !cardError && cardValue > 0;
+
               return (
                 <li
                   key={card.id}
@@ -844,7 +852,7 @@ const StepPayment = ({
                             type="number"
                             id={`card-val-${card.id}`}
                             className={`form-control ${
-                              cardError ? 'is-invalid' : total > 0 ? 'is-valid' : ''
+                              cardError ? 'is-invalid' : isValid ? 'is-valid' : ''
                             }`}
                             min={target >= 10 ? '10' : '0.01'}
                             step="0.01"

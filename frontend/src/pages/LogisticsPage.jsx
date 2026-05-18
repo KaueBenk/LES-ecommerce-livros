@@ -15,16 +15,24 @@ const ORDER_STATUSES = [
   { value: '', label: 'Todos' },
   { value: 'EM_PROCESSAMENTO', label: 'Em Processamento' },
   { value: 'APROVADA', label: 'Aprovada' },
-  { value: 'EM_TRANSITO', label: 'Em Trânsito' },
+  { value: 'EM_TRANSITO', label: 'Em Transporte' },
+  { value: 'EM_TRANSPORTE', label: 'Em Transporte' },
   { value: 'ENTREGUE', label: 'Entregue' },
+  { value: 'EM_TROCA', label: 'Em Troca' },
+  { value: 'TROCA_AUTORIZADA', label: 'Troca Autorizada' },
+  { value: 'TROCADO', label: 'Trocado' },
   { value: 'CANCELADA', label: 'Cancelada' },
 ];
 
 const STATUS_BADGES = {
   EM_PROCESSAMENTO: 'bg-secondary',
   APROVADA: 'bg-primary',
-  EM_TRANSITO: 'bg-warning text-dark',
+  EM_TRANSITO: 'bg-info text-dark',
+  EM_TRANSPORTE: 'bg-info text-dark',
   ENTREGUE: 'bg-success',
+  EM_TROCA: 'bg-warning text-dark',
+  TROCA_AUTORIZADA: 'bg-info text-dark',
+  TROCADO: 'bg-success',
   CANCELADA: 'bg-danger',
 };
 
@@ -575,7 +583,7 @@ const LogisticsPage = () => {
                             🚚 Despachar
                           </button>
                         )}
-                        {order.status === 'EM_TRANSITO' && (
+                        {['EM_TRANSITO', 'EM_TRANSPORTE'].includes(order.status) && (
                           <button
                             type="button"
                             className="btn btn-success"

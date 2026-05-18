@@ -19,7 +19,7 @@ const StatusBadge = ({ status }) => {
     REJEITADA: { cls: 'bg-danger', label: 'Rejeitada' },
   };
   const { cls = 'bg-secondary', label = status } = map[status] ?? {};
-  return <span className={`badge ${cls}`}>{label}</span>;
+  return <span className={`badge ${cls}`} data-testid="exchange-status-badge">{label}</span>;
 };
 
 // ─── Pagination ───────────────────────────────────────────────────────────────
