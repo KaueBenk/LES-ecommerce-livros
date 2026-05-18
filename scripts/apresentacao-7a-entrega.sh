@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -euo pipefail
+set -uo pipefail
 
 ROOT_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
 FRONTEND_DIR="$ROOT_DIR/frontend"
@@ -65,6 +65,8 @@ if [[ "$AUTO" != "1" ]]; then
   read -r -p "Pressione Enter para iniciar a sequencia de 10 testes obrigatorios..."
 fi
 
+FAILED_TESTS=()
+PASSED_TESTS=()
 SPECS=(
   "cypress/e2e/entrega7/01-cliente-realiza-compra.cy.js"
   "cypress/e2e/entrega7/02-cliente-pagamento-combinado.cy.js"
@@ -91,6 +93,15 @@ for i in "${!SPECS[@]}"; do
   CYPRESS_BASE_URL="$BASE_URL" \
   CYPRESS_API_BASE_URL="$CYPRESS_API_BASE_URL" \
   npx cypress run ${CYPRESS_UI_ARGS[@]:+"${CYPRESS_UI_ARGS[@]}"} --browser "$BROWSER" --spec "$spec"
+  
+  EXIT_CODE=$?
+  if [[ $EXIT_CODE -eq 0 ]]; then
+    PASSED_TESTS+=("$SCENARIO_NAME")
+    echo "✓ SUCESSO: $SCENARIO_NAME"
+  else
+    FAILED_TESTS+=("$SCENARIO_NAME")
+    echo "✗ FALHA: $SCENARIO_NAME (exit code: $EXIT_CODE)"
+  fi
 
   cd "$ROOT_DIR"
   echo ""
@@ -103,5 +114,23 @@ for i in "${!SPECS[@]}"; do
     fi
   fi
 done
+
+echo ""
+echo "======================================================================"
+echo "==> RESUMO DOS TESTES"
+echo "======================================================================"
+echo "✓ Aprovados: ${#PASSED_TESTS[@]}"
+for test in "${PASSED_TESTS[@]}"; do
+  echo "  ✓ $test"
+done
+
+if [[ ${#FAILED_TESTS[@]} -gt 0 ]]; then
+  echo ""
+  echo "✗ Falhados: ${#FAILED_TESTS[@]}"
+  for test in "${FAILED_TESTS[@]}"; do
+    echo "  ✗ $test"
+  done
+fi
+echo "======================================================================"
 
 echo "==> Concluido."

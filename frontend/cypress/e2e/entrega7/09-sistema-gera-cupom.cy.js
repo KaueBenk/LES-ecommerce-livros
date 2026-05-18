@@ -9,7 +9,7 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
     cy.desktop();
   });
 
-  it('deve gerar um cupom de troca após confirmação de recebimento', () => {
+  it('deve gerar um cupom de troca após confirmação de recebimento e validar compra com cupom', () => {
     cy.intercept('PATCH', '**/admin/pedidos/*/confirmar-pagamento').as('confirmPayment');
     cy.intercept('PATCH', '**/admin/pedidos/*/despachar').as('dispatchOrder');
     cy.intercept('PATCH', '**/admin/pedidos/*/entregar').as('deliverOrder');
@@ -17,6 +17,9 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
     cy.intercept('PATCH', '**/admin/trocas/*/confirmar-recebimento').as('confirmReceipt');
     cy.intercept('POST', '**/pedidos/*/trocas').as('requestExchange');
     cy.intercept('GET', '**/clientes/cartoes').as('getCards');
+    cy.intercept('GET', '**/clientes/cupons-troca').as('getCoupons');
+    cy.intercept('POST', '**/carrinho/aplicar-cupom').as('applyCoupon');
+    cy.intercept('POST', '**/pedidos').as('createOrder');
 
     // 1. Setup: Criar pedido entregue, solicitar troca e finalizar
     cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
@@ -121,6 +124,57 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
           expect(Number(coupons[0].valor)).to.be.greaterThan(0);
         });
       });
+
+      // 3. Validar que o cliente consegue realizar uma compra usando o cupom gerado
+      cy.clearCart();
+      cy.addToCart(2, 1);  // Adiciona livro diferente
+      cy.visit('/cart');
+      cy.get('[data-testid="checkout-btn"]').click();
+      
+      // Step 1
+      cy.get('[data-testid^="address-card-"]', { timeout: 15000 }).first().click();
+      cy.get('[data-testid="checkout-next-btn"]').click();
+      
+      // Step 2 - Aplicar cupom
+      cy.get('[data-testid="coupon-input"]').should('be.visible');
+      cy.window().then(win => {
+        const token = win.localStorage.getItem('auth_token');
+        cy.request({
+          method: 'GET',
+          url: `${Cypress.env('apiBaseUrl')}/clientes/cupons-troca`,
+          headers: { Authorization: `Bearer ${token}` }
+        }).then(res => {
+          const cupom = res.body.data[0].codigo;
+          cy.get('[data-testid="coupon-input"]').clear().type(cupom);
+          cy.get('[data-testid="apply-coupon-btn"]').click();
+          cy.contains('Cupom aplicado', { timeout: 10000 }).should('be.visible');
+        });
+      });
+      
+      cy.get('[data-testid="checkout-next-btn"]').click();
+      
+      // Step 3
+      cy.wait('@getCards');
+      cy.get('[data-testid^="payment-card-digits-"]', { timeout: 15000 })
+        .should('have.length.at.least', 1)
+        .then(($els) => {
+          const oddEl = [...$els].find(el => Number(el.textContent.trim().slice(-1)) % 2 === 1);
+          if (oddEl) {
+            const id = oddEl.getAttribute('data-testid').replace('payment-card-digits-', '');
+            cy.get(`[data-testid="payment-card-checkbox-${id}"]`).check({ force: true });
+            cy.get('[data-testid="payment-remaining-balance"]').invoke('text').then(t => {
+              const val = t.replace(/\s/g, '').replace('R$', '').replace(/\./g, '').replace(',', '.');
+              cy.get(`[data-testid="payment-card-value-${id}"]`).clear().type(val);
+            });
+          }
+        });
+
+      cy.get('[data-testid="checkout-next-btn"]').click();
+      cy.get('[data-testid="confirm-purchase-btn"]').should('be.visible').click();
+      
+      // Validar que a compra foi realizada com sucesso
+      cy.get('[data-testid="order-number"]').should('be.visible');
+      cy.contains('Compra realizada com sucesso', { timeout: 10000 }).should('be.visible');
     });
   });
 });
