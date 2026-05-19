@@ -62,30 +62,27 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
       cy.visit('/admin/logistica', { timeout: 10000 });
       cy.get('[data-testid^="order-row-"]', { timeout: 15000 }).should('have.length.greaterThan', 0);
       
-      // Procura pela linha contendo o número do pedido
-      cy.get('[data-testid^="order-row-"]').each(($row) => {
-        cy.wrap($row).invoke('text').then((text) => {
-          if (text.includes(orderNum) || text.includes(orderNum.replace('PED-', ''))) {
-            cy.wrap($row).within(() => {
-              cy.get('[data-testid^="confirm-payment-btn-"]').click();
-            });
-            cy.confirmActionModal();
-            cy.wait('@confirmPayment');
-            
-            cy.wrap($row).within(() => {
-              cy.get('[data-testid^="dispatch-btn-"]').click();
-            });
-            cy.confirmActionModal();
-            cy.wait('@dispatchOrder');
-            
-            cy.wrap($row).within(() => {
-              cy.get('[data-testid^="deliver-btn-"]').click();
-            });
-            cy.confirmActionModal();
-            cy.wait('@deliverOrder');
-          }
-        });
+      const orderSearchTerm = orderNum.replace('PED-', '');
+
+      // Procura pela linha contendo o número do pedido e executa as ações uma por uma,
+      // re-buscando o elemento após cada re-renderização
+      cy.contains('[data-testid^="order-row-"]', orderSearchTerm).within(() => {
+        cy.get('[data-testid^="confirm-payment-btn-"]').click();
       });
+      cy.confirmActionModal();
+      cy.wait('@confirmPayment');
+
+      cy.contains('[data-testid^="order-row-"]', orderSearchTerm).within(() => {
+        cy.get('[data-testid^="dispatch-btn-"]').click();
+      });
+      cy.confirmActionModal();
+      cy.wait('@dispatchOrder');
+
+      cy.contains('[data-testid^="order-row-"]', orderSearchTerm).within(() => {
+        cy.get('[data-testid^="deliver-btn-"]').click();
+      });
+      cy.confirmActionModal();
+      cy.wait('@deliverOrder');
 
       cy.login(CUSTOMER_EMAIL, CUSTOMER_PASSWORD);
       cy.visit('/account/orders', { timeout: 10000 });
@@ -94,18 +91,13 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
       cy.get('[data-testid^="order-card-"]', { timeout: 15000 }).should('have.length.greaterThan', 0);
       
       // Encontra o pedido pelo número
-      cy.get('[data-testid="order-numero"]', { timeout: 15000 }).each(($el) => {
-        cy.wrap($el).invoke('text').then((text) => {
-          if (text.includes(orderNum) || text.trim() === orderNum) {
-            cy.wrap($el)
-              .closest('[data-testid^="order-card-"]')
-              .within(() => {
-                cy.get('[data-testid^="order-toggle-"]').click();
-                cy.get('[data-testid^="exchange-btn-"]', { timeout: 10000 }).should('be.visible').click();
-              });
-          }
+      cy.contains('[data-testid="order-numero"]', orderNum)
+        .closest('[data-testid^="order-card-"]')
+        .within(() => {
+          cy.get('[data-testid^="order-toggle-"]').click();
+          cy.get('[data-testid^="exchange-btn-"]', { timeout: 10000 }).should('be.visible').click();
         });
-      });
+
       const justification = `Cupom ${Date.now()}`;
       cy.get('[data-testid="exchange-modal"]').should('be.visible');
       cy.get('[data-testid^="exchange-chk-"]').first().check({ force: true });
@@ -123,14 +115,8 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
       cy.url({ timeout: 10000 }).should('include', '/admin/trocas');
       
       // Encontra a troca pela justificativa
-      cy.get('[data-testid^="pending-exchange-row-"]', { timeout: 15000 }).each(($row) => {
-        cy.wrap($row).invoke('text').then((text) => {
-          if (text.includes(justification)) {
-            cy.wrap($row).within(() => {
-              cy.get('[data-testid^="authorize-exchange-"]').click();
-            });
-          }
-        });
+      cy.contains('[data-testid^="pending-exchange-row-"]', justification).within(() => {
+        cy.get('[data-testid^="authorize-exchange-"]').click();
       });
       
       cy.wait('@authorizeExchange');
@@ -141,14 +127,8 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
       cy.get('[data-testid="tab-authorized-content"]', { timeout: 10000 }).should('be.visible');
       
       // Aguarda a tabela de autorizadas carregar e encontra a troca
-      cy.get('[data-testid^="authorized-exchange-row-"]', { timeout: 15000 }).each(($row) => {
-        cy.wrap($row).invoke('text').then((text) => {
-          if (text.includes(orderNum) || text.includes(orderNum.replace('PED-', ''))) {
-            cy.wrap($row).within(() => {
-              cy.get('[data-testid^="confirm-receipt-"]').click();
-            });
-          }
-        });
+      cy.contains('[data-testid^="authorized-exchange-row-"]', orderSearchTerm).within(() => {
+        cy.get('[data-testid^="confirm-receipt-"]').click();
       });
       
       cy.wait('@confirmReceipt');
@@ -183,8 +163,8 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
       cy.get('[data-testid^="address-card-"]', { timeout: 15000 }).first().click();
       cy.get('[data-testid="checkout-next-btn"]').click();
       
-      // Step 2 - Aplicar cupom
-      cy.get('[data-testid="promo-coupon-input"]').should('be.visible');
+      // Step 2 - Selecionar cupom de troca
+      cy.get('[data-testid="trade-coupons-section"]').should('be.visible');
       cy.window().then(win => {
         const token = win.localStorage.getItem('auth_token');
         cy.request({
@@ -192,12 +172,11 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
           url: `${Cypress.env('apiBaseUrl')}/clientes/cupons-troca`,
           headers: { Authorization: `Bearer ${token}` }
         }).then(res => {
-          const cupom = res.body.data[0].codigo;
-          cy.get('[data-testid="promo-coupon-input"]').clear().type(cupom);
-          cy.get('[data-testid="promo-coupon-apply-btn"]').click();
+          const cupomId = res.body.data[0].id;
+          cy.get(`[data-testid="trade-coupon-checkbox-${cupomId}"]`).check({ force: true });
           
           // Aguarda o desconto ser aplicado (verificar que o elemento de desconto aparece)
-          cy.get('[data-testid="promo-coupon-discount-value"]', { timeout: 10000 })
+          cy.get('[data-testid="trade-coupon-discount-value"]', { timeout: 10000 })
             .should('be.visible')
             .invoke('text')
             .then((text) => {
@@ -231,7 +210,7 @@ describe('Cenário 09: Sistema gera cupom de troca', () => {
       
       // Validar que a compra foi realizada com sucesso
       cy.get('[data-testid="order-number"]').should('be.visible');
-      cy.contains('Compra realizada com sucesso', { timeout: 10000 }).should('be.visible');
+      cy.contains('Pedido Confirmado!', { timeout: 10000 }).should('be.visible');
     });
   });
 });
