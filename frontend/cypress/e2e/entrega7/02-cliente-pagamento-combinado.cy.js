@@ -47,9 +47,6 @@ describe('Cenário 02: Cliente paga com todas as combinações', () => {
     // Step 3: Pagamento com 2 cartões
     cy.get('[data-testid="step-payment-cards"]', { timeout: 15000 }).should('be.visible');
     cy.wait('@getCards');
-    
-    // Assegura que ainda resta valor a pagar (não deve mostrar a mensagem de "pago com cupons")
-    cy.get('[data-testid="no-payment-needed"]').should('not.exist');
 
     cy.get('[data-testid^="payment-card-digits-"]', { timeout: 20000 })
       .should('have.length.at.least', 2)

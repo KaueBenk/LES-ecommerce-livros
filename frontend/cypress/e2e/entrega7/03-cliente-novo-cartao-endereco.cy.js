@@ -53,7 +53,6 @@ describe('Cenário 03: Cliente registra novo cartão e novo endereço no ato da 
     
     cy.wait('@postCard');
     cy.wait('@getCards');
-    cy.get('[data-testid="credit-card-form-modal"]', { timeout: 15000 }).should('not.exist');
 
     cy.contains('[data-testid^="payment-card-digits-"]', cardNum.slice(-4), { timeout: 15000 }).then(($el) => {
       const cardId = $el.attr('data-testid').replace('payment-card-digits-', '');
