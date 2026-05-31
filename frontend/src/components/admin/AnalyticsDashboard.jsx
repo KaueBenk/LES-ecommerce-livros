@@ -131,6 +131,18 @@ const SalesByPeriod = () => {
   const [error, setError] = useState(null);
   const [formErrors, setFormErrors] = useState({});
 
+  const [allCategories, setAllCategories] = useState([]);
+  const [selectedCategories, setSelectedCategories] = useState([]);
+
+  React.useEffect(() => {
+    adminService.getCategories()
+      .then((res) => {
+        setAllCategories(res || []);
+        setSelectedCategories((res || []).map(c => c.nome));
+      })
+      .catch(() => {});
+  }, []);
+
   const validate = () => {
     const errs = {};
     if (!dataInicio) errs.dataInicio = 'Data inicial é obrigatória.';
@@ -148,14 +160,18 @@ const SalesByPeriod = () => {
     setLoading(true);
     setError(null);
     try {
-      const data = await adminService.getSalesAnalytics({ dataInicio, dataFim, agrupamento });
+      const params = { dataInicio, dataFim, agrupamento };
+      if (agrupamento === 'CATEGORIA' && selectedCategories.length > 0) {
+        params.categorias = selectedCategories.join(',');
+      }
+      const data = await adminService.getSalesAnalytics(params);
       setResult(data);
     } catch (err) {
       setError(getErrorMessage(err) || 'Erro ao carregar dados de análise.');
     } finally {
       setLoading(false);
     }
-  }, [dataInicio, dataFim, agrupamento]); // eslint-disable-line react-hooks/exhaustive-deps
+  }, [dataInicio, dataFim, agrupamento, selectedCategories]); // eslint-disable-line react-hooks/exhaustive-deps
 
   const buildChartData = () => {
     if (!result?.series?.length) return null;
@@ -251,6 +267,28 @@ const SalesByPeriod = () => {
           <option value="valor">Valor (R$)</option>
         </select>
       </div>
+      {agrupamento === 'CATEGORIA' && allCategories.length > 0 && (
+        <div className="col-12 mt-3">
+          <label className="form-label small fw-semibold mb-1">Filtrar Categorias</label>
+          <div className="d-flex flex-wrap gap-2 p-2 border rounded bg-white">
+            {allCategories.map(cat => (
+              <div className="form-check form-check-inline m-0" key={cat.id}>
+                <input
+                  className="form-check-input"
+                  type="checkbox"
+                  id={`cat-${cat.id}`}
+                  checked={selectedCategories.includes(cat.nome)}
+                  onChange={(e) => {
+                    if (e.target.checked) setSelectedCategories([...selectedCategories, cat.nome]);
+                    else setSelectedCategories(selectedCategories.filter(n => n !== cat.nome));
+                  }}
+                />
+                <label className="form-check-label small" htmlFor={`cat-${cat.id}`}>{cat.nome}</label>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
     </>
   );
 

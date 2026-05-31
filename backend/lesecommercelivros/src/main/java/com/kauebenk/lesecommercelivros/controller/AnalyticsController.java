@@ -21,11 +21,12 @@ public class AnalyticsController {
     public ResponseEntity<ApiResponse<Map<String, Object>>> getAnaliseVendas(
             @RequestParam String dataInicio,
             @RequestParam String dataFim,
-            @RequestParam(required = false, defaultValue = "CATEGORIA") String agrupamento) {
+            @RequestParam(required = false, defaultValue = "CATEGORIA") String agrupamento,
+            @RequestParam(required = false) java.util.List<String> categorias) {
         try {
-            log.info("[ANALYTICS-CTRL] GET /api/v1/admin/analise/vendas - DataInicio: {}, DataFim: {}, Agrupamento: {}", 
-                    dataInicio, dataFim, agrupamento);
-            Map<String, Object> result = adminWorkflowService.getAnaliseVendas(dataInicio, dataFim, agrupamento);
+            log.info("[ANALYTICS-CTRL] GET /api/v1/admin/analise/vendas - DataInicio: {}, DataFim: {}, Agrupamento: {}, Categorias: {}", 
+                    dataInicio, dataFim, agrupamento, categorias);
+            Map<String, Object> result = adminWorkflowService.getAnaliseVendas(dataInicio, dataFim, agrupamento, categorias);
             log.info("[ANALYTICS-CTRL] Análise de vendas obtida com sucesso");
             return ResponseEntity.ok(ApiResponse.success(result, "OK"));
         } catch (Exception e) {

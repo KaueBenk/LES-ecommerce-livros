@@ -633,7 +633,7 @@ public class AdminWorkflowService {
     }
 
     @Transactional(readOnly = true)
-    public Map<String, Object> getAnaliseVendas(String dataInicio, String dataFim, String agrupamento) {
+    public Map<String, Object> getAnaliseVendas(String dataInicio, String dataFim, String agrupamento, List<String> categoriasSelecionadas) {
         LocalDate inicio = parseDate(dataInicio, "dataInicio");
         LocalDate fim = parseDate(dataFim, "dataFim");
         if (fim.isBefore(inicio)) {
@@ -658,6 +658,11 @@ public class AdminWorkflowService {
                         ? safeLivroTitulo(item)
                         : firstCategoriaNome(item);
                 if (nomeSerie == null || nomeSerie.isBlank()) continue;
+                
+                String categoriaItem = firstCategoriaNome(item);
+                if (categoriasSelecionadas != null && !categoriasSelecionadas.isEmpty() && !categoriasSelecionadas.contains(categoriaItem)) {
+                    continue;
+                }
 
                 Map<YearMonth, Aggregate> bucket = seriesMap.computeIfAbsent(nomeSerie, k -> new HashMap<>());
                 Aggregate aggregate = bucket.computeIfAbsent(mes, m -> new Aggregate());
