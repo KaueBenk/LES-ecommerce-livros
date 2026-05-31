@@ -25,6 +25,30 @@ INSERT INTO autor (nome)
 SELECT 'Hunt & Thomas'
 WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Hunt & Thomas');
 
+INSERT INTO autor (nome)
+SELECT 'Joshua Bloch'
+WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Joshua Bloch');
+
+INSERT INTO autor (nome)
+SELECT 'Kathy Sierra'
+WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Kathy Sierra');
+
+INSERT INTO autor (nome)
+SELECT 'Martin Kleppmann'
+WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Martin Kleppmann');
+
+INSERT INTO autor (nome)
+SELECT 'Gene Kim'
+WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Gene Kim');
+
+INSERT INTO autor (nome)
+SELECT 'Thomas H. Cormen'
+WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Thomas H. Cormen');
+
+INSERT INTO autor (nome)
+SELECT 'Stuart Russell'
+WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Stuart Russell');
+
 -- Editoras
 INSERT INTO editora (nome)
 SELECT 'Prentice Hall'
@@ -37,6 +61,18 @@ WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'Addison-Wesley');
 INSERT INTO editora (nome)
 SELECT 'O Reilly'
 WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'O Reilly');
+
+INSERT INTO editora (nome)
+SELECT 'Pearson'
+WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'Pearson');
+
+INSERT INTO editora (nome)
+SELECT 'MIT Press'
+WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'MIT Press');
+
+INSERT INTO editora (nome)
+SELECT 'IT Revolution'
+WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'IT Revolution');
 
 -- Fornecedores
 INSERT INTO fornecedor (nome, cnpj)
@@ -63,6 +99,26 @@ WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Web');
 INSERT INTO categoria (nome, descricao)
 SELECT 'Arquitetura', 'Arquitetura de sistemas e design'
 WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Arquitetura');
+
+INSERT INTO categoria (nome, descricao)
+SELECT 'Banco de Dados', 'Modelagem, SQL e dados em escala'
+WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Banco de Dados');
+
+INSERT INTO categoria (nome, descricao)
+SELECT 'DevOps', 'Entrega continua, infraestrutura e operacoes'
+WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'DevOps');
+
+INSERT INTO categoria (nome, descricao)
+SELECT 'IA', 'Inteligencia artificial e aprendizado de maquina'
+WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'IA');
+
+INSERT INTO categoria (nome, descricao)
+SELECT 'Engenharia de Software', 'Processos, qualidade e boas praticas'
+WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Engenharia de Software');
+
+INSERT INTO categoria (nome, descricao)
+SELECT 'Testes', 'Testes automatizados e qualidade'
+WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Testes');
 
 -- Grupos de Precificação
 INSERT INTO grupo_precificacao (nome, margem_lucro)
@@ -315,6 +371,302 @@ SELECT
   true
 WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9780596517748');
 
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'Effective Java',
+  (SELECT id FROM autor WHERE nome = 'Joshua Bloch' ORDER BY id LIMIT 1),
+  2018,
+  (SELECT id FROM editora WHERE nome = 'Addison-Wesley' ORDER BY id LIMIT 1),
+  '3ª',
+  '9780134685991',
+  416,
+  'Best practices for the Java platform',
+  24.0,
+  18.0,
+  0.7,
+  3.5,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9780134685991',
+  109.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9780134685991');
+
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'Head First Java',
+  (SELECT id FROM autor WHERE nome = 'Kathy Sierra' ORDER BY id LIMIT 1),
+  2005,
+  (SELECT id FROM editora WHERE nome = 'O Reilly' ORDER BY id LIMIT 1),
+  '2ª',
+  '9780596009205',
+  720,
+  'A brain-friendly guide to Java',
+  23.0,
+  19.0,
+  1.0,
+  4.0,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9780596009205',
+  99.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9780596009205');
+
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'Clean Architecture',
+  (SELECT id FROM autor WHERE nome = 'Robert C. Martin' ORDER BY id LIMIT 1),
+  2017,
+  (SELECT id FROM editora WHERE nome = 'Pearson' ORDER BY id LIMIT 1),
+  '1ª',
+  '9780134494166',
+  432,
+  'A Craftsman''s Guide to Software Structure and Design',
+  23.0,
+  18.0,
+  0.7,
+  3.5,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9780134494166',
+  95.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9780134494166');
+
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'Designing Data-Intensive Applications',
+  (SELECT id FROM autor WHERE nome = 'Martin Kleppmann' ORDER BY id LIMIT 1),
+  2017,
+  (SELECT id FROM editora WHERE nome = 'O Reilly' ORDER BY id LIMIT 1),
+  '1ª',
+  '9781449373320',
+  616,
+  'The Big Ideas Behind Reliable, Scalable, and Maintainable Systems',
+  24.0,
+  19.0,
+  0.9,
+  4.0,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9781449373320',
+  119.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9781449373320');
+
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'Accelerate',
+  (SELECT id FROM autor WHERE nome = 'Gene Kim' ORDER BY id LIMIT 1),
+  2018,
+  (SELECT id FROM editora WHERE nome = 'IT Revolution' ORDER BY id LIMIT 1),
+  '1ª',
+  '9781942788331',
+  288,
+  'The Science of Lean Software and DevOps',
+  23.0,
+  16.0,
+  0.6,
+  3.0,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9781942788331',
+  89.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9781942788331');
+
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'The Phoenix Project',
+  (SELECT id FROM autor WHERE nome = 'Gene Kim' ORDER BY id LIMIT 1),
+  2013,
+  (SELECT id FROM editora WHERE nome = 'IT Revolution' ORDER BY id LIMIT 1),
+  '1ª',
+  '9781942788294',
+  432,
+  'A Novel about IT, DevOps, and Helping Your Business Win',
+  23.0,
+  16.0,
+  0.7,
+  3.5,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9781942788294',
+  79.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9781942788294');
+
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'Introduction to Algorithms',
+  (SELECT id FROM autor WHERE nome = 'Thomas H. Cormen' ORDER BY id LIMIT 1),
+  2009,
+  (SELECT id FROM editora WHERE nome = 'MIT Press' ORDER BY id LIMIT 1),
+  '3ª',
+  '9780262033848',
+  1312,
+  'Comprehensive algorithms textbook',
+  25.0,
+  19.0,
+  1.6,
+  5.0,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9780262033848',
+  149.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9780262033848');
+
+INSERT INTO livro (
+  titulo,
+  autor_id,
+  ano,
+  editora_id,
+  edicao,
+  isbn,
+  numero_paginas,
+  sinopse,
+  altura,
+  largura,
+  peso,
+  profundidade,
+  grupo_precificacao_id,
+  codigo_barras,
+  valor_venda,
+  ativo
+)
+SELECT
+  'Artificial Intelligence: A Modern Approach',
+  (SELECT id FROM autor WHERE nome = 'Stuart Russell' ORDER BY id LIMIT 1),
+  2010,
+  (SELECT id FROM editora WHERE nome = 'Pearson' ORDER BY id LIMIT 1),
+  '3ª',
+  '9780136042594',
+  1152,
+  'Leading textbook on AI',
+  24.0,
+  19.0,
+  1.4,
+  4.5,
+  (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1),
+  '9780136042594',
+  139.90,
+  true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9780136042594');
+
 -- livro_categoria associations
 INSERT INTO livro_categoria (livro_id, categoria_id)
 SELECT
@@ -400,6 +752,188 @@ WHERE
       AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Web' ORDER BY id LIMIT 1)
   );
 
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Programação' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Programação' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Programação' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780596009205' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Programação' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780596009205' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Programação' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780596009205' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Programação' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Banco de Dados' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Banco de Dados' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Banco de Dados' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Arquitetura' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'DevOps' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'DevOps' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'DevOps' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'DevOps' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'DevOps' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'DevOps' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Engenharia de Software' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780262033848' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'Algoritmos' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780262033848' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'Algoritmos' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780262033848' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Algoritmos' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780136042594' ORDER BY id LIMIT 1),
+  (SELECT id FROM categoria WHERE nome = 'IA' ORDER BY id LIMIT 1)
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780136042594' ORDER BY id LIMIT 1) IS NOT NULL
+  AND (SELECT id FROM categoria WHERE nome = 'IA' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1
+    FROM livro_categoria
+    WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780136042594' ORDER BY id LIMIT 1)
+      AND categoria_id = (SELECT id FROM categoria WHERE nome = 'IA' ORDER BY id LIMIT 1)
+  );
+
 -- Estoque
 INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
 SELECT
@@ -459,6 +993,102 @@ WHERE
   (SELECT id FROM livro WHERE isbn = '9780596517748' ORDER BY id LIMIT 1) IS NOT NULL
   AND NOT EXISTS (
     SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780596517748' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1),
+  30,
+  0,
+  30
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780134685991' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780596009205' ORDER BY id LIMIT 1),
+  28,
+  0,
+  28
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780596009205' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780596009205' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1),
+  25,
+  0,
+  25
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1),
+  22,
+  0,
+  22
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781449373320' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1),
+  20,
+  0,
+  20
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781942788331' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1),
+  18,
+  0,
+  18
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9781942788294' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780262033848' ORDER BY id LIMIT 1),
+  15,
+  0,
+  15
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780262033848' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780262033848' ORDER BY id LIMIT 1)
+  );
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT
+  (SELECT id FROM livro WHERE isbn = '9780136042594' ORDER BY id LIMIT 1),
+  16,
+  0,
+  16
+WHERE
+  (SELECT id FROM livro WHERE isbn = '9780136042594' ORDER BY id LIMIT 1) IS NOT NULL
+  AND NOT EXISTS (
+    SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9780136042594' ORDER BY id LIMIT 1)
   );
 
 -- Clientes (Senha padrão: Admin@123)

@@ -9,3 +9,4 @@ bmalph
 
 frontend/cypress/screenshots
 frontend/cypress/videos
+.env

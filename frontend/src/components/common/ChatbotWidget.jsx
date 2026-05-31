@@ -1,5 +1,7 @@
 import React, { useState, useRef, useEffect, useCallback } from 'react';
+import { Link } from 'react-router-dom';
 import chatService from '../../services/chatService';
+import catalogService from '../../services/catalogService';
 import { getErrorMessage } from '../../utils/helpers';
 
 // ─── Unique ID generator ──────────────────────────────────────────────────────
@@ -9,6 +11,28 @@ const nextMsgId = () => ++_msgIdCounter;
 // ─── Message Bubble ───────────────────────────────────────────────────────────
 const MessageBubble = ({ message }) => {
   const isUser = message.role === 'user';
+  
+  const renderTextWithLinks = (text) => {
+    if (!text) return null;
+    const parts = text.split(/(\[.*?\]\(.*?\))/g);
+    return parts.map((part, index) => {
+      const match = part.match(/^\[(.*?)\]\((.*?)\)$/);
+      if (match) {
+        return (
+          <Link
+            key={index}
+            to={match[2]}
+            className="text-decoration-underline"
+            style={{ color: isUser ? '#fff' : '#4f46e5', fontWeight: 500 }}
+          >
+            {match[1]}
+          </Link>
+        );
+      }
+      return <span key={index}>{part}</span>;
+    });
+  };
+
   return (
     <div
       className={`d-flex mb-2 ${isUser ? 'justify-content-end' : 'justify-content-start'}`}
@@ -35,7 +59,7 @@ const MessageBubble = ({ message }) => {
           whiteSpace: 'pre-wrap',
         }}
       >
-        {message.text}
+        {renderTextWithLinks(message.text)}
         <div
           className={`mt-1 text-end ${isUser ? 'text-white-50' : 'text-muted'}`}
           style={{ fontSize: '0.65rem' }}
@@ -81,6 +105,42 @@ const TypingIndicator = () => (
 const fmtTime = (date) =>
   date.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' });
 
+const STOP_WORDS = new Set([
+  'a', 'o', 'os', 'as', 'de', 'da', 'do', 'dos', 'das', 'um', 'uma', 'para', 'por',
+  'em', 'no', 'na', 'nos', 'nas', 'e', 'ou', 'com', 'sobre', 'que', 'como', 'livro',
+  'livros', 'quero', 'gostaria', 'recomenda', 'recomendacao', 'indica', 'indique',
+  'aprender', 'aprendendo', 'estudar', 'estudo', 'manual', 'guia', 'iniciante',
+]);
+
+const normalizeText = (value) =>
+  value
+    ? value
+      .toLowerCase()
+      .normalize('NFD')
+      .replace(/\p{M}/gu, '')
+      .replace(/[^a-z0-9\s]/g, ' ')
+      .replace(/\s+/g, ' ')
+      .trim()
+    : '';
+
+const shuffleList = (items) => {
+  const list = [...items];
+  for (let i = list.length - 1; i > 0; i -= 1) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [list[i], list[j]] = [list[j], list[i]];
+  }
+  return list;
+};
+
+const extractKeywords = (text) => {
+  const normalized = normalizeText(text);
+  if (!normalized) return [];
+  return normalized
+    .split(' ')
+    .filter((token) => token.length > 2 && !STOP_WORDS.has(token))
+    .slice(0, 4);
+};
+
 // ─── ChatbotWidget ────────────────────────────────────────────────────────────
 
 /**
@@ -103,6 +163,13 @@ const ChatbotWidget = () => {
   const [inputValue, setInputValue] = useState('');
   const [isTyping, setIsTyping] = useState(false);
   const [sessionId, setSessionId] = useState(null);
+  const [catalogMeta, setCatalogMeta] = useState({
+    categories: [],
+    authors: [],
+    titles: [],
+    loaded: false,
+  });
+  const [suggestions, setSuggestions] = useState([]);
 
   const messagesEndRef = useRef(null);
   const inputRef = useRef(null);
@@ -115,12 +182,12 @@ const ChatbotWidget = () => {
     }
   }, [messages, isTyping, isOpen]);
 
-  // Focus input when panel opens
+  // Focus input when panel opens or after bot finishes typing
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen && !isTyping) {
       setTimeout(() => inputRef.current?.focus(), 150);
     }
-  }, [isOpen]);
+  }, [isOpen, isTyping]);
 
   // Close on Escape key
   useEffect(() => {
@@ -131,8 +198,81 @@ const ChatbotWidget = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [isOpen]);
 
-  const sendMessage = useCallback(async () => {
-    const text = inputValue.trim();
+  useEffect(() => {
+    if (!isOpen || catalogMeta.loaded) return;
+    let cancelled = false;
+
+    const loadMeta = async () => {
+      try {
+        const [categories, authors, books] = await Promise.all([
+          catalogService.getCategories(),
+          catalogService.getAuthors(),
+          catalogService.getBooks({ page: 0, size: 50, ativo: true }),
+        ]);
+
+        if (cancelled) return;
+
+        const titles = (books?.content || []).map((book) => book.titulo).filter(Boolean);
+        setCatalogMeta({
+          categories: (categories || []).map((item) => item.nome).filter(Boolean),
+          authors: (authors || []).map((item) => item.nome).filter(Boolean),
+          titles,
+          loaded: true,
+        });
+      } catch (err) {
+        if (!cancelled) {
+          setCatalogMeta((prev) => ({ ...prev, loaded: true }));
+        }
+      }
+    };
+
+    loadMeta();
+    return () => {
+      cancelled = true;
+    };
+  }, [isOpen, catalogMeta.loaded]);
+
+  useEffect(() => {
+    if (!isOpen) return;
+
+    // Apenas mostrar sugestões se o usuário ainda não tiver enviado mensagens
+    const userMessages = messages.filter(msg => msg.role === 'user');
+    if (userMessages.length > 0) {
+      setSuggestions([]);
+      return;
+    }
+
+    const categorySuggestions = shuffleList(catalogMeta.categories)
+      .slice(0, 2)
+      .map((category) => `Quais os melhores livros de ${category}?`);
+
+    const authorSuggestions = shuffleList(catalogMeta.authors)
+      .slice(0, 1)
+      .map((author) => `Tem obras do autor ${author}?`);
+
+    const titleSuggestions = shuffleList(catalogMeta.titles)
+      .slice(0, 1)
+      .map((title) => `Me fale mais sobre o livro "${title}".`);
+
+    const defaultSuggestions = [
+      'Tem algum livro bom para iniciantes em programação?',
+      'Quais são os livros mais bem avaliados?',
+      'Quero recomendações de livros de tecnologia.',
+    ];
+
+    const baseSuggestions = [
+      ...categorySuggestions,
+      ...authorSuggestions,
+      ...titleSuggestions,
+      ...defaultSuggestions,
+    ].filter(Boolean);
+
+    // Selecionar no máximo 4 sugestões naturais
+    setSuggestions(shuffleList(baseSuggestions).slice(0, 4));
+  }, [catalogMeta, messages, isOpen]);
+
+  const sendMessage = useCallback(async (overrideText = null) => {
+    const text = (overrideText ?? inputValue).trim();
     if (!text || isTyping) return;
 
     // Add user message
@@ -170,6 +310,10 @@ const ChatbotWidget = () => {
       setIsTyping(false);
     }
   }, [inputValue, isTyping, sessionId]);
+  const handleSuggestionClick = (suggestion) => {
+    if (isTyping) return;
+    sendMessage(suggestion);
+  };
 
   const handleKeyDown = (e) => {
     if (e.key === 'Enter' && !e.shiftKey) {
@@ -238,8 +382,12 @@ const ChatbotWidget = () => {
         >
           {/* Header */}
           <div
-            className="d-flex align-items-center justify-content-between px-3 py-2 bg-primary text-white flex-shrink-0"
-            style={{ borderRadius: '16px 16px 0 0' }}
+            className="d-flex align-items-center justify-content-between px-3 py-3 text-white flex-shrink-0"
+            style={{ 
+              borderRadius: '16px 16px 0 0',
+              background: 'linear-gradient(135deg, #4f46e5 0%, #7c3aed 100%)',
+              boxShadow: '0 2px 10px rgba(0,0,0,0.1)'
+            }}
           >
             <div className="d-flex align-items-center gap-2">
               <span style={{ fontSize: 20 }}>🤖</span>
@@ -296,6 +444,70 @@ const ChatbotWidget = () => {
           </div>
 
           {/* Input */}
+          {suggestions.length > 0 && (
+            <div
+              className="px-3 py-2 border-top"
+              data-testid="chatbot-suggestions"
+              style={{
+                background: 'linear-gradient(to top, rgba(255,255,255,1) 0%, rgba(248,249,250,0.95) 100%)',
+                backdropFilter: 'blur(8px)',
+                WebkitBackdropFilter: 'blur(8px)'
+              }}
+            >
+              <div className="d-flex gap-2 overflow-x-auto pb-2 pt-1 px-1 suggestion-container" style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}>
+                <style>{`
+                  .suggestion-container::-webkit-scrollbar { display: none; }
+                  .suggestion-btn {
+                    border-radius: 20px;
+                    font-size: 0.85rem;
+                    padding: 0.4rem 1rem;
+                    background: #ffffff;
+                    color: #4f46e5;
+                    border: 1px solid rgba(79, 70, 229, 0.2);
+                    box-shadow: 0 2px 6px rgba(79, 70, 229, 0.08);
+                    transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    gap: 0.4rem;
+                    font-weight: 500;
+                  }
+                  .suggestion-btn:hover {
+                    background: #4f46e5;
+                    color: #ffffff;
+                    border-color: #4f46e5;
+                    transform: translateY(-2px);
+                    box-shadow: 0 4px 12px rgba(79, 70, 229, 0.2);
+                  }
+                  .suggestion-btn:active {
+                    transform: translateY(0);
+                  }
+                  .suggestion-btn svg {
+                    opacity: 0.7;
+                    transition: opacity 0.2s;
+                  }
+                  .suggestion-btn:hover svg {
+                    opacity: 1;
+                  }
+                `}</style>
+                {suggestions.map((suggestion, index) => (
+                  <button
+                    key={suggestion}
+                    type="button"
+                    className="suggestion-btn text-nowrap flex-shrink-0"
+                    style={{ animation: `chatPanelIn 0.3s ease-out ${index * 0.05}s both` }}
+                    onClick={() => handleSuggestionClick(suggestion)}
+                  >
+                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                    </svg>
+                    {suggestion}
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
           <div
             className="d-flex align-items-end gap-2 px-3 py-2 border-top bg-white flex-shrink-0"
           >
