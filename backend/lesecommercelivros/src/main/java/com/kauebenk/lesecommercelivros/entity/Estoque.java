@@ -9,8 +9,10 @@ public class Estoque {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
+    
     @OneToOne
     @JoinColumn(name = "livro_id")
+    @com.fasterxml.jackson.annotation.JsonIgnore
     private Livro livro;
     private Integer quantidadeTotal;
     private Integer quantidadeBloqueada;

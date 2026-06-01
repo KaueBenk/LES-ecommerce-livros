@@ -43371,3 +43371,61 @@ WHERE
     WHERE pedido_id = (SELECT id FROM pedido WHERE data_pedido = '2026-06-15 20:09:58' ORDER BY id LIMIT 1)
       AND livro_id = (SELECT id FROM livro WHERE isbn = '9780134494166' ORDER BY id LIMIT 1)
   );
+
+
+-- Novas categorias
+INSERT INTO categoria (nome, descricao) SELECT 'Ficção Científica', 'Ficção baseada em conceitos científicos e futuros' WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Ficção Científica');
+INSERT INTO categoria (nome, descricao) SELECT 'Fantasia', 'Mundos mágicos, criaturas e heróis míticos' WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Fantasia');
+INSERT INTO categoria (nome, descricao) SELECT 'Mistério e Terror', 'Suspense, mistérios intrigantes e contos de horror' WHERE NOT EXISTS (SELECT 1 FROM categoria WHERE nome = 'Mistério e Terror');
+
+-- Novos autores
+INSERT INTO autor (nome) SELECT 'J.R.R. Tolkien' WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'J.R.R. Tolkien');
+INSERT INTO autor (nome) SELECT 'Isaac Asimov' WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Isaac Asimov');
+INSERT INTO autor (nome) SELECT 'Stephen King' WHERE NOT EXISTS (SELECT 1 FROM autor WHERE nome = 'Stephen King');
+
+-- Novas editoras
+INSERT INTO editora (nome) SELECT 'HarperCollins' WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'HarperCollins');
+INSERT INTO editora (nome) SELECT 'Aleph' WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'Aleph');
+INSERT INTO editora (nome) SELECT 'Suma' WHERE NOT EXISTS (SELECT 1 FROM editora WHERE nome = 'Suma');
+
+-- Novos livros
+INSERT INTO livro (titulo, autor_id, ano, editora_id, edicao, isbn, numero_paginas, sinopse, altura, largura, peso, profundidade, grupo_precificacao_id, codigo_barras, valor_venda, ativo)
+SELECT 'O Senhor dos Anéis', (SELECT id FROM autor WHERE nome = 'J.R.R. Tolkien' ORDER BY id LIMIT 1), 1954, (SELECT id FROM editora WHERE nome = 'HarperCollins' ORDER BY id LIMIT 1), '1ª', '9788595084742', 1216, 'Uma jornada épica para destruir o Um Anel e salvar a Terra-média das garras do Senhor do Escuro Sauron. O maior clássico da literatura fantástica mundial.', 23.0, 15.0, 1.2, 5.0, (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1), '9788595084742', 119.90, true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9788595084742');
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT (SELECT id FROM livro WHERE isbn = '9788595084742'), (SELECT id FROM categoria WHERE nome = 'Fantasia' ORDER BY id LIMIT 1)
+WHERE NOT EXISTS (SELECT 1 FROM livro_categoria WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9788595084742') AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Fantasia' ORDER BY id LIMIT 1));
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT (SELECT id FROM livro WHERE isbn = '9788595084742'), 50, 0, 50
+WHERE NOT EXISTS (SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9788595084742'));
+
+INSERT INTO livro (titulo, autor_id, ano, editora_id, edicao, isbn, numero_paginas, sinopse, altura, largura, peso, profundidade, grupo_precificacao_id, codigo_barras, valor_venda, ativo)
+SELECT 'Fundação', (SELECT id FROM autor WHERE nome = 'Isaac Asimov' ORDER BY id LIMIT 1), 1951, (SELECT id FROM editora WHERE nome = 'Aleph' ORDER BY id LIMIT 1), '1ª', '9788576570891', 240, 'O Império Galáctico está à beira do colapso e a única esperança para o futuro reside no plano visionário do psico-historiador Hari Seldon. Uma das mais influentes obras de ficção científica.', 21.0, 14.0, 0.4, 2.0, (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1), '9788576570891', 59.90, true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9788576570891');
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT (SELECT id FROM livro WHERE isbn = '9788576570891'), (SELECT id FROM categoria WHERE nome = 'Ficção Científica' ORDER BY id LIMIT 1)
+WHERE NOT EXISTS (SELECT 1 FROM livro_categoria WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9788576570891') AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Ficção Científica' ORDER BY id LIMIT 1));
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT (SELECT id FROM livro WHERE isbn = '9788576570891'), 30, 0, 30
+WHERE NOT EXISTS (SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9788576570891'));
+
+INSERT INTO livro (titulo, autor_id, ano, editora_id, edicao, isbn, numero_paginas, sinopse, altura, largura, peso, profundidade, grupo_precificacao_id, codigo_barras, valor_venda, ativo)
+SELECT 'O Iluminado', (SELECT id FROM autor WHERE nome = 'Stephen King' ORDER BY id LIMIT 1), 1977, (SELECT id FROM editora WHERE nome = 'Suma' ORDER BY id LIMIT 1), '1ª', '9788556510341', 464, 'Um clássico do terror psicológico de Stephen King. Jack Torrance e sua família ficam isolados em um hotel assombrado, desencadeando a loucura e o pânico no inverno rigoroso do Colorado.', 23.0, 16.0, 0.6, 3.5, (SELECT id FROM grupo_precificacao WHERE nome = 'Geral' ORDER BY id LIMIT 1), '9788556510341', 79.90, true
+WHERE NOT EXISTS (SELECT 1 FROM livro WHERE isbn = '9788556510341');
+
+INSERT INTO livro_categoria (livro_id, categoria_id)
+SELECT (SELECT id FROM livro WHERE isbn = '9788556510341'), (SELECT id FROM categoria WHERE nome = 'Mistério e Terror' ORDER BY id LIMIT 1)
+WHERE NOT EXISTS (SELECT 1 FROM livro_categoria WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9788556510341') AND categoria_id = (SELECT id FROM categoria WHERE nome = 'Mistério e Terror' ORDER BY id LIMIT 1));
+
+INSERT INTO estoque (livro_id, quantidade_total, quantidade_bloqueada, quantidade_disponivel)
+SELECT (SELECT id FROM livro WHERE isbn = '9788556510341'), 25, 0, 25
+WHERE NOT EXISTS (SELECT 1 FROM estoque WHERE livro_id = (SELECT id FROM livro WHERE isbn = '9788556510341'));
+
+-- Atualizando sinopses existentes
+UPDATE livro SET sinopse = 'Um manual indispensável para desenvolvedores que buscam a excelência em código limpo, abordando práticas ágeis e padrões de projeto essenciais para o mercado atual.' WHERE isbn = '9780132350884';
+UPDATE livro SET sinopse = 'O livro fundamental sobre padrões de projeto orientados a objetos, escrito pelos lendários Gang of Four. Essencial para arquitetos de software e designers de sistemas em grande escala.' WHERE isbn = '9780201633610';
+UPDATE livro SET sinopse = 'Aprofunde-se no mundo da linguagem JavaScript com este guia detalhado sobre as melhores práticas, técnicas avançadas e ferramentas de desenvolvimento, escrito pelo criador do JSON, Douglas Crockford.' WHERE isbn = '9780596517748';

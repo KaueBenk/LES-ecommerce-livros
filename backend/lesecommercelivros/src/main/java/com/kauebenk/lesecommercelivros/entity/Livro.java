@@ -79,4 +79,12 @@ public class Livro {
     
     @ManyToOne
     private CategoriaAtivacao categoriaAtivacao;
+
+    @OneToOne(mappedBy = "livro")
+    private Estoque estoque;
+
+    @Transient
+    public Integer getQuantidadeEstoque() {
+        return estoque != null ? estoque.getQuantidadeTotal() : 0;
+    }
 }
