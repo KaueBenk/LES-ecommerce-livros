@@ -24,6 +24,44 @@ public interface PedidoRepository extends JpaRepository<Pedido, Long> {
     List<Pedido> findByStatusIn(List<StatusPedido> statuses);
     List<Pedido> findByDataPedidoBetween(LocalDateTime dataInicio, LocalDateTime dataFim);
 
+    @Query(value = """
+        SELECT 
+          TO_CHAR(p.data_pedido, 'YYYY-MM') as mes,
+          l.titulo as livroTitulo,
+          (SELECT c.nome FROM categoria c JOIN livro_categoria lc ON c.id = lc.categoria_id WHERE lc.livro_id = l.id ORDER BY c.id LIMIT 1) as categoriaNome,
+          SUM(i.quantidade) as totalQuantidade,
+          SUM(i.quantidade * i.valor_unitario) as totalValor
+        FROM pedido p
+        JOIN item_pedido i ON i.pedido_id = p.id
+        JOIN livro l ON i.livro_id = l.id
+        WHERE p.data_pedido >= :dataInicio AND p.data_pedido <= :dataFim
+          AND p.status IN ('APROVADA', 'EM_TRANSITO', 'ENTREGUE', 'EM_TROCA', 'TROCA_AUTORIZADA', 'TROCADO')
+        GROUP BY 
+          TO_CHAR(p.data_pedido, 'YYYY-MM'),
+          l.id, l.titulo
+        """, nativeQuery = true)
+    List<Object[]> getAnaliseVendasRaw(
+        @Param("dataInicio") LocalDateTime dataInicio, 
+        @Param("dataFim") LocalDateTime dataFim
+    );
+
+    @Query(value = """
+        SELECT 
+          SPLIT_PART(p.endereco_entrega, ',', 5) as estado,
+          SUM(i.quantidade) as totalQuantidade,
+          SUM(i.quantidade * i.valor_unitario) as totalValor
+        FROM pedido p
+        JOIN item_pedido i ON i.pedido_id = p.id
+        WHERE p.data_pedido >= :dataInicio AND p.data_pedido <= :dataFim
+          AND p.status IN ('APROVADA', 'EM_TRANSITO', 'ENTREGUE', 'EM_TROCA', 'TROCA_AUTORIZADA', 'TROCADO')
+          AND p.endereco_entrega IS NOT NULL
+        GROUP BY SPLIT_PART(p.endereco_entrega, ',', 5)
+        """, nativeQuery = true)
+    List<Object[]> getAnaliseVendasRegiaoRaw(
+        @Param("dataInicio") LocalDateTime dataInicio, 
+        @Param("dataFim") LocalDateTime dataFim
+    );
+
     @Query("""
             select coalesce(sum(i.valorUnitario * i.quantidade), 0)
             from Pedido p

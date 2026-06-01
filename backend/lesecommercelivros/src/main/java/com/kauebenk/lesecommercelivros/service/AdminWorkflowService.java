@@ -642,35 +642,35 @@ public class AdminWorkflowService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data fim deve ser maior ou igual à data início");
         }
 
-        List<Pedido> pedidos = pedidoRepository.findByDataPedidoBetween(
+        List<Object[]> rows = pedidoRepository.getAnaliseVendasRaw(
                 inicio.atStartOfDay(),
                 fim.plusDays(1).atStartOfDay().minusNanos(1)
         );
-        pedidos = pedidos.stream().filter(this::isPedidoAprovado).toList();
 
         boolean agruparPorProduto = "PRODUTO".equalsIgnoreCase(agrupamento);
-        Map<String, Map<YearMonth, Aggregate>> seriesMap = new HashMap<>();
+        Map<String, Map<String, Aggregate>> seriesMap = new HashMap<>();
 
-        for (Pedido pedido : pedidos) {
-            YearMonth mes = YearMonth.from(pedido.getDataPedido());
-            for (ItemPedido item : safeItems(pedido.getItens())) {
-                String nomeSerie = agruparPorProduto
-                        ? safeLivroTitulo(item)
-                        : firstCategoriaNome(item);
-                if (nomeSerie == null || nomeSerie.isBlank()) continue;
-                
-                String categoriaItem = firstCategoriaNome(item);
-                if (categoriasSelecionadas != null && !categoriasSelecionadas.isEmpty() && !categoriasSelecionadas.contains(categoriaItem)) {
-                    continue;
-                }
+        for (Object[] row : rows) {
+            String mes = (String) row[0];
+            String livroTitulo = (String) row[1];
+            String categoriaNome = (String) row[2];
+            Number totalQuantidade = (Number) row[3];
+            Number totalValor = (Number) row[4];
 
-                Map<YearMonth, Aggregate> bucket = seriesMap.computeIfAbsent(nomeSerie, k -> new HashMap<>());
-                Aggregate aggregate = bucket.computeIfAbsent(mes, m -> new Aggregate());
-                int quantidade = item.getQuantidade() == null ? 0 : item.getQuantidade();
-                BigDecimal valorUnitario = item.getValorUnitario() == null ? BigDecimal.ZERO : item.getValorUnitario();
-                aggregate.quantidade += quantidade;
-                aggregate.valor = aggregate.valor.add(valorUnitario.multiply(BigDecimal.valueOf(quantidade)));
+            if (categoriaNome == null || categoriaNome.isBlank()) categoriaNome = "Sem categoria";
+            
+            if (categoriasSelecionadas != null && !categoriasSelecionadas.isEmpty() && !categoriasSelecionadas.contains(categoriaNome)) {
+                continue;
             }
+
+            String nomeSerie = agruparPorProduto ? livroTitulo : categoriaNome;
+            if (nomeSerie == null || nomeSerie.isBlank()) continue;
+
+            Map<String, Aggregate> bucket = seriesMap.computeIfAbsent(nomeSerie, k -> new HashMap<>());
+            Aggregate aggregate = bucket.computeIfAbsent(mes, m -> new Aggregate());
+            
+            aggregate.quantidade += totalQuantidade != null ? totalQuantidade.intValue() : 0;
+            aggregate.valor = aggregate.valor.add(totalValor != null ? new BigDecimal(totalValor.toString()) : BigDecimal.ZERO);
         }
 
         List<Map<String, Object>> series = seriesMap.entrySet().stream()
@@ -680,7 +680,7 @@ public class AdminWorkflowService {
                             .sorted(Map.Entry.comparingByKey())
                             .map(monthEntry -> {
                                 Map<String, Object> ponto = new HashMap<>();
-                                ponto.put("mes", monthEntry.getKey().toString());
+                                ponto.put("mes", monthEntry.getKey());
                                 ponto.put("quantidade", monthEntry.getValue().quantidade);
                                 ponto.put("valor", monthEntry.getValue().valor);
                                 return ponto;
@@ -710,31 +710,31 @@ public class AdminWorkflowService {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "Data fim deve ser maior ou igual à data início");
         }
 
-        List<Pedido> pedidos = pedidoRepository.findByDataPedidoBetween(
+        List<Object[]> rows = pedidoRepository.getAnaliseVendasRegiaoRaw(
                 inicio.atStartOfDay(),
                 fim.plusDays(1).atStartOfDay().minusNanos(1)
         );
-        pedidos = pedidos.stream().filter(this::isPedidoAprovado).toList();
 
         Map<String, Aggregate> porEstado = new HashMap<>();
-        for (Pedido pedido : pedidos) {
-            String estado = extractEstado(pedido.getEnderecoEntrega());
+        for (Object[] row : rows) {
+            String rawEstado = (String) row[0];
+            String estado = (rawEstado == null || rawEstado.trim().isEmpty()) ? "N/I" : rawEstado.trim().toUpperCase(Locale.ROOT);
+            Number totalQuantidade = (Number) row[1];
+            Number totalValor = (Number) row[2];
+
             Aggregate aggregate = porEstado.computeIfAbsent(estado, k -> new Aggregate());
-            aggregate.quantidade += safeItems(pedido.getItens()).stream()
-                    .map(ItemPedido::getQuantidade)
-                    .filter(q -> q != null && q > 0)
-                    .reduce(0, Integer::sum);
-            aggregate.valor = aggregate.valor.add(pedido.getValorTotal() == null ? BigDecimal.ZERO : pedido.getValorTotal());
+            aggregate.quantidade += totalQuantidade != null ? totalQuantidade.intValue() : 0;
+            aggregate.valor = aggregate.valor.add(totalValor != null ? new BigDecimal(totalValor.toString()) : BigDecimal.ZERO);
         }
 
         List<Map<String, Object>> estados = porEstado.entrySet().stream()
                 .sorted(Comparator.comparing((Map.Entry<String, Aggregate> e) -> e.getValue().quantidade).reversed())
                 .map(entry -> {
-                    Map<String, Object> estado = new HashMap<>();
-                    estado.put("estado", entry.getKey());
-                    estado.put("quantidade", entry.getValue().quantidade);
-                    estado.put("valor", entry.getValue().valor);
-                    return estado;
+                    Map<String, Object> estadoMap = new HashMap<>();
+                    estadoMap.put("estado", entry.getKey());
+                    estadoMap.put("quantidade", entry.getValue().quantidade);
+                    estadoMap.put("valor", entry.getValue().valor);
+                    return estadoMap;
                 })
                 .toList();
 
