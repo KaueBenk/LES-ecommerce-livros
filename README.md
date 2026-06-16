@@ -1,69 +1,48 @@
 # LES E-Commerce de Livros
 
-React-based bookstore e-commerce frontend built for the LES (Laboratório de Engenharia de Software) 2026 course project.
+Este é o repositório do projeto da disciplina de Laboratório de Engenharia de Software (LES) 2026.
+O projeto consiste em um E-commerce de Livros completo com frontend em React/Vite e backend em Java/Spring Boot.
 
-## Quick Start
+## 🚀 Como Inicializar o Projeto
 
+A maneira mais rápida de rodar o projeto e suas dependências é utilizando o **Docker**.
+
+### 1. Iniciar Banco de Dados e Backend
+Na raiz do projeto, execute o comando abaixo para iniciar o PostgreSQL e a API:
+```bash
+docker compose up -d db backend
+```
+> **Nota sobre o Banco de Dados:** A inicialização do banco é automática. Assim que o backend sobe, o Spring Boot utiliza o arquivo `data.sql` (localizado em `backend/lesecommercelivros/src/main/resources/`) para criar e popular todas as tabelas.
+
+O backend ficará disponível em `http://localhost:8080`.
+
+### 2. Iniciar o Frontend
+Em um terminal separado, instale as dependências e rode o servidor de desenvolvimento:
 ```bash
 cd frontend
 npm install
-npm run dev        # http://localhost:5173
+npm run dev
 ```
+> O frontend ficará disponível e pronto para uso em `http://localhost:5173`.
 
-Or with Docker:
-
+*(Opcional)* Se preferir rodar o frontend via Docker, basta usar o profile de dev:
 ```bash
-docker-compose up frontend   # http://localhost:5173
+docker compose --profile dev up -d
 ```
 
-## Documentation
+## 🧪 Testes Automatizados das Entregas
 
-| Document | Description |
-|---|---|
-| [frontend/SETUP.md](frontend/SETUP.md) | Installation, environment variables, dev server, build, tests, Docker, troubleshooting |
-| [CONTRIBUTING.md](CONTRIBUTING.md) | Coding standards, component patterns, commit guide, PR guidelines, code review checklist |
-| [API_CONTRACT.md](API_CONTRACT.md) | All backend API endpoints, request/response schemas, and authentication |
-| [docs/MOCKING_GUIDE.md](docs/MOCKING_GUIDE.md) | Cypress mock data conventions |
-| [docs/Contexto_Tecnico_LES_2026.md](docs/Contexto_Tecnico_LES_2026.md) | Technical context and architecture |
+Os testes E2E solicitados pelo professor estão organizados nas pastas de suas respectivas entregas (`frontend/cypress/e2e/entrega6` e `frontend/cypress/e2e/entrega7`).
 
-## Tech Stack
-
-- **React 19** + **Vite 7**
-- **Bootstrap 5.3** + Sass
-- **React Router v6**
-- **Axios** with JWT interceptor
-- **Cypress** for end-to-end tests
-
-## Available Commands
-
+Para abrir a interface gráfica do Cypress e executá-los manualmente:
 ```bash
 cd frontend
-
-npm run dev          # Start development server (hot reload)
-npm run build        # Production build → dist/
-npm run lint         # ESLint check
-npm run test:e2e     # Cypress end-to-end tests (headless)
-npm run test:e2e:open # Cypress interactive UI
-npm run preview      # Preview production build locally
+npm run test:e2e:open
 ```
 
-## Project Structure
-
-```
-frontend/
-├── src/
-│   ├── components/   # Reusable UI components organised by domain
-│   ├── hooks/        # Custom React hooks
-│   ├── pages/        # One component per route
-│   ├── services/     # API service layer (axios)
-│   ├── store/        # React Context providers
-│   ├── styles/       # SCSS files
-│   └── utils/        # Pure helpers and constants
-├── cypress/          # End-to-end test specs and fixtures
-├── Dockerfile        # Multi-stage: development + production (nginx)
-└── SETUP.md          # Full setup guide
+**Script de Apresentação Automatizado:**
+Para facilitar a apresentação da 7ª Entrega, disponibilizamos um script que valida se o ambiente está rodando e executa a sequência de 10 testes obrigatórios de ponta a ponta automaticamente:
+```bash
+./scripts/apresentacao-7a-entrega.sh
 ```
 
-## Contributing
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for coding standards, commit message format, PR guidelines, and the code review checklist.
